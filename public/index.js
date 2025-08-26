@@ -30,14 +30,36 @@ const countries = [
 
 const visibleTemplates = {
   PP: {
-    decentralized: ['First Name','Last Name','Birth Date','Citizenship','Nationality'],
-    centralized: ['First Name','Last Name','Birth Date','Nationality','Citizenship','SystemId','SystemName','SearchQuerySource','Queue Name']
+    decentralized: [
+      { label: 'Name', key: 'firstName' },
+      { label: 'Last Name', key: 'lastName' },
+      { label: 'Birth Date', key: 'birthDate' },
+      { label: 'Citizenship', key: 'citizenship' },
+      { label: 'Nationality', key: 'nationality' }
+    ],
+    centralized: [
+      { label: 'Name', key: 'firstName' },
+      { label: 'Last Name', key: 'lastName' },
+      { label: 'Birth Date', key: 'birthDate' },
+      { label: 'Nationality', key: 'nationality' },
+      { label: 'Citizenship', key: 'citizenship' },
+      { label: 'SystemId', key: 'systemId' },
+      { label: 'SystemName', key: 'systemName' },
+      { label: 'SearchQuerySource', key: 'searchQuerySource' },
+      { label: 'Queue Name', key: 'queueName' }
+    ]
   },
   PM: {
-    decentralized: ['Business Name'], // 
-    centralized: ['Business Name','SystemName','SystemId','searchQuerySource']
+    decentralized: [{ label: 'Business Name', key: 'businessName' }],
+    centralized: [
+      { label: 'Business Name', key: 'businessName' },
+      { label: 'SystemName', key: 'systemName' },
+      { label: 'SystemId', key: 'systemId' },
+      { label: 'SearchQuerySource', key: 'searchQuerySource' }
+    ]
   }
 };
+
 
 // Default hidden values
 const defaultValues = {
@@ -128,24 +150,24 @@ subTabButtons.forEach(btn => btn.addEventListener('click', () => {
 // --- Render input fields ---
 function renderFields(containerId, entityType, processType) {
   const container = document.getElementById(containerId);
-  container.innerHTML = '';
-  if (!entityType) return;
+  container.innerHTML = ''; // clear previous fields
 
   const fields = visibleTemplates[entityType]?.[processType] || [];
+
   fields.forEach(field => {
     const label = document.createElement('label');
-    label.textContent = field + ':';
-    
-    let input;
+    label.textContent = field.label + ':';
 
-    // Make dropdown for Citizenship/Nationality
-    if (field === 'Citizenship' || field === 'Nationality') {
+    let input;
+    if (field.key === 'citizenship' || field.key === 'nationality') {
       input = document.createElement('select');
-      input.id = containerId + '_' + field;
+      input.id = containerId + '_' + field.key;
+
       const defaultOption = document.createElement('option');
       defaultOption.value = '';
       defaultOption.textContent = 'Select Country';
       input.appendChild(defaultOption);
+
       countries.forEach(country => {
         const option = document.createElement('option');
         option.value = country;
@@ -154,14 +176,15 @@ function renderFields(containerId, entityType, processType) {
       });
     } else {
       input = document.createElement('input');
-      input.id = containerId + '_' + field;
-      input.type = (field === 'Birth Date') ? 'date' : 'text';
+      input.id = containerId + '_' + field.key;
+      input.type = (field.key === 'birthDate') ? 'date' : 'text';
     }
 
     container.appendChild(label);
     container.appendChild(input);
   });
 }
+
 
 
 // --- Popup function ---
@@ -185,12 +208,6 @@ function showPopup(message, link = '') {
 
   if (link) popupLink.select();
 }
-
-// Close popup button
-document.getElementById('closePopup').addEventListener('click', () => {
-  document.getElementById('popup').style.display = 'none';
-  document.getElementById('overlay').style.display = 'none';
-});
 
 // --- Call searchPersonCustomer ---
 async function callSearch(entityType, containerId, responseId, isDecentralized = false) {
@@ -225,6 +242,24 @@ async function callSearch(entityType, containerId, responseId, isDecentralized =
 }
 
 // --- Button Events ---
+
+
+
+// Close popup button
+const closeBtn = document.getElementById('closePopup');
+closeBtn.addEventListener('click', () => {
+  const popup = document.getElementById('popup');
+  const overlay = document.getElementById('overlay');
+  popup.style.display = 'none';
+  overlay.style.display = 'none';
+
+  // Clear selected text (optional)
+  const sel = window.getSelection();
+  sel.removeAllRanges();
+});
+
+
+
 document.getElementById('submitDecentralized')
   .addEventListener('click', () => 
     callSearch(
