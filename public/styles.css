@@ -1,0 +1,94 @@
+/* styles.css */
+body {
+  font-family: 'Roboto', sans-serif;
+  background: #f5f8fa;
+  margin: 0;
+  padding: 0 10px 40px;
+  color: #222;
+}
+
+header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 0 30px;
+  border-bottom: 2px solid #007ACC;
+}
+
+header img { height: 120px; }
+
+header h1 {
+  font-weight: 700;
+  font-size: 2.2rem;
+  color: #004080;
+  margin: 10px 0 0;
+}
+
+.container {
+  display: flex;
+  gap: 30px;
+  max-width: 1500px;
+  margin: 30px auto;
+  padding: 0 10px;
+}
+
+section {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 3px 8px rgb(0 0 0 / 0.1);
+  flex: 1;
+  padding: 25px 30px;
+  min-width: 300px;
+}
+
+h2 { color: #004080; margin-top: 0; text-align: center; }
+label { display: block; margin-top: 15px; font-weight: 500; color: #333; }
+
+input, select {
+  width: 100%; padding: 8px 10px; margin-top: 6px; border: 1.8px solid #ccc;
+  border-radius: 5px; font-size: 1rem;
+}
+
+input:focus, select:focus {
+  border-color: #007ACC; outline: none;
+  box-shadow: 0 0 8px rgba(0, 122, 204, 0.4);
+}
+
+button {
+  margin-top: 20px;
+  background-color: #007ACC; color: white; border: none;
+  padding: 12px 0; width: 100%; font-size: 1.1rem; border-radius: 6px; cursor: pointer;
+  font-weight: 600;
+}
+
+button:hover { background-color: #004080; }
+
+.response-box {
+  background: #e9f1fb;
+  padding: 15px;
+  border-radius: 6px;
+  max-height: 300px;
+  overflow-y: auto;
+  white-space: normal;
+  word-wrap: break-word;
+  margin-top: 15px;
+  font-size: 0.9rem;
+  color: #222;
+}
+
+.tabs, .subTabs { display: flex; gap: 10px; margin-top: 15px; }
+.tabBtn, .subTabBtn {
+  flex: 1; padding: 10px; border-radius: 6px; border: none; cursor: pointer;
+  background: #e0e0e0; font-weight: 600;
+}
+
+.tabBtn.active, .subTabBtn.active { background: #007ACC; color: white; }
+
+.tabContent, .subTabContent { margin-top: 20px; }
+
+.entity-fields input {
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
+
+@media (max-width: 900px) { .container { flex-direction: column; } }
