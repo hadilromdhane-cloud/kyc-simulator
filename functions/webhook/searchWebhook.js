@@ -1,4 +1,4 @@
-import { broadcast } from './events.js';
+import { broadcast } from '../events.js';
 
 let requestCount = 0;
 
