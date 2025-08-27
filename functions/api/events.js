@@ -10,23 +10,23 @@ export async function onRequestGet(context) {
     'Access-Control-Allow-Origin': '*'
   };
 
-  const stream = new WritableStream({
+  const stream = new ReadableStream({
     start(controller) {
-      // Keep connection open
       clients.push(controller);
-      controller.enqueue(`data: Connected\n\n`);
-    },
-    close() {
+
       // Remove client when disconnected
-      clients = clients.filter(c => c !== controller);
+      request.signal.addEventListener('abort', () => {
+        clients = clients.filter(c => c !== controller);
+      });
     }
   });
 
   return new Response(stream, { headers });
 }
 
-// Helper to broadcast events to all connected clients
-export function broadcast(eventData) {
-  const data = `data: ${JSON.stringify(eventData)}\n\n`;
-  clients.forEach(client => client.enqueue(data));
+// Broadcast function
+export function broadcast(payload) {
+  clients.forEach(controller => {
+    controller.enqueue(`data: ${JSON.stringify(payload)}\n\n`);
+  });
 }

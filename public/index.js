@@ -313,11 +313,8 @@ const evtSource = new EventSource('/events');
 
 evtSource.onmessage = function(event) {
   const data = JSON.parse(event.data);
-  console.log('Webhook received in frontend:', data);
-  // Optional: show popup
-  // showPopup(`New alert: ${data.status || data.ServiceType}`);
-};
+  console.log('Webhook received in browser:', data);
 
-evtSource.onerror = function(err) {
-  console.error('SSE error:', err);
+  // Optional: show popup
+  // showPopup(`Alert for customer ${data.customerId}`);
 };
