@@ -211,23 +211,37 @@ function showPopup(message, link = '') {
 
 // --- Call searchPersonCustomer ---
 async function callSearch(entityType, containerId, responseId, isDecentralized = false) {
-  if (!tenantName || !authToken) { alert('Authenticate first!'); return; }
-  let payload = {};
+  if (!tenantName || !authToken) { 
+    alert('Authenticate first!'); 
+    return; 
+  }
 
-  document.querySelectorAll(`#${containerId} input`).forEach(input => {
-    payload[input.id.replace(containerId+'_','')] = input.value;
+  // Collect user input fields
+  let payload = {};
+  document.querySelectorAll(`#${containerId} input, #${containerId} select`).forEach(input => {
+    payload[input.id.replace(containerId + '_', '')] = input.value;
   });
 
-  Object.assign(payload, defaultValues[entityType] || {});
+  // Assign default values but override systemId with a unique one
+  payload.systemId = `system_${Date.now()}_${Math.floor(Math.random() * 1000)}`; // unique ID
+  payload.systemName = defaultValues[entityType].systemName;
+  payload.searchQuerySource = defaultValues[entityType].searchQuerySource;
+
+  if (entityType === 'PP') payload.queueName = defaultValues[entityType].queueName;
 
   try {
     const res = await fetch('https://greataml.com/kyc-web-restful/search/searchPersonCustomer', {
-      method:'POST',
-      headers:{ 'Content-Type':'application/json','x-auth-tenant':tenantName,'x-auth-token':authToken },
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'x-auth-tenant': tenantName,
+        'x-auth-token': authToken
+      },
       body: JSON.stringify(payload)
     });
+
     const data = await res.json();
-    document.getElementById(responseId).textContent = JSON.stringify(data,null,2);
+    document.getElementById(responseId).textContent = JSON.stringify(data, null, 2);
 
     // --- Decentralized popup ---
     if (isDecentralized) {
@@ -238,8 +252,11 @@ async function callSearch(entityType, containerId, responseId, isDecentralized =
         showPopup("Your customer doesn't have any hits.");
       }
     }
-  } catch(err) { document.getElementById(responseId).textContent = `Error: ${err.message}`; }
+  } catch (err) {
+    document.getElementById(responseId).textContent = `Error: ${err.message}`;
+  }
 }
+
 
 // --- Button Events ---
 
@@ -292,8 +309,3 @@ document.getElementById('entityTypeAsync')
 
 
 
-const evtSource = new EventSource('/events'); // server sends updates
-evtSource.onmessage = function(event) {
-  const data = JSON.parse(event.data);
-  alert(`Alert treated for customer ${data.customerId}`);
-};
