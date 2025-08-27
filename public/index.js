@@ -262,7 +262,7 @@ function setupEventSource() {
 
   logMessage('Attempting to connect to event stream...', 'info');
   
-  eventSource = new EventSource('/functions/events');
+  eventSource = new EventSource('/api/events');
   
   eventSource.onopen = function() {
     logMessage('Connected to event stream', 'success');
