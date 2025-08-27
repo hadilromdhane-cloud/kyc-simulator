@@ -67,7 +67,7 @@ function setupEventSource() {
   logMessage(`Attempting to connect to event stream (attempt ${attemptNumber}/${connectionState.maxReconnectAttempts})...`, 'info');
   
   try {
-    eventSource = new EventSource('/functions/events');
+    eventSource = new EventSource('/api/events');
 
     
     // Connection opened successfully

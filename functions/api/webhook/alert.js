@@ -1,108 +1,51 @@
 // /functions/webhook/alert.js
-import { broadcast } from '../../events';
+import { broadcast } from '../events';
 
 export async function onRequestPost(context) {
   try {
     // Parse the webhook JSON
     const payload = await context.request.json();
 
-    // Enhanced logging with timestamp
-    const timestamp = new Date().toISOString();
-    console.log(`[${timestamp}] Webhook Alert Received:`, JSON.stringify(payload, null, 2));
-    
-    // Log specific fields for better debugging
-    console.log(`[${timestamp}] Alert Details:`, {
-      customerId: payload.customerId || 'N/A',
-      searchQueryId: payload.search_query_id || 'N/A',
-      alertType: payload.alertType || 'Unknown',
-      timestamp: payload.timestamp || 'N/A'
-    });
-
-    // Add server timestamp to payload before broadcasting
-    const enrichedPayload = {
-      ...payload,
-      serverTimestamp: timestamp,
-      source: 'webhook-alert'
-    };
+    // Log the payload for debugging
+    console.log('Received alert:', JSON.stringify(payload, null, 2));
 
     // Broadcast to any connected SSE clients
-    broadcast(enrichedPayload);
-    console.log(`[${timestamp}] Alert broadcasted to connected clients`);
+    broadcast(payload);
 
-    // Return success response with detailed info
-    const response = {
+    // Return HTTP 200 success response
+    return new Response(JSON.stringify({
       status: 'success',
-      message: 'Alert received and processed',
-      receivedAt: timestamp,
-      payloadKeys: Object.keys(payload),
-      clientsNotified: true
-    };
-
-    console.log(`[${timestamp}] Response:`, response);
-
-    return new Response(JSON.stringify(response), {
+      message: 'Alert received',
+      receivedAt: new Date().toISOString()
+    }), {
       status: 200,
       headers: { 
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type'
+        'Access-Control-Allow-Origin': '*' // optional for CORS
       }
     });
 
   } catch (error) {
-    const timestamp = new Date().toISOString();
-    console.error(`[${timestamp}] Webhook processing error:`, error);
-    console.error(`[${timestamp}] Error stack:`, error.stack);
+    console.error('Webhook processing error:', error);
 
-    const errorResponse = {
+    return new Response(JSON.stringify({
       status: 'error',
       message: 'Invalid webhook payload',
-      details: error.message,
-      timestamp: timestamp
-    };
-
-    return new Response(JSON.stringify(errorResponse), {
+      details: error.message
+    }), {
       status: 400,
-      headers: { 
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      }
+      headers: { 'Content-Type': 'application/json' }
     });
   }
 }
 
-// Enhanced GET endpoint for health check with more info
-export async function onRequestGet(context) {
-  const timestamp = new Date().toISOString();
-  console.log(`[${timestamp}] Health check request received`);
-  
-  const healthResponse = {
+// Optional GET endpoint for health check
+export async function onRequestGet() {
+  return new Response(JSON.stringify({
     status: 'healthy',
-    message: 'Webhook endpoint is operational',
-    timestamp: timestamp,
-    endpoint: '/functions/webhook/alert',
-    methods: ['GET', 'POST'],
-    version: '1.1'
-  };
-
-  return new Response(JSON.stringify(healthResponse), {
-    status: 200,
-    headers: { 
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*'
-    }
-  });
-}
-
-// Handle OPTIONS requests for CORS preflight
-export async function onRequestOptions(context) {
-  return new Response(null, {
-    status: 200,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type'
-    }
+    message: 'Webhook endpoint is up',
+    timestamp: new Date().toISOString()
+  }), {
+    headers: { 'Content-Type': 'application/json' }
   });
 }
