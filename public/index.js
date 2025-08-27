@@ -2,6 +2,11 @@ let authToken = null;
 let tenantName = null;
 let eventSource = null;
 
+// NEW: Add these variables at the top
+let reconnectAttempts = 0;
+const maxReconnectAttempts = 5;
+const reconnectDelay = 3000; // 3 seconds
+
 // Visible fields per process
 const countries = [
   "Afghanistan","Albania","Algeria","Andorra","Angola","Antigua and Barbuda","Argentina",
@@ -253,7 +258,7 @@ function updateConnectionStatus(connected) {
   }
 }
 
-// --- Server-Sent Events Setup ---
+// --- IMPROVED Server-Sent Events Setup ---
 function setupEventSource() {
   // Close existing connection
   if (eventSource) {
@@ -261,17 +266,27 @@ function setupEventSource() {
     eventSource = null;
   }
 
-  logMessage('Attempting to connect to event stream...', 'info');
+  // Reset reconnect attempts on manual connection
+  if (reconnectAttempts === 0) {
+    logMessage('Attempting to connect to event stream...', 'info');
+  } else {
+    logMessage(`Reconnection attempt ${reconnectAttempts}/${maxReconnectAttempts}...`, 'warning');
+  }
   
-  // Fixed: Changed from '/api/events' to '/events' to match Cloudflare Functions structure
+  // Create new EventSource connection
   eventSource = new EventSource('/events');
   
+  // Connection opened successfully
   eventSource.onopen = function(event) {
     logMessage('Connected to event stream', 'success');
     updateConnectionStatus(true);
     showNotification('Real-time notifications connected', 'success');
+    
+    // Reset reconnect attempts on successful connection
+    reconnectAttempts = 0;
   };
   
+  // Message received from server
   eventSource.onmessage = function(event) {
     try {
       const data = JSON.parse(event.data);
@@ -284,6 +299,8 @@ function setupEventSource() {
       if (data.type === 'connection') {
         message = data.message || 'Connected to notifications';
         notificationType = 'success';
+        // Don't show notification for initial connection message
+        return;
       } else if (data.customerId) {
         message = `Alert for customer: ${data.customerId}`;
         notificationType = 'warning';
@@ -302,26 +319,46 @@ function setupEventSource() {
       
     } catch (error) {
       logMessage(`Error parsing event data: ${error.message}`, 'error');
-      console.error('Event parsing error:', error);
+      console.error('Event parsing error:', error, 'Raw data:', event.data);
     }
   };
   
+  // Connection error or closed
   eventSource.onerror = function(event) {
     logMessage('Event stream connection lost', 'error');
     updateConnectionStatus(false);
-    showNotification('Connection lost. Attempting to reconnect...', 'error');
     
-    // Clean up the current connection
-    if (eventSource && eventSource.readyState === EventSource.CLOSED) {
+    // Close the current connection
+    if (eventSource) {
+      eventSource.close();
       eventSource = null;
+    }
+    
+    // Only attempt reconnection if we haven't exceeded max attempts
+    if (reconnectAttempts < maxReconnectAttempts) {
+      reconnectAttempts++;
+      showNotification(`Connection lost. Reconnecting... (${reconnectAttempts}/${maxReconnectAttempts})`, 'warning');
       
-      // Attempt to reconnect after 5 seconds
       setTimeout(() => {
-        logMessage('Attempting to reconnect...', 'info');
-        setupEventSource();
-      }, 5000);
+        if (!eventSource) { // Only reconnect if not already connected
+          setupEventSource();
+        }
+      }, reconnectDelay);
+    } else {
+      logMessage('Max reconnection attempts reached. Please refresh the page.', 'error');
+      showNotification('Connection failed. Please refresh the page.', 'error', 10000);
     }
   };
+}
+
+// Function to manually reset connection (you can call this from console or add a button)
+function resetConnection() {
+  reconnectAttempts = 0;
+  if (eventSource) {
+    eventSource.close();
+    eventSource = null;
+  }
+  setupEventSource();
 }
 
 // --- Authentication ---

@@ -7,62 +7,101 @@ export async function onRequestGet(context) {
   
   console.log(`[${timestamp}] New SSE client connecting`);
 
+  // Essential SSE headers
   const headers = {
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache',
     'Connection': 'keep-alive',
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Cache-Control'
+    'Access-Control-Allow-Headers': 'Cache-Control',
+    'Access-Control-Allow-Methods': 'GET',
+    'X-Accel-Buffering': 'no' // Disable nginx buffering for real-time streaming
   };
 
-  const stream = new ReadableStream({
-    start(controller) {
-      console.log(`[${timestamp}] SSE stream started for client`);
-      clients.push(controller);
+  // Create a readable stream for SSE
+  const { readable, writable } = new TransformStream();
+  const writer = writable.getWriter();
+  const encoder = new TextEncoder();
 
-      // Send initial connection message
-      const welcomeMessage = {
-        type: 'connection',
-        message: 'Connected to real-time notifications',
-        timestamp: timestamp,
-        clientId: clients.length
-      };
-      
-      controller.enqueue(`data: ${JSON.stringify(welcomeMessage)}\n\n`);
-      console.log(`[${timestamp}] Welcome message sent to client ${clients.length}`);
+  // Add client to our list
+  const clientId = Date.now() + Math.random();
+  const client = {
+    id: clientId,
+    writer: writer,
+    connected: true
+  };
+  
+  clients.push(client);
+  console.log(`[${timestamp}] Client ${clientId} connected. Total clients: ${clients.length}`);
 
-      // Handle client disconnect
-      request.signal.addEventListener('abort', () => {
-        const disconnectTime = new Date().toISOString();
-        console.log(`[${disconnectTime}] Client disconnected`);
-        clients = clients.filter(c => c !== controller);
-        console.log(`[${disconnectTime}] Remaining clients: ${clients.length}`);
-      });
+  // Send initial connection message immediately
+  const welcomeMessage = {
+    type: 'connection',
+    message: 'Connected to real-time notifications',
+    timestamp: timestamp,
+    clientId: clientId
+  };
 
-      // Keep-alive ping every 30 seconds
-      const keepAlive = setInterval(() => {
-        try {
-          controller.enqueue(`: keep-alive ${new Date().toISOString()}\n\n`);
-        } catch (error) {
-          console.log(`[${new Date().toISOString()}] Client connection closed, clearing keep-alive`);
-          clearInterval(keepAlive);
-        }
-      }, 30000);
+  try {
+    await writer.write(encoder.encode(`data: ${JSON.stringify(welcomeMessage)}\n\n`));
+    console.log(`[${timestamp}] Welcome message sent to client ${clientId}`);
+  } catch (error) {
+    console.error(`[${timestamp}] Failed to send welcome message:`, error);
+  }
 
-      // Clear interval when client disconnects
-      request.signal.addEventListener('abort', () => {
-        clearInterval(keepAlive);
-      });
+  // Keep-alive mechanism
+  const keepAliveInterval = setInterval(async () => {
+    if (!client.connected) {
+      clearInterval(keepAliveInterval);
+      return;
     }
-  });
 
-  return new Response(stream, { headers });
+    try {
+      // Send keep-alive comment (invisible to client)
+      await writer.write(encoder.encode(`: keep-alive ${new Date().toISOString()}\n\n`));
+    } catch (error) {
+      console.log(`[${new Date().toISOString()}] Client ${clientId} disconnected during keep-alive`);
+      client.connected = false;
+      clearInterval(keepAliveInterval);
+      removeClient(clientId);
+    }
+  }, 30000); // Every 30 seconds
+
+  // Handle client disconnect
+  const handleDisconnect = () => {
+    const disconnectTime = new Date().toISOString();
+    console.log(`[${disconnectTime}] Client ${clientId} disconnecting`);
+    client.connected = false;
+    clearInterval(keepAliveInterval);
+    removeClient(clientId);
+    
+    // Close the writer
+    try {
+      writer.close();
+    } catch (error) {
+      // Writer might already be closed
+      console.log(`[${disconnectTime}] Writer already closed for client ${clientId}`);
+    }
+  };
+
+  // Listen for disconnect
+  request.signal?.addEventListener('abort', handleDisconnect);
+
+  // Return the response with the readable stream
+  return new Response(readable, { headers });
 }
 
-// Enhanced broadcast function with better error handling
-export function broadcast(payload) {
+// Helper function to remove disconnected clients
+function removeClient(clientId) {
+  const initialLength = clients.length;
+  clients = clients.filter(client => client.id !== clientId && client.connected);
+  console.log(`[${new Date().toISOString()}] Removed client ${clientId}. Clients: ${initialLength} -> ${clients.length}`);
+}
+
+// Enhanced broadcast function
+export async function broadcast(payload) {
   const timestamp = new Date().toISOString();
-  console.log(`[${timestamp}] Broadcasting message to ${clients.length} clients:`, JSON.stringify(payload));
+  console.log(`[${timestamp}] Broadcasting message to ${clients.length} clients:`, JSON.stringify(payload, null, 2));
 
   if (clients.length === 0) {
     console.log(`[${timestamp}] No clients connected, message not sent`);
@@ -74,32 +113,35 @@ export function broadcast(payload) {
     broadcastTimestamp: timestamp
   });
 
-  // Track successful and failed broadcasts
+  const encoder = new TextEncoder();
+  const data = encoder.encode(`data: ${message}\n\n`);
+
+  // Track results
   let successful = 0;
   let failed = 0;
+  const failedClients = [];
 
-  clients.forEach((controller, index) => {
+  // Send to all connected clients
+  for (const client of clients) {
+    if (!client.connected) {
+      failedClients.push(client.id);
+      continue;
+    }
+
     try {
-      controller.enqueue(`data: ${message}\n\n`);
+      await client.writer.write(data);
       successful++;
     } catch (error) {
-      console.error(`[${timestamp}] Failed to send to client ${index + 1}:`, error.message);
+      console.error(`[${timestamp}] Failed to send to client ${client.id}:`, error.message);
+      client.connected = false;
+      failedClients.push(client.id);
       failed++;
     }
-  });
+  }
 
   // Remove failed clients
-  if (failed > 0) {
-    clients = clients.filter((controller, index) => {
-      try {
-        // Test if controller is still active by trying to enqueue a comment
-        controller.enqueue(`: test\n\n`);
-        return true;
-      } catch (error) {
-        console.log(`[${timestamp}] Removing inactive client ${index + 1}`);
-        return false;
-      }
-    });
+  if (failedClients.length > 0) {
+    clients = clients.filter(client => !failedClients.includes(client.id));
   }
 
   console.log(`[${timestamp}] Broadcast complete - Success: ${successful}, Failed: ${failed}, Active clients: ${clients.length}`);
