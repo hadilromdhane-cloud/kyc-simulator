@@ -258,13 +258,15 @@ function setupEventSource() {
   // Close existing connection
   if (eventSource) {
     eventSource.close();
+    eventSource = null;
   }
 
   logMessage('Attempting to connect to event stream...', 'info');
   
-  eventSource = new EventSource('/api/events');
+  // Fixed: Changed from '/api/events' to '/events' to match Cloudflare Functions structure
+  eventSource = new EventSource('/events');
   
-  eventSource.onopen = function() {
+  eventSource.onopen = function(event) {
     logMessage('Connected to event stream', 'success');
     updateConnectionStatus(true);
     showNotification('Real-time notifications connected', 'success');
@@ -273,26 +275,34 @@ function setupEventSource() {
   eventSource.onmessage = function(event) {
     try {
       const data = JSON.parse(event.data);
-      logMessage(`Webhook received: ${JSON.stringify(data)}`, 'info');
+      logMessage(`Event received: ${JSON.stringify(data)}`, 'info');
       
-      // Show notification based on webhook data
-      let message = 'New webhook notification received';
-      if (data.customerId) {
+      // Show notification based on event data
+      let message = 'New event received';
+      let notificationType = 'info';
+      
+      if (data.type === 'connection') {
+        message = data.message || 'Connected to notifications';
+        notificationType = 'success';
+      } else if (data.customerId) {
         message = `Alert for customer: ${data.customerId}`;
+        notificationType = 'warning';
       } else if (data.message) {
         message = data.message;
+        notificationType = 'warning';
       }
       
-      showNotification(message, 'warning', 8000);
+      showNotification(message, notificationType, 8000);
       
-      // You can add more specific handling based on your webhook payload structure
+      // Handle specific webhook payloads
       if (data.search_query_id) {
         const link = `https://greataml.com/search/searchdecision/${data.search_query_id}`;
         showPopup('New search result available:', link);
       }
       
     } catch (error) {
-      logMessage(`Error parsing webhook data: ${error.message}`, 'error');
+      logMessage(`Error parsing event data: ${error.message}`, 'error');
+      console.error('Event parsing error:', error);
     }
   };
   
@@ -301,12 +311,16 @@ function setupEventSource() {
     updateConnectionStatus(false);
     showNotification('Connection lost. Attempting to reconnect...', 'error');
     
-    // Attempt to reconnect after 5 seconds
-    setTimeout(() => {
-      if (eventSource.readyState === EventSource.CLOSED) {
+    // Clean up the current connection
+    if (eventSource && eventSource.readyState === EventSource.CLOSED) {
+      eventSource = null;
+      
+      // Attempt to reconnect after 5 seconds
+      setTimeout(() => {
+        logMessage('Attempting to reconnect...', 'info');
         setupEventSource();
-      }
-    }, 5000);
+      }, 5000);
+    }
   };
 }
 
