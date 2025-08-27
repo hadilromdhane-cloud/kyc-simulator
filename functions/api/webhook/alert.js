@@ -5,8 +5,12 @@ export async function onRequestPost(context) {
     // Parse the webhook JSON
     const payload = await context.request.json();
 
-    // Log it (Cloudflare logs)
+    // Log the payload for debugging
     console.log('Received alert:', JSON.stringify(payload, null, 2));
+
+    // You can optionally store in KV or Durable Objects if needed
+    // Example (commented out):
+    // await ALERTS_KV.put(`alert_${Date.now()}`, JSON.stringify(payload));
 
     // Return HTTP 200 success response
     return new Response(JSON.stringify({
