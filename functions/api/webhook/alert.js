@@ -1,5 +1,5 @@
 // /functions/webhook/alert.js
-import { broadcast } from '../events';
+import { broadcast } from '../../events';
 
 export async function onRequestPost(context) {
   try {
