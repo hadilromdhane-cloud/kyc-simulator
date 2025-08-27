@@ -1,27 +1,32 @@
+let clients = [];
+
 export async function onRequestGet(context) {
-  // Basic SSE implementation for Cloudflare
-  // Note: Full SSE requires Durable Objects for persistent connections
-  
-  const stream = new ReadableStream({
+  const { request } = context;
+
+  const headers = {
+    'Content-Type': 'text/event-stream',
+    'Cache-Control': 'no-cache',
+    'Connection': 'keep-alive',
+    'Access-Control-Allow-Origin': '*'
+  };
+
+  const stream = new WritableStream({
     start(controller) {
-      const encoder = new TextEncoder();
-      
-      // Send initial connection message
-      controller.enqueue(encoder.encode('data: {"type":"connected"}\n\n'));
-      
-      // For demo purposes, close after initial message
-      // In production, you'd use Durable Objects for persistent connections
-      setTimeout(() => {
-        controller.close();
-      }, 1000);
+      // Keep connection open
+      clients.push(controller);
+      controller.enqueue(`data: Connected\n\n`);
+    },
+    close() {
+      // Remove client when disconnected
+      clients = clients.filter(c => c !== controller);
     }
   });
 
-  return new Response(stream, {
-    headers: {
-      'Content-Type': 'text/event-stream',
-      'Cache-Control': 'no-cache',
-      'Connection': 'keep-alive',
-    }
-  });
+  return new Response(stream, { headers });
+}
+
+// Helper to broadcast events to all connected clients
+export function broadcast(eventData) {
+  const data = `data: ${JSON.stringify(eventData)}\n\n`;
+  clients.forEach(client => client.enqueue(data));
 }

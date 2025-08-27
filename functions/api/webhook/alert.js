@@ -1,4 +1,5 @@
 // /functions/webhook/alert.js
+import { broadcast } from '../events';
 
 export async function onRequestPost(context) {
   try {
@@ -8,9 +9,8 @@ export async function onRequestPost(context) {
     // Log the payload for debugging
     console.log('Received alert:', JSON.stringify(payload, null, 2));
 
-    // You can optionally store in KV or Durable Objects if needed
-    // Example (commented out):
-    // await ALERTS_KV.put(`alert_${Date.now()}`, JSON.stringify(payload));
+    // Broadcast to any connected SSE clients
+    broadcast(payload);
 
     // Return HTTP 200 success response
     return new Response(JSON.stringify({
