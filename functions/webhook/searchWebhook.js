@@ -22,7 +22,7 @@ export async function onRequestPost(context) {
   
   try {
     const body = await context.request.text();
-    console.log(`[${timestamp}] Raw search webhook body:`, body);
+    console.log(`[${timestamp}] Raw Reis KYC webhook body:`, body);
     
     let payload;
     try {
@@ -54,19 +54,19 @@ export async function onRequestPost(context) {
       sanctionDecision: payload.sanctionDecision,
       // Metadata
       timestamp: timestamp,
-      source: 'Screening_Service',
+      source: 'Reis_KYC',
       hash: payload._hash,
       originalData: payload
     };
 
-    console.log(`[${timestamp}] Broadcasting search notification:`, JSON.stringify(notification, null, 2));
+    console.log(`[${timestamp}] Broadcasting Reis KYC notification:`, JSON.stringify(notification, null, 2));
     
     // Broadcast the notification (or original payload - adjust as needed)
     await broadcast(notification);
     
     return new Response(JSON.stringify({
       status: 'success',
-      message: 'Search webhook received and processed',
+      message: 'Reis KYC webhook received and processed',
       searchQueryId: payload.searchQueryId,
       receivedAt: timestamp
     }), {
@@ -87,10 +87,10 @@ export async function onRequestPost(context) {
 export async function onRequestGet() {
   return new Response(JSON.stringify({
     status: 'healthy',
-    endpoint: 'Search Webhook',
+    endpoint: 'Reis KYC Webhook',
     totalWebhooksReceived: requestLog.length,
     lastRequests: requestLog.slice(-5),
-    message: 'Search webhook endpoint operational',
+    message: 'Reis KYC webhook endpoint operational',
     expectedFormat: {
       customerId: 'string (required)',
       searchQueryId: 'integer (required)',
