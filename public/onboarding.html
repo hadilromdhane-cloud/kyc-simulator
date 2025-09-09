@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Customer Onboarding - Web Service Simulator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="onboarding.css" />
+</head>
+<body>
+  <header>
+    <h1>Customer Onboarding</h1>
+    <p class="subtitle">Complete customer risk assessment and onboarding process</p>
+  </header>
+
+  <div class="container">
+    <!-- Customer Information Card -->
+    <div class="onboarding-card">
+      <div class="card-header">
+        Customer Information
+      </div>
+      <div class="card-content">
+        <div class="customer-info" id="customerInfo">
+          <strong>Customer ID:</strong> <span id="displayCustomerId">Loading...</span>
+          <br><strong>Screening Status:</strong> <span id="screeningStatus">Cleared for onboarding</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Onboarding Form Card -->
+    <div class="onboarding-card">
+      <div class="card-header">
+        Onboarding Form
+      </div>
+      <div class="card-content">
+        <form id="onboardingForm">
+          <!-- Basic Information Section -->
+          <div class="form-section">
+            <h3>Basic Information</h3>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="firstName">First Name *</label>
+                <input type="text" id="firstName" name="first_name" required>
+              </div>
+              <div class="form-group">
+                <label for="lastName">Last Name *</label>
+                <input type="text" id="lastName" name="last_name" required>
+              </div>
+              <div class="form-group">
+                <label for="birthDate">Date of Birth *</label>
+                <input type="date" id="birthDate" name="birth_date" required>
+              </div>
+              <div class="form-group">
+                <label for="citizenship">Citizenship *</label>
+                <select id="citizenship" name="citizenship" required>
+                  <option value="">Select Citizenship</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Additional Details Section -->
+          <div class="form-section">
+            <h3>Additional Details</h3>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="tin">Tax Identification Number</label>
+                <input type="text" id="tin" name="tin">
+              </div>
+              <div class="form-group">
+                <label for="product">Product *</label>
+                <select id="product" name="product" required>
+                  <option value="">Select Product</option>
+                  <option value="SAVINGS-001">Savings Account</option>
+                  <option value="CHECKING-002">Checking Account</option>
+                  <option value="LOAN-T367">Personal Loan</option>
+                  <option value="MORTGAGE-004">Mortgage Loan</option>
+                  <option value="CREDIT-CARD-005">Credit Card</option>
+                  <option value="INVESTMENT-006">Investment Account</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="distributionChannel">Distribution Channel *</label>
+                <select id="distributionChannel" name="distribution_channel" required>
+                  <option value="">Select Channel</option>
+                  <option value="branch">Branch</option>
+                  <option value="online">Online</option>
+                  <option value="mobile">Mobile</option>
+                  <option value="phone">Phone</option>
+                  <option value="agent">Agent</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="branchCode">Branch Code</label>
+                <input type="text" id="branchCode" name="branchCode" placeholder="e.g., 123">
+              </div>
+            </div>
+          </div>
+
+          <!-- Risk Factors Section -->
+          <div class="form-section">
+            <h3>Risk Factors</h3>
+            <div class="checkbox-group">
+              <input type="checkbox" id="isResident" name="resident">
+              <label for="isResident">Is Resident</label>
+            </div>
+            <div class="checkbox-group">
+              <input type="checkbox" id="isUsCitizen" name="is_us_citizen">
+              <label for="isUsCitizen">Is US Citizen</label>
+            </div>
+            <div class="checkbox-group">
+              <input type="checkbox" id="useEntityRiskValues" name="useEntityRiskValues" checked>
+              <label for="useEntityRiskValues">Use Entity Risk Values in Calculation</label>
+            </div>
+          </div>
+
+          <!-- System Information (Hidden) -->
+          <input type="hidden" id="systemName" name="systemName" value="T24">
+          <input type="hidden" id="systemId" name="systemId">
+          <input type="hidden" id="formId" name="formId" value="1">
+
+          <!-- Action Buttons -->
+          <div class="btn-group">
+            <button type="button" class="btn btn-secondary" id="backBtn">
+              Back to Simulator
+            </button>
+            <button type="submit" class="btn btn-primary" id="submitBtn">
+              <span id="submitText">Process Onboarding</span>
+            </button>
+          </div>
+        </form>
+
+        <!-- Results Section -->
+        <div id="resultsSection" class="hidden">
+          <div class="risk-assessment">
+            <h3 style="text-align: center; color: #004080; margin-bottom: 20px;">Risk Assessment Results</h3>
+            <div id="riskResults"></div>
+            <div id="instructionResults"></div>
+            
+            <div class="btn-group">
+              <button type="button" class="btn btn-secondary" id="resetBtn">
+                Process Another Customer
+              </button>
+              <button type="button" class="btn btn-success" id="completeBtn">
+                Complete Onboarding
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="onboarding.js"></script>
+</body>
+</html>

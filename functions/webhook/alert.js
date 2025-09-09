@@ -1,70 +1,57 @@
-// functions/webhook/alert.js
+// api/webhook/alert.js
 import { broadcast } from '../events.js';
 
 let requestLog = [];
 
-export async function onRequestPost(context) {
+export default async function handler(req, res) {
   const timestamp = new Date().toISOString();
   const logEntry = {
     timestamp,
-    headers: Object.fromEntries(context.request.headers.entries()),
-    url: context.request.url,
-    method: context.request.method
+    headers: req.headers,
+    url: req.url,
+    method: req.method
   };
   
   requestLog.push(logEntry);
-  console.log(`[${timestamp}] Webhook POST received - Total requests: ${requestLog.length}`);
+  console.log(`[${timestamp}] Alert Webhook ${req.method} received - Total requests: ${requestLog.length}`);
   
   // Keep only last 100 requests
   if (requestLog.length > 100) {
     requestLog = requestLog.slice(-100);
   }
-  
-  try {
-    const body = await context.request.text();
-    console.log(`[${timestamp}] Raw webhook body:`, body);
-    
-    let payload;
-    try {
-      payload = JSON.parse(body);
-      console.log(`[${timestamp}] Parsed webhook payload:`, JSON.stringify(payload, null, 2));
-    } catch (parseError) {
-      console.error(`[${timestamp}] JSON parsing error:`, parseError.message);
-      return new Response(JSON.stringify({
-        status: 'error',
-        message: 'Invalid JSON payload',
-        details: parseError.message
-      }), { status: 400, headers: { 'Content-Type': 'application/json' } });
-    }
 
-    await broadcast(payload);
-    
-    return new Response(JSON.stringify({
-      status: 'success',
-      message: 'Webhook received and processed',
-      receivedAt: timestamp
-    }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' }
+  if (req.method === 'GET') {
+    return res.status(200).json({
+      status: 'healthy',
+      totalWebhooksReceived: requestLog.filter(r => r.method === 'POST').length,
+      lastRequests: requestLog.slice(-5),
+      message: 'Alert webhook endpoint operational'
     });
-
-  } catch (error) {
-    console.error(`[${timestamp}] Webhook processing error:`, error);
-    return new Response(JSON.stringify({
-      status: 'error',
-      message: 'Processing failed',
-      details: error.message
-    }), { status: 500, headers: { 'Content-Type': 'application/json' } });
   }
-}
 
-export async function onRequestGet() {
-  return new Response(JSON.stringify({
-    status: 'healthy',
-    totalWebhooksReceived: requestLog.length,
-    lastRequests: requestLog.slice(-5),
-    message: 'Webhook endpoint operational'
-  }), {
-    headers: { 'Content-Type': 'application/json' }
-  });
+  if (req.method === 'POST') {
+    try {
+      const payload = req.body;
+      console.log(`[${timestamp}] Parsed alert webhook payload:`, JSON.stringify(payload, null, 2));
+
+      broadcast(payload);
+      
+      return res.status(200).json({
+        status: 'success',
+        message: 'Alert webhook received and processed',
+        receivedAt: timestamp
+      });
+
+    } catch (error) {
+      console.error(`[${timestamp}] Alert webhook processing error:`, error);
+      return res.status(500).json({
+        status: 'error',
+        message: 'Processing failed',
+        details: error.message
+      });
+    }
+  }
+
+  // Method not allowed
+  res.status(405).json({ message: 'Method not allowed' });
 }
