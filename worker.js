@@ -1,4 +1,7 @@
-// worker.js - Deploy this to Cloudflare Workers
+// worker.js - Fixed version with proper state management
+let storedEvents = [];
+let eventId = 0;
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -16,42 +19,40 @@ export default {
       return new Response(null, { headers: corsHeaders });
     }
 
-    // Store events in memory (will reset when worker restarts)
-    // In production, you'd use Cloudflare KV or Durable Objects
-    if (!globalThis.storedEvents) {
-      globalThis.storedEvents = [];
-      globalThis.eventId = 0;
-    }
-
-    // Webhook endpoint - supporting both paths
-    if ((path === '/webhook/alert' || path === '/api/webhook/searchWebhook') && request.method === 'POST') {
+    // Webhook endpoint
+    if (path === '/api/webhook/searchWebhook' && request.method === 'POST') {
       try {
         const body = await request.json();
         console.log('Webhook received:', body);
         
         // Increment event ID and store event
-        globalThis.eventId++;
+        eventId++;
         const eventData = {
-          id: globalThis.eventId,
+          id: eventId,
           timestamp: new Date().toISOString(),
           ...body
         };
         
-        globalThis.storedEvents.push(eventData);
+        storedEvents.push(eventData);
         
         // Keep only last 100 events
-        if (globalThis.storedEvents.length > 100) {
-          globalThis.storedEvents = globalThis.storedEvents.slice(-100);
+        if (storedEvents.length > 100) {
+          storedEvents = storedEvents.slice(-100);
         }
         
-        console.log(`Stored event ${globalThis.eventId}, total stored: ${globalThis.storedEvents.length}`);
+        console.log(`Stored event ${eventId}, total stored: ${storedEvents.length}`);
+        console.log('Current stored events:', storedEvents.map(e => ({ id: e.id, customerId: e.customerId })));
         
         return new Response(
           JSON.stringify({ 
             status: 'ok', 
             message: 'Webhook received successfully',
-            eventId: globalThis.eventId,
-            timestamp: new Date().toISOString()
+            eventId: eventId,
+            timestamp: new Date().toISOString(),
+            debug: {
+              storedCount: storedEvents.length,
+              eventData: eventData
+            }
           }),
           { 
             headers: { 
@@ -79,23 +80,24 @@ export default {
     if (path === '/api/events' && request.method === 'GET') {
       const lastId = parseInt(url.searchParams.get('lastId')) || 0;
       
-      // Initialize if not exists
-      if (!globalThis.storedEvents) {
-        globalThis.storedEvents = [];
-        globalThis.eventId = 0;
-      }
-      
       // Filter events newer than lastId
-      const newEvents = globalThis.storedEvents.filter(event => event.id > lastId);
+      const newEvents = storedEvents.filter(event => event.id > lastId);
       
-      console.log(`API request - lastId: ${lastId}, returning ${newEvents.length} events`);
+      console.log(`API request - lastId: ${lastId}, currentEventId: ${eventId}, storedEvents: ${storedEvents.length}, returning ${newEvents.length} events`);
+      console.log('All stored events:', storedEvents.map(e => ({ id: e.id, customerId: e.customerId })));
       
       return new Response(
         JSON.stringify({
           events: newEvents,
-          lastEventId: globalThis.eventId,
+          lastEventId: eventId,
           timestamp: new Date().toISOString(),
-          totalStored: globalThis.storedEvents.length
+          totalStored: storedEvents.length,
+          debug: {
+            lastId: lastId,
+            currentEventId: eventId,
+            allEvents: storedEvents.map(e => ({ id: e.id, customerId: e.customerId, timestamp: e.timestamp })),
+            filteredEvents: newEvents.map(e => ({ id: e.id, customerId: e.customerId }))
+          }
         }),
         { 
           headers: { 
@@ -114,48 +116,11 @@ export default {
           service: 'KYC Simulator API',
           timestamp: new Date().toISOString(),
           environment: 'cloudflare-workers',
-          eventId: globalThis.eventId || 0,
-          storedEvents: globalThis.storedEvents?.length || 0
-        }),
-        { 
-          headers: { 
-            'Content-Type': 'application/json',
-            ...corsHeaders 
-          } 
-        }
-      );
-    }
-
-    // Test endpoint to simulate webhook
-    if (path === '/api/test-webhook' && request.method === 'POST') {
-      const testData = {
-        customerId: `TEST_${Date.now()}`,
-        source: 'Reis_KYC',
-        isPEP: false,
-        isSanctioned: false,
-        isAdverseMedia: false,
-        pepDecision: 'NO_MATCH',
-        sanctionDecision: 'NO_MATCH',
-        search_query_id: `test_${Date.now()}`,
-        message: 'Test webhook from API'
-      };
-
-      // Process like a real webhook
-      globalThis.eventId++;
-      const eventData = {
-        id: globalThis.eventId,
-        timestamp: new Date().toISOString(),
-        ...testData
-      };
-      
-      if (!globalThis.storedEvents) globalThis.storedEvents = [];
-      globalThis.storedEvents.push(eventData);
-      
-      return new Response(
-        JSON.stringify({ 
-          status: 'ok', 
-          message: 'Test webhook created',
-          eventData: eventData
+          eventId: eventId,
+          storedEvents: storedEvents.length,
+          debug: {
+            allEvents: storedEvents.map(e => ({ id: e.id, customerId: e.customerId }))
+          }
         }),
         { 
           headers: { 
@@ -173,10 +138,9 @@ export default {
         path: path,
         method: request.method,
         availableEndpoints: [
-          'POST /webhook/alert',
+          'POST /api/webhook/searchWebhook',
           'GET /api/events?lastId=0',
-          'GET /api/health',
-          'POST /api/test-webhook'
+          'GET /api/health'
         ]
       }), 
       { 

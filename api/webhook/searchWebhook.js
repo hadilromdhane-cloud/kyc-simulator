@@ -1,4 +1,4 @@
-// api/webhook/searchWebhook.js
+// api/webhook/searchWebhook.js - Updated for Cloudflare Workers
 let requestLog = [];
 
 export default async function handler(req, res) {
@@ -24,6 +24,7 @@ export default async function handler(req, res) {
       totalWebhooksReceived: requestLog.filter(r => r.method === 'POST').length,
       lastRequests: requestLog.slice(-5),
       message: 'Reis KYC webhook endpoint operational',
+      workerEndpoint: 'https://kyc-simulator-api.kyc-simulator.workers.dev/api/webhook/searchWebhook',
       expectedFormat: {
         customerId: 'string (required)',
         searchQueryId: 'integer (required)',
@@ -67,9 +68,9 @@ export default async function handler(req, res) {
 
       console.log(`[${timestamp}] Notification created:`, JSON.stringify(notification, null, 2));
       
-      // Instead of using broadcast, let's call the events endpoint directly
+      // Forward to Cloudflare Worker instead of Vercel endpoint
       try {
-        const eventsResponse = await fetch(`${req.headers.host ? `https://${req.headers.host}` : 'https://kyc-simulator-application.vercel.app'}/api/events`, {
+        const workerResponse = await fetch('https://kyc-simulator-api.kyc-simulator.workers.dev/api/webhook/searchWebhook', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -77,14 +78,21 @@ export default async function handler(req, res) {
           body: JSON.stringify(notification)
         });
         
-        console.log(`[${timestamp}] Events API call status:`, eventsResponse.status);
+        const workerData = await workerResponse.json();
+        console.log(`[${timestamp}] Worker API response:`, workerData);
+        
+        if (!workerResponse.ok) {
+          throw new Error(`Worker responded with ${workerResponse.status}: ${JSON.stringify(workerData)}`);
+        }
+        
       } catch (fetchError) {
-        console.error(`[${timestamp}] Failed to call events API:`, fetchError);
+        console.error(`[${timestamp}] Failed to forward to Worker:`, fetchError);
+        // Don't fail the original webhook - log the error but continue
       }
       
       return res.status(200).json({
         status: 'success',
-        message: 'Reis KYC webhook received and processed',
+        message: 'Reis KYC webhook received and forwarded to Worker',
         searchQueryId: payload.searchQueryId,
         receivedAt: timestamp
       });
