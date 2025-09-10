@@ -1,0 +1,6 @@
+name = "kyc-simulator-api"
+main = "worker.js"
+compatibility_date = "2023-12-01"
+
+[env.production]
+name = "kyc-simulator-api-prod"
