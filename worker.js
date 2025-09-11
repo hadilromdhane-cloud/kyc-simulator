@@ -1,6 +1,6 @@
-// worker.js - Fixed version with proper state management
-let storedEvents = [];
-let eventId = 0;
+// worker.js - Improved version for frontend integration
+let lastWebhook = null;
+let eventCounter = 0;
 
 export default {
   async fetch(request, env, ctx) {
@@ -18,40 +18,43 @@ export default {
     if (request.method === 'OPTIONS') {
       return new Response(null, { headers: corsHeaders });
     }
-
+    
     // Webhook endpoint
     if (path === '/api/webhook/searchWebhook' && request.method === 'POST') {
       try {
         const body = await request.json();
-        console.log('Webhook received:', body);
+        console.log('Webhook received:', JSON.stringify(body));
         
-        // Increment event ID and store event
-        eventId++;
-        const eventData = {
-          id: eventId,
+        // Store the latest webhook temporarily
+        eventCounter++;
+        lastWebhook = {
+          id: eventCounter,
           timestamp: new Date().toISOString(),
-          ...body
+          customerId: body.customerId,
+          source: body.source || 'Reis_KYC',
+          search_query_id: body.searchQueryId,
+          isPEP: body.isPEP,
+          isSanctioned: body.isSanctioned,
+          isAdverseMedia: body.isAdverseMedia,
+          pepDecision: body.pepDecision || (body.isPEP ? 'HIT' : 'NO_HIT'),
+          sanctionDecision: body.sanctionDecision || (body.isSanctioned ? 'HIT' : 'NO_HIT'),
+          message: `Screening completed for customer ${body.customerId}`,
+          // Store original data
+          originalData: body
         };
         
-        storedEvents.push(eventData);
-        
-        // Keep only last 100 events
-        if (storedEvents.length > 100) {
-          storedEvents = storedEvents.slice(-100);
-        }
-        
-        console.log(`Stored event ${eventId}, total stored: ${storedEvents.length}`);
-        console.log('Current stored events:', storedEvents.map(e => ({ id: e.id, customerId: e.customerId })));
+        console.log('Stored webhook for frontend:', JSON.stringify(lastWebhook));
         
         return new Response(
           JSON.stringify({ 
             status: 'ok', 
             message: 'Webhook received successfully',
-            eventId: eventId,
             timestamp: new Date().toISOString(),
+            customerId: body.customerId,
+            eventId: eventCounter,
             debug: {
-              storedCount: storedEvents.length,
-              eventData: eventData
+              receivedData: body,
+              storedForFrontend: true
             }
           }),
           { 
@@ -76,27 +79,30 @@ export default {
       }
     }
 
-    // API events endpoint (for polling)
+    // Events endpoint - return the last webhook received
     if (path === '/api/events' && request.method === 'GET') {
       const lastId = parseInt(url.searchParams.get('lastId')) || 0;
       
-      // Filter events newer than lastId
-      const newEvents = storedEvents.filter(event => event.id > lastId);
+      let events = [];
       
-      console.log(`API request - lastId: ${lastId}, currentEventId: ${eventId}, storedEvents: ${storedEvents.length}, returning ${newEvents.length} events`);
-      console.log('All stored events:', storedEvents.map(e => ({ id: e.id, customerId: e.customerId })));
+      // If we have a webhook and it's newer than requested lastId
+      if (lastWebhook && lastWebhook.id > lastId) {
+        events = [lastWebhook];
+      }
+      
+      console.log(`Events API called - lastId: ${lastId}, returning ${events.length} events`);
       
       return new Response(
         JSON.stringify({
-          events: newEvents,
-          lastEventId: eventId,
+          events: events,
+          lastEventId: eventCounter,
           timestamp: new Date().toISOString(),
-          totalStored: storedEvents.length,
+          totalStored: lastWebhook ? 1 : 0,
           debug: {
             lastId: lastId,
-            currentEventId: eventId,
-            allEvents: storedEvents.map(e => ({ id: e.id, customerId: e.customerId, timestamp: e.timestamp })),
-            filteredEvents: newEvents.map(e => ({ id: e.id, customerId: e.customerId }))
+            currentEventId: eventCounter,
+            hasWebhook: !!lastWebhook,
+            lastWebhookId: lastWebhook?.id || null
           }
         }),
         { 
@@ -115,12 +121,10 @@ export default {
           status: 'ok',
           service: 'KYC Simulator API',
           timestamp: new Date().toISOString(),
-          environment: 'cloudflare-workers',
-          eventId: eventId,
-          storedEvents: storedEvents.length,
-          debug: {
-            allEvents: storedEvents.map(e => ({ id: e.id, customerId: e.customerId }))
-          }
+          environment: 'cloudflare-workers-free',
+          lastWebhookReceived: lastWebhook?.timestamp || 'none',
+          eventCounter: eventCounter,
+          connectivity: 'ok'
         }),
         { 
           headers: { 

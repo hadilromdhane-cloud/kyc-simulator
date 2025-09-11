@@ -6,6 +6,8 @@ let eventSource = null;
 let reconnectAttempts = 0;
 const maxReconnectAttempts = 5;
 const reconnectDelay = 3000; // 3 seconds
+const API_BASE_URL = 'https://kyc-simulator-api.kyc-simulator.workers.dev';
+
 
 // Visible fields per process
 const countries = [
@@ -411,8 +413,7 @@ function setupEventPolling() {
   // Start polling
   pollingInterval = setInterval(async () => {
     try {
-      const response = await fetch(`/api/events?lastId=${lastEventId}`);
-      
+    const response = await fetch(`https://kyc-simulator-api.kyc-simulator.workers.dev/api/events?lastId=${lastEventId}`);      
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);
       }
