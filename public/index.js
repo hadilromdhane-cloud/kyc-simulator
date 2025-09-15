@@ -981,7 +981,6 @@ function showOnboardingPage(customerId) {
 }
 
 // --- Call searchPersonCustomer ---
-// Updated callSearch function - add this to your index.js
 async function callSearch(entityType, containerId, responseId, isDecentralized = false) {
   if (!tenantName || !authToken) { 
     showNotification('Please authenticate first!', 'warning');
@@ -1028,6 +1027,9 @@ async function callSearch(entityType, containerId, responseId, isDecentralized =
     });
 
     const data = await res.json();
+    
+    // MOVE THIS LINE HERE - inside the try block after data is defined
+    storeSearchEventForWebhook(payload, data);
 
     logMessage(`Search completed for ${entityType}`, 'success');
     showNotification('Search completed successfully', 'success');
@@ -1057,8 +1059,8 @@ async function callSearch(entityType, containerId, responseId, isDecentralized =
     logMessage(errorMsg, 'error');
     showNotification('Search failed', 'error');
   }
-  // Add this line after: const data = await res.json();
-storeSearchEventForWebhook(payload, data);
+  // REMOVE THIS LINE - it was incorrectly placed outside the try block
+  // storeSearchEventForWebhook(payload, data);
 }
 
 // New function for centralized popup
