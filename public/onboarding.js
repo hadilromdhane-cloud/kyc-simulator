@@ -171,31 +171,102 @@ async function submitForm() {
             }
         });
 
-        // Build the payload structure matching the API format
+        // Build the payload structure with STRICT format
         const payload = {
-            customerId: parseInt(customerData.customerId) || Math.floor(Math.random() * 10000), // Generate ID if not provided
+            customerId: parseInt(customerData.customerId) || Math.floor(Math.random() * 10000),
+            customerRelationName: "",
+            formId: "1",
             items: {
-                // Core identity fields
-                first_name: formData.prenom || "",
-                last_name: formData.nom || "",
+                isSanctionnedWorkflow: "Non",
+                AddressDataGrid: [],
+                PaysDeResidence: formData.paysResidence || "",
+                address: [],
+                address_doc: [],
+                address_proof_type: {},
+                adresseDeResidence: formData.adresse || "",
+                agence: "headquarters",
+                agencyId: 3,
+                agencyName: "headquarters",
+                agency_location: null,
                 birth_date: formData.dateNaissance || "",
-                nationality: formData.nationalite || "",
+                businessName: "",
+                canal_de_distribution: formData.canal || "",
                 citizenship: formData.nationalite || "",
-                pays: getPaysName(formData.nationalite) || "",
+                containerelm: {
+                    "profession-2": "",
+                    retrieved_dob: "",
+                    retrieved_last_name: "",
+                    retrieved_first_name: "",
+                    "citizenship-2": "",
+                    retrieved_address: ""
+                },
+                createdBy: "admin",
+                createdOn: new Date().toISOString(),
+                creatorFirstName: "System",
+                creatorId: 1,
+                creatorLastName: "User",
+                current_date: new Date().toISOString(),
+                current_user_id: 1,
+                current_user_name: "System User",
+                cus_birth_date: formData.dateNaissance || "",
+                customerUrl: "https://greataml.com/",
+                customer_type: "manual-entry",
+                dataGrid: [{
+                    select: "",
+                    nature: "",
+                    tx_nature: {}
+                }],
+                dataGrid1: [{
+                    source_of_funds_doctype: {},
+                    source_of_funds_doc: []
+                }],
+                delivery_date: formData.dateDelivrance || "",
+                distribution_channel: null,
+                dpr: "",
+                eaiIds: {},
+                email: formData.email || "",
+                entityType: "PP",
+                expiry_date: formData.dateExpiration || "",
+                extendedProperties: {},
+                first_name: formData.prenom || "",
+                fiscale_ville: formData.ville || "",
+                form_entity_type: "PP",
+                hasRiskedCountry: false,
+                id: parseInt(customerData.customerId) || Math.floor(Math.random() * 10000),
+                id_doc: [],
+                invokeElm: false,
+                isPEP: false,
+                isPepWorkflow: "<li>Personne politiquement exposée : <b> <span> Non</span></b></li>",
+                isSanctioned: false,
+                isSanctionned: false,
+                is_hq_user: false,
+                last_name: formData.nom || "",
+                last_update: new Date().toISOString(),
+                listsNames: [],
+                luneDeVosRelationsPresenteTElleLunDesIndicesDamericaniteDefinisParLaLoiFatca: "",
                 marital_status: formData.etatCivil || "",
-                
-                // Contact information
+                modificationDate: new Date().toISOString(),
+                mscq: "",
+                nationality: formData.nationalite || "",
+                nid: formData.numeroPiece || "",
+                obnl_name: formData.nom || "",
+                origine_des_fonds: [formData.origineFonds || ""],
+                outboundSystems: null,
+                pays: formData.nationalite || "",
+                pep: "",
+                pliberal: "",
+                postal_code: formData.codePostal || "",
+                process_type: "",
+                produit: [formData.produits || ""],
+                profession: formData.profession || "",
+                revenuAnnuelNet: parseInt(formData.revenu) || 0,
+                rm_fn: "System",
+                rm_ln: "User",
+                rm_username: "admin",
+                searchId: Math.floor(Math.random() * 100000),
                 tel1: formData.telephone || "",
                 tel2: formData.portable || "",
-                email: formData.email || "",
-                
-                // Address information
-                adresseDeResidence: formData.adresse || "",
-                postal_code: formData.codePostal || "",
-                fiscale_ville: formData.ville || "",
-                PaysDeResidence: formData.paysResidence || "",
-                
-                // Identity document
+                tiin_doc: [],
                 tin_: {
                     id: getDocumentTypeId(formData.typePiece),
                     name: getDocumentTypeName(formData.typePiece),
@@ -206,75 +277,8 @@ async function submitForm() {
                     uniqueCode: `${getDocumentTypeName(formData.typePiece)}:${formData.typePiece}:tin`,
                     tags: ["tin"]
                 },
-                nid: formData.numeroPiece || "",
-                delivery_date: formData.dateDelivrance || "",
-                expiry_date: formData.dateExpiration || "",
-                
-                // Financial information
-                profession: getProfessionMapped(formData.profession) || "",
-                produit: [mapProductToArray(formData.produits)],
-                canal_de_distribution: mapCanalDistribution(formData.canal) || "",
-                origine_des_fonds: [mapOrigineFonds(formData.origineFonds)],
-                revenuAnnuelNet: parseInt(formData.revenu) || 0,
-                
-                // System fields
-                agence: "headquarters",
-                rm_username: "admin",
-                rm_fn: "System",
-                rm_ln: "User",
-                process_type: "",
-                createdOn: new Date().toISOString(),
-                last_update: new Date().toISOString(),
-                entityType: "PP",
-                customer_type: "manual-entry",
-                createdBy: "admin",
-                creatorId: 1,
-                creatorFirstName: "System",
-                creatorLastName: "User",
-                modificationDate: new Date().toISOString(),
-                agencyId: 1,
-                agencyName: "headquarters",
-                form_entity_type: "PP",
-                cus_birth_date: formData.dateNaissance || "",
-                url: "https://greataml.com/",
-                customerUrl: "https://greataml.com/",
-                current_date: new Date().toISOString(),
-                current_user_name: "System User",
-                current_user_id: 1,
-                
-                // Risk flags (defaults)
-                isPEP: false,
-                isSanctionned: false,
-                isSanctioned: false,
-                hasRiskedCountry: false,
-                isSanctionnedWorkflow: "Non",
-                isPepWorkflow: "<li>Personne politiquement exposée : <b> <span> Non</span></b></li>",
-                
-                // Empty arrays for optional fields
-                dataGrid: [],
-                id_doc: [],
-                address_proof_type: {},
-                address_doc: [],
-                tiin_doc: [],
-                dataGrid1: [],
-                AddressDataGrid: [],
-                address: [],
-                listsNames: [],
-                extendedProperties: {},
-                eaiIds: {},
-                outboundSystems: null,
-                
-                // Additional fields
-                invokeElm: false,
-                containerelm: {},
-                is_hq_user: false,
-                agency_location: null,
-                distribution_channel: null,
-                searchId: Math.floor(Math.random() * 100000),
-                obnl_name: formData.nom || ""
-            },
-            formId: "1",
-            customerRelationName: ""
+                url: "https://greataml.com/"
+            }
         };
 
         // Store the completed form data locally as backup
