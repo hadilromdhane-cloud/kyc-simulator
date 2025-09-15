@@ -78,6 +78,63 @@ const defaultValues = {
     queueName: 'Default'
   }
 };
+let sessionEvents = JSON.parse(sessionStorage.getItem('kycEvents')) || [];
+let sessionEventCounter = parseInt(sessionStorage.getItem('kycEventCounter')) || 0;
+
+// Add this function to store search data for webhook linking
+function storeSearchEventForWebhook(searchData, searchResponse) {
+  const tempData = {
+    searchQueryId: searchResponse.search_query_id,
+    customerId: searchData.customerId || `${searchData.firstName}_${searchData.lastName}`,
+    systemId: searchData.systemId,
+    timestamp: Date.now(),
+    searchData: searchData
+  };
+  
+  sessionStorage.setItem(`pending_webhook_${searchResponse.search_query_id}`, JSON.stringify(tempData));
+  console.log('Stored pending webhook data:', tempData);
+}
+
+// Add this function to handle real webhook events
+function handleRealWebhookEvent(webhookData) {
+  sessionEventCounter++;
+  
+  const realEvent = {
+    id: sessionEventCounter,
+    timestamp: new Date().toISOString(),
+    customerId: webhookData.customerId,
+    source: 'Reis_KYC',
+    search_query_id: webhookData.searchQueryId,
+    isPEP: webhookData.isPEP || false,
+    isSanctioned: webhookData.isSanctioned || false,
+    isAdverseMedia: webhookData.isAdverseMedia || false,
+    pepDecision: webhookData.pepDecision || (webhookData.isPEP ? 'HIT' : 'NO_HIT'),
+    sanctionDecision: webhookData.sanctionDecision || (webhookData.isSanctioned ? 'HIT' : 'NO_HIT'),
+    message: `Real screening completed for customer ${webhookData.customerId}`,
+    originalData: webhookData,
+    isReal: true
+  };
+  
+  // Store in session
+  sessionEvents.unshift(realEvent);
+  if (sessionEvents.length > 50) {
+    sessionEvents = sessionEvents.slice(0, 50);
+  }
+  
+  sessionStorage.setItem('kycEvents', JSON.stringify(sessionEvents));
+  sessionStorage.setItem('kycEventCounter', sessionEventCounter.toString());
+  
+  // Show notifications
+  showNotification(`Real webhook received for customer ${realEvent.customerId}`, 'warning');
+  showScreeningResultsPopup(realEvent);
+  
+  // Update history
+  notificationsHistory.unshift(realEvent);
+  localStorage.setItem('notificationsHistory', JSON.stringify(notificationsHistory));
+  updateNotificationBadge();
+  
+  console.log('Real webhook event processed:', realEvent);
+}
 
 // --- Notification System ---
 function createNotificationElements() {
@@ -1000,6 +1057,8 @@ async function callSearch(entityType, containerId, responseId, isDecentralized =
     logMessage(errorMsg, 'error');
     showNotification('Search failed', 'error');
   }
+  // Add this line after: const data = await res.json();
+storeSearchEventForWebhook(payload, data);
 }
 
 // New function for centralized popup

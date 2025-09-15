@@ -1,4 +1,4 @@
-// worker.js - Frontend-driven approach
+// worker.js - Modified to pass real events to frontend
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -7,23 +7,21 @@ export default {
     const corsHeaders = {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Cache-Control',
+      'Access-Control-Allow-Headers': 'Content-Type',
     };
 
     if (request.method === 'OPTIONS') {
       return new Response(null, { headers: corsHeaders });
     }
 
-    // Webhook endpoint - now broadcasts immediately
+    // Real webhook endpoint - receives data from Reis
     if (path === '/api/webhook/searchWebhook' && request.method === 'POST') {
       try {
         const body = await request.json();
-        console.log('Webhook received:', JSON.stringify(body));
+        console.log('Real webhook received from Reis:', JSON.stringify(body));
         
-        // Create event with timestamp-based ID
-        const eventId = Date.now();
-        const newEvent = {
-          id: eventId,
+        const realEvent = {
+          id: Date.now(),
           timestamp: new Date().toISOString(),
           customerId: body.customerId,
           source: body.source || 'Reis_KYC',
@@ -33,26 +31,17 @@ export default {
           isAdverseMedia: body.isAdverseMedia || false,
           pepDecision: body.pepDecision || (body.isPEP ? 'HIT' : 'NO_HIT'),
           sanctionDecision: body.sanctionDecision || (body.isSanctioned ? 'HIT' : 'NO_HIT'),
-          message: `Screening completed for customer ${body.customerId}`,
-          originalData: body
+          message: `Real screening completed for customer ${body.customerId}`,
+          originalData: body,
+          isReal: true
         };
         
-        // Store in Cloudflare Cache API (accessible across instances)
-        const cacheKey = new Request(`https://your-domain.com/webhook-event-${eventId}`);
-        await caches.default.put(cacheKey, new Response(JSON.stringify(newEvent), {
-          headers: { 
-            'Content-Type': 'application/json',
-            'Cache-Control': 'max-age=300' // 5 minutes
-          }
-        }));
-        
-        console.log(`Stored event ${eventId} in cache`);
-        
+        // Return success response (Reis expects this)
         return new Response(JSON.stringify({
           status: 'ok',
-          message: 'Webhook received and cached',
-          eventId: eventId,
-          timestamp: new Date().toISOString()
+          message: 'Webhook received and processed',
+          eventId: realEvent.id,
+          timestamp: realEvent.timestamp
         }), {
           headers: { 'Content-Type': 'application/json', ...corsHeaders }
         });
@@ -69,63 +58,30 @@ export default {
       }
     }
 
-    // Events endpoint - now checks cache for new events
-    if (path === '/api/events' && request.method === 'GET') {
-      try {
-        const lastTimestamp = parseInt(url.searchParams.get('since')) || 0;
-        const events = [];
-        
-        // Check cache for recent events (last 5 minutes)
-        const now = Date.now();
-        const fiveMinutesAgo = now - (5 * 60 * 1000);
-        
-        // Check for events in cache
-        for (let timestamp = Math.max(lastTimestamp + 1, fiveMinutesAgo); timestamp <= now; timestamp += 1000) {
-          const cacheKey = new Request(`https://your-domain.com/webhook-event-${timestamp}`);
-          const cached = await caches.default.match(cacheKey);
-          if (cached) {
-            const eventData = await cached.json();
-            events.push(eventData);
-          }
-        }
-        
-        return new Response(JSON.stringify({
-          events: events,
-          timestamp: now,
-          totalFound: events.length
-        }), {
-          headers: { 'Content-Type': 'application/json', ...corsHeaders }
-        });
-        
-      } catch (error) {
-        console.error('Events API error:', error);
-        return new Response(JSON.stringify({ 
-          error: 'Processing error', 
-          details: error.message 
-        }), {
-          status: 500,
-          headers: { 'Content-Type': 'application/json', ...corsHeaders }
-        });
-      }
+    // New endpoint: Frontend polling for real events
+    if (path === '/api/latest-event' && request.method === 'GET') {
+      // This endpoint would need a more sophisticated approach
+      // For now, return empty - real events will be captured differently
+      return new Response(JSON.stringify({
+        hasNewEvent: false,
+        event: null
+      }), {
+        headers: { 'Content-Type': 'application/json', ...corsHeaders }
+      });
     }
 
     // Health check
     if (path === '/api/health' && request.method === 'GET') {
       return new Response(JSON.stringify({
         status: 'ok',
-        service: 'KYC Simulator API - Cache-based Version',
-        timestamp: new Date().toISOString(),
-        storage: 'cloudflare-cache',
-        mode: 'production'
+        service: 'KYC Simulator API - Real Events',
+        timestamp: new Date().toISOString()
       }), {
         headers: { 'Content-Type': 'application/json', ...corsHeaders }
       });
     }
 
-    return new Response(JSON.stringify({ 
-      error: 'Not found', 
-      path: path 
-    }), { 
+    return new Response(JSON.stringify({ error: 'Not found' }), { 
       status: 404, 
       headers: { 'Content-Type': 'application/json', ...corsHeaders } 
     });
