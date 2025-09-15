@@ -513,22 +513,7 @@ function setupEventPolling() {
 }
 
 // Update the clear history function to also reset timestamp
-document.getElementById('clearHistory').onclick = () => {
-  if (confirm('Clear all notification history and reset event tracking?')) {
-    notificationsHistory = [];
-    localStorage.setItem('notificationsHistory', JSON.stringify(notificationsHistory));
-    
-    // Reset timestamp tracking
-    lastEventTimestamp = Date.now() - 300000; // Go back 5 minutes
-    localStorage.setItem('lastEventTimestamp', lastEventTimestamp.toString());
-    
-    updateNotificationBadge();
-    closeNotificationHistory();
-    
-    showNotification('History cleared and event tracking reset', 'success');
-    console.log('Reset complete. lastEventTimestamp is now:', lastEventTimestamp);
-  }
-};
+
 
 // Helper function to link customer ID to systemId using search_query_id
 function linkCustomerToSystemId(customerId, searchQueryId) {
