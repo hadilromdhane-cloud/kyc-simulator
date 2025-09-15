@@ -1114,6 +1114,69 @@ function showCentralizedPopup(message, showContinueButton = false) {
     };
     buttonContainer.appendChild(continueButton);
   }
+// Add webhook receiver function (add this after your existing functions)
+async function receiveDirectWebhook(event) {
+  try {
+    const webhookData = typeof event === 'string' ? JSON.parse(event) : event;
+    console.log('Direct webhook received from Reis:', webhookData);
+    
+    // Process the real webhook data
+    handleRealWebhookEvent(webhookData);
+    
+    return { status: 'ok', message: 'Webhook processed successfully' };
+  } catch (error) {
+    console.error('Error processing direct webhook:', error);
+    return { status: 'error', message: error.message };
+  }
+}
+
+// Make it globally accessible for webhook calls
+window.receiveDirectWebhook = receiveDirectWebhook;
+
+// Add webhook endpoint simulation for testing
+function simulateDirectWebhook() {
+  const testWebhookData = {
+    customerId: `DIRECT_CUSTOMER_${Math.floor(Math.random() * 1000)}`,
+    searchQueryId: `direct_search_${Date.now()}`,
+    source: 'Reis_KYC',
+    isPEP: Math.random() > 0.7,
+    isSanctioned: Math.random() > 0.9,
+    isAdverseMedia: Math.random() > 0.8,
+    pepDecision: Math.random() > 0.7 ? 'HIT' : 'NO_HIT',
+    sanctionDecision: Math.random() > 0.9 ? 'HIT' : 'NO_HIT'
+  };
+  
+  receiveDirectWebhook(testWebhookData);
+}
+
+// Add test button to your page
+function addDirectWebhookTestButton() {
+  const testButton = document.createElement('button');
+  testButton.textContent = 'Test Direct Webhook';
+  testButton.style.cssText = `
+    position: fixed;
+    top: 45px;
+    left: 20px;
+    z-index: 10000;
+    padding: 10px 15px;
+    background-color: #007ACC;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+  `;
+  testButton.onclick = simulateDirectWebhook;
+  document.body.appendChild(testButton);
+}
+
+
+
+
+
+
+
+
 
   // Add close button
   const closeButton = document.createElement('button');
@@ -1227,6 +1290,7 @@ document.getElementById('entityTypeAsync')
 document.addEventListener('DOMContentLoaded', function() {
   logMessage('Application initialized', 'info');
   createNotificationElements();
+  addDirectWebhookTestButton(); // Add this line
   setupEventPolling();
 });
 
