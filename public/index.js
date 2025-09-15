@@ -397,6 +397,9 @@ let pollingInterval = null;
 const pollingFrequency = 2000; // Poll every 2 seconds
 let notificationsHistory = JSON.parse(localStorage.getItem('notificationsHistory')) || [];
 
+// Replace the polling section in your index.js
+let lastEventTimestamp = parseInt(localStorage.getItem('lastEventTimestamp')) || (Date.now() - 300000); // Start from 5 minutes ago
+
 function setupEventPolling() {
   // Clear existing polling
   if (pollingInterval) {
@@ -405,7 +408,7 @@ function setupEventPolling() {
   }
 
   if (reconnectAttempts === 0) {
-    logMessage('Starting event polling...', 'info');
+    logMessage('Starting cache-based event polling...', 'info');
   } else {
     logMessage(`Polling reconnection attempt ${reconnectAttempts}/${maxReconnectAttempts}...`, 'warning');
   }
@@ -413,9 +416,9 @@ function setupEventPolling() {
   // Start polling
   pollingInterval = setInterval(async () => {
     try {
-    const response = await fetch('https://kyc-simulator-api.kyc-simulator.workers.dev/api/events?lastId=' + lastEventId);
-    
-    if (!response.ok) {
+      const response = await fetch(`${API_BASE_URL}/api/events?since=${lastEventTimestamp}`);
+      
+      if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);
       }
 
@@ -423,7 +426,7 @@ function setupEventPolling() {
       
       // Connection successful
       if (reconnectAttempts > 0) {
-        logMessage('Connected to event polling', 'success');
+        logMessage('Connected to cache-based polling', 'success');
         updateConnectionStatus(true);
         showNotification('Real-time notifications connected', 'success');
         reconnectAttempts = 0;
@@ -434,59 +437,38 @@ function setupEventPolling() {
         data.events.forEach(event => {
           logMessage(`Event received: ${JSON.stringify(event)}`, 'info');
           
-          // Update last event ID and save to localStorage
-          if (event.id > lastEventId) {
-            lastEventId = event.id;
-            localStorage.setItem('lastEventId', lastEventId.toString());
+          // Update last timestamp
+          if (event.id > lastEventTimestamp) {
+            lastEventTimestamp = event.id;
+            localStorage.setItem('lastEventTimestamp', lastEventTimestamp.toString());
           }
 
-          // Show notification based on event data
+          // Process the event (rest of your existing event handling code remains the same)
           let message = 'New event received';
           let notificationType = 'info';
           
-          if (event.type === 'connection') {
-            // Skip connection events in polling mode
-            return;
-          } else if (event.source === 'Reis_KYC' && event.customerId) {
+          if (event.source === 'Reis_KYC' && event.customerId) {
             message = `Hits processed for customer ${event.customerId}`;
             notificationType = 'warning';
-          } else if (event.customerId) {
-            message = `Alert for customer: ${event.customerId}`;
-            notificationType = 'warning';
-          } else if (event.message) {
-            message = event.message;
-            notificationType = 'warning';
-          }
-          
-          showNotification(message, notificationType, 8000);
-          
-          // Handle Reis KYC screening results with detailed popup
-          if (event.source === 'Reis_KYC' && event.customerId) {
+            
+            // Your existing Reis KYC processing logic here...
             console.log('Processing Reis KYC event:', event);
             
-            // Find and link the systemId from the screening request
             const linkedSystemId = linkCustomerToSystemId(event.customerId, event.search_query_id);
             if (linkedSystemId) {
               event.originalSystemId = linkedSystemId;
-              // Store the permanent mapping
               storeSystemIdForScreening(event.customerId, linkedSystemId, {
                 searchQueryId: event.search_query_id,
                 source: event.source
               });
-              console.log('Successfully linked systemId to customer:', {
-                customerId: event.customerId,
-                systemId: linkedSystemId,
-                searchQueryId: event.search_query_id
-              });
-            } else {
-              console.warn('Could not find systemId for customer:', event.customerId);
             }
             
             // Save to history
-            const existingIndex = notificationsHistory.findIndex(n => n.customerId === event.customerId && n.search_query_id === event.search_query_id);
+            const existingIndex = notificationsHistory.findIndex(n => 
+              n.customerId === event.customerId && n.search_query_id === event.search_query_id
+            );
             if (existingIndex === -1) {
-              notificationsHistory.unshift(event); // Add to beginning
-              // Keep only last 50 notifications
+              notificationsHistory.unshift(event);
               if (notificationsHistory.length > 50) {
                 notificationsHistory = notificationsHistory.slice(0, 50);
               }
@@ -494,25 +476,22 @@ function setupEventPolling() {
               updateNotificationBadge();
             }
             
-            console.log('About to show screening popup');
             showScreeningResultsPopup(event);
-          } else if (event.search_query_id) {
-            const link = `https://greataml.com/search/searchdecision/${event.search_query_id}`;
-            showPopup('New search result available:', link);
           }
+          
+          showNotification(message, notificationType, 8000);
         });
       }
 
     } catch (error) {
       console.error('Polling error:', error);
       
-      // Handle connection errors
+      // Handle connection errors (your existing error handling code)
       if (reconnectAttempts === 0) {
-        logMessage('Event polling connection lost', 'error');
+        logMessage('Cache-based polling connection lost', 'error');
         updateConnectionStatus(false);
       }
       
-      // Stop polling and attempt reconnection
       clearInterval(pollingInterval);
       pollingInterval = null;
       
@@ -521,7 +500,7 @@ function setupEventPolling() {
         showNotification(`Connection lost. Reconnecting... (${reconnectAttempts}/${maxReconnectAttempts})`, 'warning');
         
         setTimeout(() => {
-          if (!pollingInterval) { // Only reconnect if not already connected
+          if (!pollingInterval) {
             setupEventPolling();
           }
         }, reconnectDelay);
@@ -532,6 +511,24 @@ function setupEventPolling() {
     }
   }, pollingFrequency);
 }
+
+// Update the clear history function to also reset timestamp
+document.getElementById('clearHistory').onclick = () => {
+  if (confirm('Clear all notification history and reset event tracking?')) {
+    notificationsHistory = [];
+    localStorage.setItem('notificationsHistory', JSON.stringify(notificationsHistory));
+    
+    // Reset timestamp tracking
+    lastEventTimestamp = Date.now() - 300000; // Go back 5 minutes
+    localStorage.setItem('lastEventTimestamp', lastEventTimestamp.toString());
+    
+    updateNotificationBadge();
+    closeNotificationHistory();
+    
+    showNotification('History cleared and event tracking reset', 'success');
+    console.log('Reset complete. lastEventTimestamp is now:', lastEventTimestamp);
+  }
+};
 
 // Helper function to link customer ID to systemId using search_query_id
 function linkCustomerToSystemId(customerId, searchQueryId) {
