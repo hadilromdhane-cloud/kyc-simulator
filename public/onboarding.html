@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Onboarding KYC</title>
+    <title>Onboarding KYC - Personne Physique</title>
     <style>
         * {
             margin: 0;
@@ -19,7 +19,7 @@
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 800px;
             margin: 0 auto;
             background: white;
             border-radius: 15px;
@@ -35,13 +35,14 @@
         }
 
         .header h1 {
-            font-size: 2.5em;
+            font-size: 2em;
             margin-bottom: 10px;
         }
 
         .customer-info {
             background: #f8f9fa;
-            padding: 20px;
+            padding: 15px;
+            text-align: center;
             border-bottom: 2px solid #e9ecef;
         }
 
@@ -49,98 +50,58 @@
             display: inline-block;
             background: linear-gradient(45deg, #28a745, #20c997);
             color: white;
-            padding: 10px 20px;
-            border-radius: 25px;
+            padding: 8px 16px;
+            border-radius: 20px;
             font-weight: bold;
-            margin: 10px;
+            margin: 5px;
+            font-size: 14px;
         }
 
-        .wizard-container {
-            padding: 30px;
-        }
-
-        .wizard-tabs {
+        .tabs {
             display: flex;
+            background: #f8f9fa;
             border-bottom: 2px solid #e9ecef;
-            margin-bottom: 30px;
-            overflow-x: auto;
         }
 
-        .wizard-tab {
+        .tab {
             flex: 1;
-            padding: 15px 20px;
+            padding: 20px;
             background: #f8f9fa;
             border: none;
             cursor: pointer;
-            transition: all 0.3s ease;
+            font-size: 16px;
             font-weight: 600;
-            min-width: 200px;
-            text-align: center;
+            transition: all 0.3s ease;
             position: relative;
         }
 
-        .wizard-tab.active {
+        .tab.active {
             background: #007bff;
             color: white;
         }
 
-        .wizard-tab:hover:not(.active) {
+        .tab:hover:not(.active) {
             background: #e9ecef;
         }
 
-        .wizard-tab::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: #007bff;
-            transform: scaleX(0);
-            transition: transform 0.3s ease;
-        }
-
-        .wizard-tab.active::after {
-            transform: scaleX(1);
-        }
-
-        .wizard-content {
+        .tab-content {
             display: none;
-            animation: fadeIn 0.5s ease-in-out;
+            padding: 40px;
+            animation: fadeIn 0.3s ease-in-out;
         }
 
-        .wizard-content.active {
+        .tab-content.active {
             display: block;
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
+            from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
-        }
-
-        .form-section {
-            background: #ffffff;
-            border: 1px solid #e9ecef;
-            border-radius: 10px;
-            margin: 20px 0;
-            overflow: hidden;
-        }
-
-        .section-header {
-            background: linear-gradient(45deg, #ffc107, #ff8c00);
-            color: #212529;
-            padding: 15px 20px;
-            font-weight: bold;
-            font-size: 1.1em;
-        }
-
-        .section-content {
-            padding: 25px;
         }
 
         .form-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 20px;
             margin: 20px 0;
         }
@@ -177,37 +138,7 @@
 
         .form-group textarea {
             resize: vertical;
-            min-height: 100px;
-        }
-
-        .radio-group {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-
-        .radio-option {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .radio-option input[type="radio"] {
-            width: auto;
-        }
-
-        .file-upload {
-            border: 2px dashed #007bff;
-            border-radius: 10px;
-            padding: 20px;
-            text-align: center;
-            background: #f8f9ff;
-            transition: all 0.3s ease;
-        }
-
-        .file-upload:hover {
-            border-color: #0056b3;
-            background: #e6f3ff;
+            min-height: 80px;
         }
 
         .btn-group {
@@ -226,7 +157,6 @@
             font-weight: 600;
             font-size: 14px;
             transition: all 0.3s ease;
-            text-transform: uppercase;
         }
 
         .btn-primary {
@@ -249,55 +179,6 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
 
-        .table-container {
-            overflow-x: auto;
-            margin: 20px 0;
-        }
-
-        .financial-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-        }
-
-        .financial-table th,
-        .financial-table td {
-            padding: 12px 15px;
-            text-align: center;
-            border-bottom: 1px solid #e9ecef;
-        }
-
-        .financial-table th {
-            background: linear-gradient(45deg, #6c757d, #495057);
-            color: white;
-            font-weight: 600;
-        }
-
-        .financial-table input {
-            border: 1px solid #e9ecef;
-            padding: 8px;
-            border-radius: 4px;
-            width: 100%;
-        }
-
-        .progress-bar {
-            height: 6px;
-            background: #e9ecef;
-            border-radius: 3px;
-            overflow: hidden;
-            margin: 20px 0;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(45deg, #28a745, #20c997);
-            border-radius: 3px;
-            transition: width 0.3s ease;
-        }
-
         .hidden {
             display: none;
         }
@@ -306,18 +187,13 @@
             color: #dc3545;
         }
 
-        .error-message {
-            color: #dc3545;
-            font-size: 12px;
-            margin-top: 5px;
-        }
-
-        .success-message {
-            background: #d4edda;
-            color: #155724;
-            padding: 10px 15px;
-            border-radius: 5px;
-            margin: 10px 0;
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 10px;
         }
 
         @media (max-width: 768px) {
@@ -325,7 +201,7 @@
                 grid-template-columns: 1fr;
             }
             
-            .wizard-tabs {
+            .tabs {
                 flex-direction: column;
             }
             
@@ -340,42 +216,225 @@
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <h1 id="formTitle">Fiche de Connaissance Client</h1>
-            <p id="formSubtitle">Système d'onboarding KYC</p>
+            <h1>Fiche de Connaissance Client</h1>
+            <p>Personne Physique - BankFR</p>
         </div>
 
         <!-- Customer Information -->
         <div class="customer-info">
-            <div id="customerDetails">
-                <span class="customer-badge" id="customerBadge">Client: Non spécifié</span>
-                <span class="customer-badge" id="typeBadge">Type: Non défini</span>
-                <span class="customer-badge" id="tenantBadge">Tenant: Non défini</span>
+            <span class="customer-badge" id="customerBadge">Client: Non spécifié</span>
+            <span class="customer-badge">Type: Personne Physique</span>
+            <span class="customer-badge">Tenant: BANKFR</span>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" onclick="showTab(0)">Identification Client</button>
+            <button class="tab" onclick="showTab(1)">Informations Financières</button>
+        </div>
+
+        <!-- Tab 1: Client Identification -->
+        <div class="tab-content active" id="tab-0">
+            <div class="section-title">Identification du Client</div>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="prenom">Prénom <span class="required">*</span></label>
+                    <input type="text" id="prenom" name="prenom" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="nom">Nom <span class="required">*</span></label>
+                    <input type="text" id="nom" name="nom" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="dateNaissance">Date de naissance <span class="required">*</span></label>
+                    <input type="date" id="dateNaissance" name="dateNaissance" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="nationalite">Nationalité <span class="required">*</span></label>
+                    <select id="nationalite" name="nationalite" required>
+                        <option value="">-- Sélectionner --</option>
+                        <option value="FR">Française</option>
+                        <option value="TN">Tunisienne</option>
+                        <option value="MA">Marocaine</option>
+                        <option value="DZ">Algérienne</option>
+                        <option value="IT">Italienne</option>
+                        <option value="ES">Espagnole</option>
+                        <option value="DE">Allemande</option>
+                        <option value="UK">Britannique</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="etatCivil">État civil <span class="required">*</span></label>
+                    <select id="etatCivil" name="etatCivil" required>
+                        <option value="">-- Sélectionner --</option>
+                        <option value="celibataire">Célibataire</option>
+                        <option value="marie">Marié(e)</option>
+                        <option value="divorce">Divorcé(e)</option>
+                        <option value="veuf">Veuf/Veuve</option>
+                        <option value="pacs">PACS</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="telephone">Téléphone</label>
+                    <input type="tel" id="telephone" name="telephone">
+                </div>
+                
+                <div class="form-group">
+                    <label for="portable">Portable <span class="required">*</span></label>
+                    <input type="tel" id="portable" name="portable" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">E-mail <span class="required">*</span></label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="adresse">Adresse de résidence <span class="required">*</span></label>
+                <textarea id="adresse" name="adresse" required placeholder="Adresse complète"></textarea>
+            </div>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="codePostal">Code postal <span class="required">*</span></label>
+                    <input type="text" id="codePostal" name="codePostal" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="ville">Ville <span class="required">*</span></label>
+                    <input type="text" id="ville" name="ville" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="paysResidence">Pays de Résidence <span class="required">*</span></label>
+                    <select id="paysResidence" name="paysResidence" required>
+                        <option value="">-- Sélectionner --</option>
+                        <option value="FR">France</option>
+                        <option value="TN">Tunisie</option>
+                        <option value="MA">Maroc</option>
+                        <option value="DZ">Algérie</option>
+                        <option value="IT">Italie</option>
+                        <option value="ES">Espagne</option>
+                        <option value="DE">Allemagne</option>
+                        <option value="UK">Royaume-Uni</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="section-title" style="margin-top: 30px;">Pièce d'identité</div>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="typePiece">Type de la pièce d'identité <span class="required">*</span></label>
+                    <select id="typePiece" name="typePiece" required>
+                        <option value="">-- Sélectionner --</option>
+                        <option value="cin">Carte d'identité nationale</option>
+                        <option value="passeport">Passeport</option>
+                        <option value="titre_sejour">Titre de séjour</option>
+                        <option value="permis_conduire">Permis de conduire</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="numeroPiece">Numéro de la pièce d'identité <span class="required">*</span></label>
+                    <input type="text" id="numeroPiece" name="numeroPiece" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="dateDelivrance">Date de délivrance</label>
+                    <input type="date" id="dateDelivrance" name="dateDelivrance">
+                </div>
+                
+                <div class="form-group">
+                    <label for="dateExpiration">Date d'expiration</label>
+                    <input type="date" id="dateExpiration" name="dateExpiration">
+                </div>
             </div>
         </div>
 
-        <!-- Progress Bar -->
-        <div class="progress-bar">
-            <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+        <!-- Tab 2: Financial Information -->
+        <div class="tab-content" id="tab-1">
+            <div class="section-title">Informations Financières</div>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="profession">Profession <span class="required">*</span></label>
+                    <select id="profession" name="profession" required>
+                        <option value="">-- Sélectionner --</option>
+                        <option value="salarie">Salarié</option>
+                        <option value="fonctionnaire">Fonctionnaire</option>
+                        <option value="dirigeant">Dirigeant d'entreprise</option>
+                        <option value="profession_liberale">Profession libérale</option>
+                        <option value="commercant">Commerçant</option>
+                        <option value="artisan">Artisan</option>
+                        <option value="retraite">Retraité</option>
+                        <option value="etudiant">Étudiant</option>
+                        <option value="sans_emploi">Sans emploi</option>
+                        <option value="autre">Autre</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="produits">Produits/Services cibles <span class="required">*</span></label>
+                    <select id="produits" name="produits" required>
+                        <option value="">-- Sélectionner --</option>
+                        <option value="compte_courant">Compte courant</option>
+                        <option value="compte_epargne">Compte épargne</option>
+                        <option value="credit_immobilier">Crédit immobilier</option>
+                        <option value="credit_consommation">Crédit consommation</option>
+                        <option value="assurance_vie">Assurance vie</option>
+                        <option value="placement">Placement financier</option>
+                        <option value="carte_bancaire">Carte bancaire</option>
+                        <option value="package_complet">Package complet</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="canal">Canal de distribution <span class="required">*</span></label>
+                    <select id="canal" name="canal" required>
+                        <option value="">-- Sélectionner --</option>
+                        <option value="agence">Agence physique</option>
+                        <option value="digital">Digital/En ligne</option>
+                        <option value="telephone">Centre d'appels</option>
+                        <option value="mobile">Application mobile</option>
+                        <option value="conseiller">Conseiller personnel</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="revenu">Revenu annuel net (€) <span class="required">*</span></label>
+                    <input type="number" id="revenu" name="revenu" min="0" step="1000" required placeholder="Ex: 35000">
+                </div>
+                
+                <div class="form-group">
+                    <label for="origineFonds">Origine des fonds <span class="required">*</span></label>
+                    <select id="origineFonds" name="origineFonds" required>
+                        <option value="">-- Sélectionner --</option>
+                        <option value="salaire">Salaire</option>
+                        <option value="pension">Pension de retraite</option>
+                        <option value="benefices_entreprise">Bénéfices d'entreprise</option>
+                        <option value="heritage">Héritage</option>
+                        <option value="donation">Donation</option>
+                        <option value="vente_immobilier">Vente immobilière</option>
+                        <option value="placements">Revenus de placements</option>
+                        <option value="autre">Autre</option>
+                    </select>
+                </div>
+            </div>
         </div>
 
-        <!-- Wizard Container -->
-        <div class="wizard-container">
-            <!-- Wizard Tabs -->
-            <div class="wizard-tabs" id="wizardTabs">
-                <!-- Tabs will be dynamically generated -->
-            </div>
-
-            <!-- Wizard Content -->
-            <div id="wizardContent">
-                <!-- Content will be dynamically generated -->
-            </div>
-
-            <!-- Navigation Buttons -->
-            <div class="btn-group">
-                <button class="btn btn-secondary" id="prevBtn" onclick="previousStep()">Précédent</button>
-                <button class="btn btn-primary" id="nextBtn" onclick="nextStep()">Suivant</button>
-                <button class="btn btn-success hidden" id="submitBtn" onclick="submitForm()">Soumettre</button>
-            </div>
+        <!-- Navigation Buttons -->
+        <div class="btn-group">
+            <button class="btn btn-secondary hidden" id="prevBtn" onclick="previousTab()">Précédent</button>
+            <button class="btn btn-primary" id="nextBtn" onclick="nextTab()">Suivant</button>
+            <button class="btn btn-success hidden" id="submitBtn" onclick="submitForm()">Soumettre le dossier</button>
         </div>
     </div>
 
