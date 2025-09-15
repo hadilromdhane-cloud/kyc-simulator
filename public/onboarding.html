@@ -1,156 +1,384 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Customer Onboarding - Web Service Simulator</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="onboarding.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Onboarding KYC</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(45deg, #2c3e50, #3498db);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .customer-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .customer-badge {
+            display: inline-block;
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            margin: 10px;
+        }
+
+        .wizard-container {
+            padding: 30px;
+        }
+
+        .wizard-tabs {
+            display: flex;
+            border-bottom: 2px solid #e9ecef;
+            margin-bottom: 30px;
+            overflow-x: auto;
+        }
+
+        .wizard-tab {
+            flex: 1;
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            min-width: 200px;
+            text-align: center;
+            position: relative;
+        }
+
+        .wizard-tab.active {
+            background: #007bff;
+            color: white;
+        }
+
+        .wizard-tab:hover:not(.active) {
+            background: #e9ecef;
+        }
+
+        .wizard-tab::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #007bff;
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .wizard-tab.active::after {
+            transform: scaleX(1);
+        }
+
+        .wizard-content {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .wizard-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-section {
+            background: #ffffff;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .section-header {
+            background: linear-gradient(45deg, #ffc107, #ff8c00);
+            color: #212529;
+            padding: 15px 20px;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .section-content {
+            padding: 25px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .radio-option input[type="radio"] {
+            width: auto;
+        }
+
+        .file-upload {
+            border: 2px dashed #007bff;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            background: #f8f9ff;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload:hover {
+            border-color: #0056b3;
+            background: #e6f3ff;
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #e9ecef;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+
+        .financial-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        .financial-table th,
+        .financial-table td {
+            padding: 12px 15px;
+            text-align: center;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .financial-table th {
+            background: linear-gradient(45deg, #6c757d, #495057);
+            color: white;
+            font-weight: 600;
+        }
+
+        .financial-table input {
+            border: 1px solid #e9ecef;
+            padding: 8px;
+            border-radius: 4px;
+            width: 100%;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: #e9ecef;
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #28a745, #20c997);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .required {
+            color: #dc3545;
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .wizard-tabs {
+                flex-direction: column;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <header>
-    <h1>Customer Onboarding</h1>
-    <p class="subtitle">Complete customer risk assessment and onboarding process</p>
-  </header>
-
-  <div class="container">
-    <!-- Customer Information Card -->
-    <div class="onboarding-card">
-      <div class="card-header">
-        Customer Information
-      </div>
-      <div class="card-content">
-        <div class="customer-info" id="customerInfo">
-          <strong>Customer ID:</strong> <span id="displayCustomerId">Loading...</span>
-          <br><strong>Screening Status:</strong> <span id="screeningStatus">Cleared for onboarding</span>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1 id="formTitle">Fiche de Connaissance Client</h1>
+            <p id="formSubtitle">Système d'onboarding KYC</p>
         </div>
-      </div>
-    </div>
 
-    <!-- Onboarding Form Card -->
-    <div class="onboarding-card">
-      <div class="card-header">
-        Onboarding Form
-      </div>
-      <div class="card-content">
-        <form id="onboardingForm">
-          <!-- Basic Information Section -->
-          <div class="form-section">
-            <h3>Basic Information</h3>
-            <div class="form-grid">
-              <div class="form-group">
-                <label for="firstName">First Name *</label>
-                <input type="text" id="firstName" name="first_name" required>
-              </div>
-              <div class="form-group">
-                <label for="lastName">Last Name *</label>
-                <input type="text" id="lastName" name="last_name" required>
-              </div>
-              <div class="form-group">
-                <label for="birthDate">Date of Birth *</label>
-                <input type="date" id="birthDate" name="birth_date" required>
-              </div>
-              <div class="form-group">
-                <label for="citizenship">Citizenship *</label>
-                <select id="citizenship" name="citizenship" required>
-                  <option value="">Select Citizenship</option>
-                </select>
-              </div>
+        <!-- Customer Information -->
+        <div class="customer-info">
+            <div id="customerDetails">
+                <span class="customer-badge" id="customerBadge">Client: Non spécifié</span>
+                <span class="customer-badge" id="typeBadge">Type: Non défini</span>
+                <span class="customer-badge" id="tenantBadge">Tenant: Non défini</span>
             </div>
-          </div>
+        </div>
 
-          <!-- Additional Details Section -->
-          <div class="form-section">
-            <h3>Additional Details</h3>
-            <div class="form-grid">
-              <div class="form-group">
-                <label for="tin">Tax Identification Number</label>
-                <input type="text" id="tin" name="tin">
-              </div>
-              <div class="form-group">
-                <label for="product">Product *</label>
-                <select id="product" name="product" required>
-                  <option value="">Select Product</option>
-                  <option value="SAVINGS-001">Savings Account</option>
-                  <option value="CHECKING-002">Checking Account</option>
-                  <option value="LOAN-T367">Personal Loan</option>
-                  <option value="MORTGAGE-004">Mortgage Loan</option>
-                  <option value="CREDIT-CARD-005">Credit Card</option>
-                  <option value="INVESTMENT-006">Investment Account</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label for="distributionChannel">Distribution Channel *</label>
-                <select id="distributionChannel" name="distribution_channel" required>
-                  <option value="">Select Channel</option>
-                  <option value="branch">Branch</option>
-                  <option value="online">Online</option>
-                  <option value="mobile">Mobile</option>
-                  <option value="phone">Phone</option>
-                  <option value="agent">Agent</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label for="branchCode">Branch Code</label>
-                <input type="text" id="branchCode" name="branchCode" placeholder="e.g., 123">
-              </div>
+        <!-- Progress Bar -->
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+        </div>
+
+        <!-- Wizard Container -->
+        <div class="wizard-container">
+            <!-- Wizard Tabs -->
+            <div class="wizard-tabs" id="wizardTabs">
+                <!-- Tabs will be dynamically generated -->
             </div>
-          </div>
 
-          <!-- Risk Factors Section -->
-          <div class="form-section">
-            <h3>Risk Factors</h3>
-            <div class="checkbox-group">
-              <input type="checkbox" id="isResident" name="resident">
-              <label for="isResident">Is Resident</label>
+            <!-- Wizard Content -->
+            <div id="wizardContent">
+                <!-- Content will be dynamically generated -->
             </div>
-            <div class="checkbox-group">
-              <input type="checkbox" id="isUsCitizen" name="is_us_citizen">
-              <label for="isUsCitizen">Is US Citizen</label>
-            </div>
-            <div class="checkbox-group">
-              <input type="checkbox" id="useEntityRiskValues" name="useEntityRiskValues" checked>
-              <label for="useEntityRiskValues">Use Entity Risk Values in Calculation</label>
-            </div>
-          </div>
 
-          <!-- System Information (Hidden) -->
-          <input type="hidden" id="systemName" name="systemName" value="T24">
-          <input type="hidden" id="systemId" name="systemId">
-          <input type="hidden" id="formId" name="formId" value="1">
-
-          <!-- Action Buttons -->
-          <div class="btn-group">
-            <button type="button" class="btn btn-secondary" id="backBtn">
-              Back to Simulator
-            </button>
-            <button type="submit" class="btn btn-primary" id="submitBtn">
-              <span id="submitText">Process Onboarding</span>
-            </button>
-          </div>
-        </form>
-
-        <!-- Results Section -->
-        <div id="resultsSection" class="hidden">
-          <div class="risk-assessment">
-            <h3 style="text-align: center; color: #004080; margin-bottom: 20px;">Risk Assessment Results</h3>
-            <div id="riskResults"></div>
-            <div id="instructionResults"></div>
-            
+            <!-- Navigation Buttons -->
             <div class="btn-group">
-              <button type="button" class="btn btn-secondary" id="resetBtn">
-                Process Another Customer
-              </button>
-              <button type="button" class="btn btn-success" id="completeBtn">
-                Complete Onboarding
-              </button>
+                <button class="btn btn-secondary" id="prevBtn" onclick="previousStep()">Précédent</button>
+                <button class="btn btn-primary" id="nextBtn" onclick="nextStep()">Suivant</button>
+                <button class="btn btn-success hidden" id="submitBtn" onclick="submitForm()">Soumettre</button>
             </div>
-          </div>
         </div>
-      </div>
     </div>
-  </div>
 
-  <script src="onboarding.js"></script>
+    <script src="onboarding.js"></script>
 </body>
 </html>
