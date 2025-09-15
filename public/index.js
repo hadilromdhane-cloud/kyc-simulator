@@ -449,6 +449,7 @@ function updateConnectionStatus(connected) {
 }
 
 // --- POLLING-BASED Event System (instead of SSE) ---
+// Update this line at the top of your file
 let lastEventId = parseInt(localStorage.getItem('lastEventId')) || 0;
 let pollingInterval = null;
 const pollingFrequency = 2000; // Poll every 2 seconds
@@ -465,7 +466,7 @@ function setupEventPolling() {
   }
 
   if (reconnectAttempts === 0) {
-    logMessage('Starting cache-based event polling...', 'info');
+    logMessage('Starting Supabase event polling...', 'info');
   } else {
     logMessage(`Polling reconnection attempt ${reconnectAttempts}/${maxReconnectAttempts}...`, 'warning');
   }
@@ -473,7 +474,7 @@ function setupEventPolling() {
   // Start polling
   pollingInterval = setInterval(async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/events?since=${lastEventTimestamp}`);
+      const response = await fetch(`${API_BASE_URL}/api/events?since=${lastEventId}`);
       
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);
@@ -483,44 +484,31 @@ function setupEventPolling() {
       
       // Connection successful
       if (reconnectAttempts > 0) {
-        logMessage('Connected to cache-based polling', 'success');
-        updateConnectionStatus(true);
+        logMessage('Connected to Supabase polling', 'success');
         showNotification('Real-time notifications connected', 'success');
         reconnectAttempts = 0;
       }
 
-      // Process new events
+      // Process new events and show popups immediately
       if (data.events && data.events.length > 0) {
         data.events.forEach(event => {
-          logMessage(`Event received: ${JSON.stringify(event)}`, 'info');
+          logMessage(`New event received from database: ${JSON.stringify(event)}`, 'info');
           
-          // Update last timestamp
-          if (event.id > lastEventTimestamp) {
-            lastEventTimestamp = event.id;
-            localStorage.setItem('lastEventTimestamp', lastEventTimestamp.toString());
+          // Update last event ID
+          if (event.id > lastEventId) {
+            lastEventId = event.id;
+            localStorage.setItem('lastEventId', lastEventId.toString());
           }
 
-          // Process the event (rest of your existing event handling code remains the same)
-          let message = 'New event received';
-          let notificationType = 'info';
-          
+          // Show immediate popup for Reis KYC events
           if (event.source === 'Reis_KYC' && event.customerId) {
-            message = `Hits processed for customer ${event.customerId}`;
-            notificationType = 'warning';
+            // Show notification
+            showNotification(`Screening completed for customer ${event.customerId}`, 'warning');
             
-            // Your existing Reis KYC processing logic here...
-            console.log('Processing Reis KYC event:', event);
+            // Show detailed popup immediately
+            showScreeningResultsPopup(event);
             
-            const linkedSystemId = linkCustomerToSystemId(event.customerId, event.search_query_id);
-            if (linkedSystemId) {
-              event.originalSystemId = linkedSystemId;
-              storeSystemIdForScreening(event.customerId, linkedSystemId, {
-                searchQueryId: event.search_query_id,
-                source: event.source
-              });
-            }
-            
-            // Save to history
+            // Add to notifications history
             const existingIndex = notificationsHistory.findIndex(n => 
               n.customerId === event.customerId && n.search_query_id === event.search_query_id
             );
@@ -532,21 +520,15 @@ function setupEventPolling() {
               localStorage.setItem('notificationsHistory', JSON.stringify(notificationsHistory));
               updateNotificationBadge();
             }
-            
-            showScreeningResultsPopup(event);
           }
-          
-          showNotification(message, notificationType, 8000);
         });
       }
 
     } catch (error) {
-      console.error('Polling error:', error);
+      console.error('Supabase polling error:', error);
       
-      // Handle connection errors (your existing error handling code)
       if (reconnectAttempts === 0) {
-        logMessage('Cache-based polling connection lost', 'error');
-        updateConnectionStatus(false);
+        logMessage('Supabase polling connection lost', 'error');
       }
       
       clearInterval(pollingInterval);
