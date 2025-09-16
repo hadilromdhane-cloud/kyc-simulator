@@ -407,26 +407,7 @@ function createNotificationElements() {
   tokenStatusButton.onclick = showTokenStatus;
   document.body.appendChild(tokenStatusButton);
 
-  // COMPACT: Test polling button
-  const testPollingButton = document.createElement('button');
-  testPollingButton.id = 'testPollingBtn';
-  testPollingButton.innerHTML = 'Test Polling';
-  testPollingButton.style.cssText = `
-    position: fixed;
-    top: 110px;
-    right: 20px;
-    z-index: 10000;
-    padding: 4px 8px;
-    background-color: #ffc107;
-    color: black;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 10px;
-    font-weight: 600;
-  `;
-  testPollingButton.onclick = startTestPolling;
-  document.body.appendChild(testPollingButton);
+  
 
   // Update displays
   updateNotificationBadge();
@@ -1567,27 +1548,26 @@ function showCentralizedPopup(message, showContinueButton = false) {
     receiveDirectWebhook(testWebhookData);
   }
 
-  // Add test button to your page
-  function addDirectWebhookTestButton() {
-    const testButton = document.createElement('button');
-    testButton.textContent = 'Test Direct Webhook';
-    testButton.style.cssText = `
-      position: fixed;
-      top: 45px;
-      left: 20px;
-      z-index: 10000;
-      padding: 10px 15px;
-      background-color: #007ACC;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 14px;
-    `;
-    testButton.onclick = simulateDirectWebhook;
-    document.body.appendChild(testButton);
-  }
-
+function addDirectWebhookTestButton() {
+  // Only create the direct webhook test button
+  const testButton = document.createElement('button');
+  testButton.textContent = 'Test Direct Webhook';
+  testButton.style.cssText = `
+    position: fixed;
+    top: 45px;
+    left: 20px;
+    z-index: 10000;
+    padding: 10px 15px;
+    background-color: #007ACC;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+  `;
+  testButton.onclick = simulateDirectWebhook;
+  document.body.appendChild(testButton);
+}
   // Add close button
   const closeButton = document.createElement('button');
   closeButton.textContent = 'Close';
