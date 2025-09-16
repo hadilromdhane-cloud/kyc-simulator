@@ -690,6 +690,8 @@ let notificationsHistory = JSON.parse(localStorage.getItem('notificationsHistory
 // Replace the polling section in your index.js
 let lastEventTimestamp = parseInt(localStorage.getItem('lastEventTimestamp')) || (Date.now() - 300000); // Start from 5 minutes ago
 
+// Trouvez cette fonction dans votre index.js actuel et remplacez-la par ceci :
+
 function setupEventPolling() {
   // Reset the event tracking
   localStorage.setItem('lastEventId', '0');
@@ -747,6 +749,12 @@ function setupEventPolling() {
   console.log('Updated polling started - you should see popups for existing events');
 }
 
+// ET AUSSI, ajoutez cette fonction pour tester :
+function resetEventTracking() {
+  localStorage.setItem('lastEventId', '0');
+  lastEventId = 0;
+  console.log('Event tracking reset to 0');
+}
 // Helper function to link customer ID to systemId using search_query_id
 function linkCustomerToSystemId(customerId, searchQueryId) {
   try {
