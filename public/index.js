@@ -8,6 +8,185 @@ const maxReconnectAttempts = 5;
 const reconnectDelay = 3000; // 3 seconds
 const API_BASE_URL = 'https://kyc-simulator-api.kyc-simulator.workers.dev';
 
+// TOKEN REFRESH SYSTEM - NEW ADDITION
+class TokenManager {
+    constructor() {
+        this.tokenKey = 'authToken';
+        this.tenantKey = 'tenantName';
+        this.tokenExpiryKey = 'tokenExpiry';
+        this.refreshTokenKey = 'refreshToken';
+        this.refreshBuffer = 60; // Refresh 60 seconds before expiry
+    }
+
+    // Store token with expiry information
+    storeToken(token, tenant, expiresIn = 300) {
+        const expiryTime = Date.now() + (expiresIn * 1000);
+        localStorage.setItem(this.tokenKey, token);
+        localStorage.setItem(this.tenantKey, tenant);
+        localStorage.setItem(this.tokenExpiryKey, expiryTime.toString());
+        
+        console.log(`Token stored, expires in ${expiresIn} seconds`);
+        logMessage(`Token stored, expires in ${expiresIn} seconds`, 'success');
+    }
+
+    // Store refresh token (for OIDC method)
+    storeRefreshToken(refreshToken) {
+        localStorage.setItem(this.refreshTokenKey, refreshToken);
+    }
+
+    // Get current token
+    getToken() {
+        return localStorage.getItem(this.tokenKey);
+    }
+
+    // Get tenant
+    getTenant() {
+        return localStorage.getItem(this.tenantKey) || tenantName;
+    }
+
+    // Check if token needs refresh
+    needsRefresh() {
+        const expiryTime = localStorage.getItem(this.tokenExpiryKey);
+        if (!expiryTime) return true;
+        
+        const timeUntilExpiry = parseInt(expiryTime) - Date.now();
+        return timeUntilExpiry < (this.refreshBuffer * 1000);
+    }
+
+    // Refresh token using standard method
+    async refreshTokenStandard() {
+        const currentToken = this.getToken();
+        const tenant = this.getTenant();
+        
+        if (!currentToken) {
+            throw new Error('No token to refresh');
+        }
+
+        console.log('Refreshing token using standard method...');
+        logMessage('Refreshing token using standard method...', 'info');
+
+        const response = await fetch('https://greataml.com/kyc-web-restful/xauth/refreshtoken', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-auth-tenant': tenant,
+                'x-auth-token': currentToken
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Token refresh failed: ${response.status}`);
+        }
+
+        const result = await response.json();
+        
+        // Assuming the API returns the new token directly or in a specific field
+        const newToken = result.token || result.access_token || result;
+        
+        // Store the new token (assuming same TTL)
+        this.storeToken(newToken, tenant, 300);
+        
+        console.log('Token refreshed successfully');
+        logMessage('Token refreshed successfully', 'success');
+        showNotification('Token refreshed successfully', 'success');
+        return newToken;
+    }
+
+    // Refresh token using OIDC method
+    async refreshTokenOIDC() {
+        const refreshToken = localStorage.getItem(this.refreshTokenKey);
+        
+        if (!refreshToken) {
+            throw new Error('No refresh token available');
+        }
+
+        console.log('Refreshing token using OIDC method...');
+        logMessage('Refreshing token using OIDC method...', 'info');
+
+        const response = await fetch('https://greataml.com/auth/realms/public/protocol/openid-connect/token', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: new URLSearchParams({
+                client_id: 'reis',
+                grant_type: 'refresh_token',
+                refresh_token: refreshToken
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`OIDC token refresh failed: ${response.status}`);
+        }
+
+        const result = await response.json();
+        
+        // Store new tokens
+        this.storeToken(result.access_token, this.getTenant(), result.expires_in);
+        if (result.refresh_token) {
+            this.storeRefreshToken(result.refresh_token);
+        }
+        
+        console.log('OIDC token refreshed successfully');
+        logMessage('OIDC token refreshed successfully', 'success');
+        showNotification('Token refreshed successfully', 'success');
+        return result.access_token;
+    }
+
+    // Main refresh method - tries standard first, then OIDC
+    async refreshToken() {
+        try {
+            // Try standard method first
+            return await this.refreshTokenStandard();
+        } catch (error) {
+            console.log('Standard refresh failed, trying OIDC...', error.message);
+            logMessage('Standard refresh failed, trying OIDC...', 'warning');
+            try {
+                return await this.refreshTokenOIDC();
+            } catch (oidcError) {
+                console.error('Both refresh methods failed:', oidcError.message);
+                logMessage('Both refresh methods failed. Please login again.', 'error');
+                throw new Error('Token refresh failed. Please login again.');
+            }
+        }
+    }
+
+    // Get valid token (refresh if needed)
+    async getValidToken() {
+        if (this.needsRefresh()) {
+            console.log('Token needs refresh...');
+            logMessage('Token needs refresh...', 'info');
+            return await this.refreshToken();
+        }
+        return this.getToken();
+    }
+
+    // Clear all tokens (for logout)
+    clearTokens() {
+        localStorage.removeItem(this.tokenKey);
+        localStorage.removeItem(this.tenantKey);
+        localStorage.removeItem(this.tokenExpiryKey);
+        localStorage.removeItem(this.refreshTokenKey);
+        console.log('All tokens cleared');
+        logMessage('All tokens cleared', 'info');
+    }
+
+    // Check token status
+    getTokenStatus() {
+        const expiryTime = localStorage.getItem(this.tokenExpiryKey);
+        if (!expiryTime) return 'No token';
+        
+        const timeUntilExpiry = parseInt(expiryTime) - Date.now();
+        const secondsLeft = Math.floor(timeUntilExpiry / 1000);
+        
+        if (secondsLeft <= 0) return 'Expired';
+        if (secondsLeft < this.refreshBuffer) return `Needs refresh (${secondsLeft}s left)`;
+        return `Valid (${secondsLeft}s left)`;
+    }
+}
+
+// Global token manager instance
+const tokenManager = new TokenManager();
 
 // Visible fields per process
 const countries = [
@@ -189,9 +368,61 @@ function createNotificationElements() {
   notificationButton.onclick = showNotificationHistory;
   document.body.appendChild(notificationButton);
 
+  // Create token status button - NEW ADDITION
+  const tokenStatusButton = document.createElement('button');
+  tokenStatusButton.id = 'tokenStatusBtn';
+  tokenStatusButton.innerHTML = 'Token Status';
+  tokenStatusButton.style.cssText = `
+    position: fixed;
+    top: 45px;
+    right: 140px;
+    z-index: 10000;
+    padding: 8px 12px;
+    background-color: #17a2b8;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+  `;
+  tokenStatusButton.onclick = showTokenStatus;
+  document.body.appendChild(tokenStatusButton);
+
   // Update button badge
   updateNotificationBadge();
+  updateTokenStatusButton(); // NEW
 }
+
+// NEW: Token status functions
+function updateTokenStatusButton() {
+  const button = document.getElementById('tokenStatusBtn');
+  if (!button) return;
+
+  const status = tokenManager.getTokenStatus();
+  button.innerHTML = `Token: ${status}`;
+  
+  if (status.includes('Expired')) {
+    button.style.backgroundColor = '#dc3545';
+  } else if (status.includes('Needs refresh')) {
+    button.style.backgroundColor = '#ffc107';
+  } else if (status.includes('Valid')) {
+    button.style.backgroundColor = '#28a745';
+  } else {
+    button.style.backgroundColor = '#17a2b8';
+  }
+}
+
+function showTokenStatus() {
+  const status = tokenManager.getTokenStatus();
+  const token = tokenManager.getToken();
+  const tenant = tokenManager.getTenant();
+  
+  showPopup(`Token Status: ${status}\nTenant: ${tenant}\nToken: ${token ? `${token.substring(0, 20)}...` : 'None'}`);
+}
+
+// Update token status button every 10 seconds
+setInterval(updateTokenStatusButton, 10000);
 
 function updateNotificationBadge() {
   const button = document.getElementById('notificationHistoryBtn');
@@ -551,9 +782,6 @@ function setupEventPolling() {
   }, pollingFrequency);
 }
 
-// Update the clear history function to also reset timestamp
-
-
 // Helper function to link customer ID to systemId using search_query_id
 function linkCustomerToSystemId(customerId, searchQueryId) {
   try {
@@ -639,7 +867,7 @@ function resetConnection() {
   setupEventPolling();
 }
 
-// --- Authentication ---
+// --- Authentication with TOKEN REFRESH INTEGRATION ---
 const authBtn = document.getElementById('authBtn');
 authBtn.addEventListener('click', async () => {
   tenantName = document.getElementById('tenantName').value;
@@ -668,12 +896,20 @@ authBtn.addEventListener('click', async () => {
     }
 
     authToken = data.token;
+    
+    // UPDATED: Use TokenManager to store token with proper expiry tracking
+    tokenManager.storeToken(authToken, tenantName, 300); // 300 seconds = 5 minutes
+    
     logMessage('Authentication successful', 'success');
     showNotification('Authenticated successfully!', 'success');
 
+    // Keep backward compatibility for now
     localStorage.setItem('authToken', authToken);
     localStorage.setItem('tenantName', tenantName);
     console.log('Auth tokens stored for onboarding page');
+    
+    // Update token status display
+    updateTokenStatusButton();
   } catch(err) {
     logMessage(`Authentication error: ${err.message}`, 'error');
     showNotification('Authentication failed!', 'error');
@@ -717,7 +953,6 @@ subTabButtons.forEach(btn => btn.addEventListener('click', () => {
   }
 }));
 
-// --- Render input fields ---
 // --- Render input fields ---
 function renderFields(containerId, entityType, processType) {
   const container = document.getElementById(containerId);
@@ -847,7 +1082,6 @@ function showPopup(message, link = '') {
 }
 
 // --- Enhanced popup for screening results ---
-// --- Enhanced popup for screening results (FIXED VERSION) ---
 function showScreeningResultsPopup(event) {
   const popup = document.getElementById('popup');
   const popupText = document.getElementById('popupText');
@@ -956,43 +1190,51 @@ function navigateToOnboarding(customerId) {
   window.location.href = `onboarding.html?customerId=${customerId}`;
 }
 
-// --- Show onboarding page ---
-function showOnboardingPage(customerId) {
-  // This function is no longer needed since we're navigating to a new page
-  // Keeping it for backward compatibility but it won't be called
-}
-
-// --- Call searchPersonCustomer ---
+// --- Call searchPersonCustomer with TOKEN REFRESH ---
 async function callSearch(entityType, containerId, responseId, isDecentralized = false) {
-  if (!tenantName || !authToken) { 
+  if (!tenantName) { 
     showNotification('Please authenticate first!', 'warning');
     return; 
   }
 
   logMessage(`Starting search for ${entityType}...`, 'info');
 
-  let payload = {};
-  document.querySelectorAll(`#${containerId} input, #${containerId} select`).forEach(input => {
-    payload[input.id.replace(containerId + '_', '')] = input.value;
-  });
-
-  // Generate systemId with the exact format: system_timestamp_random
-  const generatedSystemId = `system_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
-  payload.systemId = generatedSystemId;
-  payload.systemName = defaultValues[entityType].systemName;
-  payload.searchQuerySource = defaultValues[entityType].searchQuerySource;
-
-  // Store the systemId for this customer for later use in onboarding
-  const customerIdentifier = payload.firstName + '_' + payload.lastName + '_' + payload.birthDate;
-  localStorage.setItem(`systemId_${customerIdentifier}`, generatedSystemId);
-  console.log('Stored systemId for customer:', customerIdentifier, '→', generatedSystemId);
-
-  // Add queueName for both PP and PM in centralized process
-  if (!isDecentralized) {
-    payload.queueName = payload.queueName || defaultValues[entityType].queueName;
-  }
-
   try {
+    // UPDATED: Get valid token (auto-refresh if needed)
+    let currentAuthToken;
+    try {
+      currentAuthToken = await tokenManager.getValidToken();
+      if (!currentAuthToken) {
+        throw new Error('No valid token available');
+      }
+      logMessage('Using valid token for search', 'info');
+    } catch (tokenError) {
+      logMessage('Token validation failed: ' + tokenError.message, 'error');
+      showNotification('Authentication expired. Please login again.', 'error');
+      return;
+    }
+
+    let payload = {};
+    document.querySelectorAll(`#${containerId} input, #${containerId} select`).forEach(input => {
+      payload[input.id.replace(containerId + '_', '')] = input.value;
+    });
+
+    // Generate systemId with the exact format: system_timestamp_random
+    const generatedSystemId = `system_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+    payload.systemId = generatedSystemId;
+    payload.systemName = defaultValues[entityType].systemName;
+    payload.searchQuerySource = defaultValues[entityType].searchQuerySource;
+
+    // Store the systemId for this customer for later use in onboarding
+    const customerIdentifier = payload.firstName + '_' + payload.lastName + '_' + payload.birthDate;
+    localStorage.setItem(`systemId_${customerIdentifier}`, generatedSystemId);
+    console.log('Stored systemId for customer:', customerIdentifier, '→', generatedSystemId);
+
+    // Add queueName for both PP and PM in centralized process
+    if (!isDecentralized) {
+      payload.queueName = payload.queueName || defaultValues[entityType].queueName;
+    }
+
     // Use different endpoint based on entity type
     const endpoint = entityType === 'PM' 
       ? 'https://greataml.com/kyc-web-restful/search/searchEntityCustomer'
@@ -1003,7 +1245,7 @@ async function callSearch(entityType, containerId, responseId, isDecentralized =
       headers: { 
         'Content-Type': 'application/json',
         'x-auth-tenant': tenantName,
-        'x-auth-token': authToken
+        'x-auth-token': currentAuthToken  // UPDATED: Use refreshed token
       },
       body: JSON.stringify(payload)
     });
@@ -1041,8 +1283,6 @@ async function callSearch(entityType, containerId, responseId, isDecentralized =
     logMessage(errorMsg, 'error');
     showNotification('Search failed', 'error');
   }
-  // REMOVE THIS LINE - it was incorrectly placed outside the try block
-  // storeSearchEventForWebhook(payload, data);
 }
 
 // New function for centralized popup
@@ -1098,69 +1338,62 @@ function showCentralizedPopup(message, showContinueButton = false) {
     };
     buttonContainer.appendChild(continueButton);
   }
-// Add webhook receiver function (add this after your existing functions)
-async function receiveDirectWebhook(event) {
-  try {
-    const webhookData = typeof event === 'string' ? JSON.parse(event) : event;
-    console.log('Direct webhook received from Reis:', webhookData);
-    
-    // Process the real webhook data
-    handleRealWebhookEvent(webhookData);
-    
-    return { status: 'ok', message: 'Webhook processed successfully' };
-  } catch (error) {
-    console.error('Error processing direct webhook:', error);
-    return { status: 'error', message: error.message };
+
+  // Add webhook receiver function (add this after your existing functions)
+  async function receiveDirectWebhook(event) {
+    try {
+      const webhookData = typeof event === 'string' ? JSON.parse(event) : event;
+      console.log('Direct webhook received from Reis:', webhookData);
+      
+      // Process the real webhook data
+      handleRealWebhookEvent(webhookData);
+      
+      return { status: 'ok', message: 'Webhook processed successfully' };
+    } catch (error) {
+      console.error('Error processing direct webhook:', error);
+      return { status: 'error', message: error.message };
+    }
   }
-}
 
-// Make it globally accessible for webhook calls
-window.receiveDirectWebhook = receiveDirectWebhook;
+  // Make it globally accessible for webhook calls
+  window.receiveDirectWebhook = receiveDirectWebhook;
 
-// Add webhook endpoint simulation for testing
-function simulateDirectWebhook() {
-  const testWebhookData = {
-    customerId: `DIRECT_CUSTOMER_${Math.floor(Math.random() * 1000)}`,
-    searchQueryId: `direct_search_${Date.now()}`,
-    source: 'Reis_KYC',
-    isPEP: Math.random() > 0.7,
-    isSanctioned: Math.random() > 0.9,
-    isAdverseMedia: Math.random() > 0.8,
-    pepDecision: Math.random() > 0.7 ? 'HIT' : 'NO_HIT',
-    sanctionDecision: Math.random() > 0.9 ? 'HIT' : 'NO_HIT'
-  };
-  
-  receiveDirectWebhook(testWebhookData);
-}
+  // Add webhook endpoint simulation for testing
+  function simulateDirectWebhook() {
+    const testWebhookData = {
+      customerId: `DIRECT_CUSTOMER_${Math.floor(Math.random() * 1000)}`,
+      searchQueryId: `direct_search_${Date.now()}`,
+      source: 'Reis_KYC',
+      isPEP: Math.random() > 0.7,
+      isSanctioned: Math.random() > 0.9,
+      isAdverseMedia: Math.random() > 0.8,
+      pepDecision: Math.random() > 0.7 ? 'HIT' : 'NO_HIT',
+      sanctionDecision: Math.random() > 0.9 ? 'HIT' : 'NO_HIT'
+    };
+    
+    receiveDirectWebhook(testWebhookData);
+  }
 
-// Add test button to your page
-function addDirectWebhookTestButton() {
-  const testButton = document.createElement('button');
-  testButton.textContent = 'Test Direct Webhook';
-  testButton.style.cssText = `
-    position: fixed;
-    top: 45px;
-    left: 20px;
-    z-index: 10000;
-    padding: 10px 15px;
-    background-color: #007ACC;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 14px;
-  `;
-  testButton.onclick = simulateDirectWebhook;
-  document.body.appendChild(testButton);
-}
-
-
-
-
-
-
-
-
+  // Add test button to your page
+  function addDirectWebhookTestButton() {
+    const testButton = document.createElement('button');
+    testButton.textContent = 'Test Direct Webhook';
+    testButton.style.cssText = `
+      position: fixed;
+      top: 45px;
+      left: 20px;
+      z-index: 10000;
+      padding: 10px 15px;
+      background-color: #007ACC;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    `;
+    testButton.onclick = simulateDirectWebhook;
+    document.body.appendChild(testButton);
+  }
 
   // Add close button
   const closeButton = document.createElement('button');
@@ -1204,6 +1437,7 @@ function addDirectWebhookTestButton() {
   popup.appendChild(buttonContainer);
   popup.style.display = 'block';
 }
+
 // --- Button Events ---
 const closeBtn = document.getElementById('closePopup');
 closeBtn.addEventListener('click', () => {
@@ -1276,6 +1510,9 @@ document.addEventListener('DOMContentLoaded', function() {
   createNotificationElements();
   addDirectWebhookTestButton(); // Add this line
   setupEventPolling();
+  
+  // Initialize token status display
+  updateTokenStatusButton();
 });
 
 // Clean up on page unload
