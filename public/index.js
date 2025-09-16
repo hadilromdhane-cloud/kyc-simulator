@@ -562,11 +562,12 @@ function showNotificationHistory() {
     notificationsHistory = [];
     localStorage.setItem('notificationsHistory', JSON.stringify(notificationsHistory));
     
-    // Add this: Reset event tracking too
+    // Reset event tracking too
     localStorage.setItem('lastEventId', '0');
     lastEventId = 0;
     
     updateNotificationBadge();
+    updateEventCounter(); // NEW: Update counter
     closeNotificationHistory();
     
     showNotification('History cleared and event tracking reset', 'success');
