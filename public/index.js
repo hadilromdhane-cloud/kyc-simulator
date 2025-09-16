@@ -315,64 +315,46 @@ function handleRealWebhookEvent(webhookData) {
   console.log('Real webhook event processed:', realEvent);
 }
 
-// --- Notification System with COMPACT INTERFACE ---
+// --- Notification System ---
 function createNotificationElements() {
   // Create notification container
   const notificationContainer = document.createElement('div');
   notificationContainer.id = 'notificationContainer';
   notificationContainer.style.cssText = `
     position: fixed;
-    top: 80px;
+    top: 130px;
     right: 20px;
     z-index: 10000;
-    max-width: 300px;
+    max-width: 350px;
   `;
   document.body.appendChild(notificationContainer);
 
-  // COMPACT: Small counter in top left
-  const eventCounter = document.createElement('div');
-  eventCounter.id = 'eventCounter';
-  eventCounter.innerHTML = '0';
-  eventCounter.style.cssText = `
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    z-index: 10000;
-    background-color: #dc3545;
-    color: white;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    font-weight: bold;
-    font-family: 'Roboto', sans-serif;
-  `;
-  document.body.appendChild(eventCounter);
-
-  // COMPACT: Small notifications button
+  // Create notifications history button
   const notificationButton = document.createElement('button');
   notificationButton.id = 'notificationHistoryBtn';
   notificationButton.innerHTML = 'Notifications';
   notificationButton.style.cssText = `
- padding: 10px 15px; 
-  background-color: #007ACC;
-  color: white; border: none; 
-  border-radius: 6px; 
-  cursor: pointer; 
-  font-size: 14px; f
-  ont-weight: 600; 
-  font-family: 'Roboto', 
-  sans-serif; 
-  box-shadow: 0 3px 8px rgb(0 0 0 / 0.1); 
-  transition: background-color 0.2s ease; 
-  width: auto; 
-  margin-top: 0; 
-  min-width: 120px;
+    position: fixed;
+    top: 85px;
+    right: 20px;
+    z-index: 10000;
+    padding: 10px 15px;
+    background-color: #007ACC;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'Roboto', sans-serif;
+    box-shadow: 0 3px 8px rgb(0 0 0 / 0.1);
+    transition: background-color 0.2s ease;
+    width: auto;
+    margin-top: 0;
+    min-width: 120px;
   `;
   
+  // Add hover effect that matches your button styles
   notificationButton.onmouseover = () => {
     notificationButton.style.backgroundColor = '#004080';
   };
@@ -386,71 +368,40 @@ function createNotificationElements() {
   notificationButton.onclick = showNotificationHistory;
   document.body.appendChild(notificationButton);
 
-  // COMPACT: Small token status button
+  // Create token status button - NEW ADDITION
   const tokenStatusButton = document.createElement('button');
   tokenStatusButton.id = 'tokenStatusBtn';
-  tokenStatusButton.innerHTML = 'Token';
+  tokenStatusButton.innerHTML = 'Token Status';
   tokenStatusButton.style.cssText = `
-    position: fixed;
-    top: 80px;
+position: fixed;
+    top: 35px;
     right: 20px;
     z-index: 10000;
-    padding: 4px 8px;
-    background-color: #17a2b8;
+    padding: 10px 15px;
+    background-color: #007ACC;
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: 6px;
     cursor: pointer;
-    font-size: 10px;
+    font-size: 14px;
     font-weight: 600;
+    font-family: 'Roboto', sans-serif;
+    box-shadow: 0 3px 8px rgb(0 0 0 / 0.1);
+    transition: background-color 0.2s ease;
+    width: auto;
+    margin-top: 0;
+    min-width: 120px;
+   
   `;
   tokenStatusButton.onclick = showTokenStatus;
   document.body.appendChild(tokenStatusButton);
 
-  
-
-  // Update displays
+  // Update button badge
   updateNotificationBadge();
-  updateTokenStatusButton();
-  updateEventCounter();
+  updateTokenStatusButton(); // NEW
 }
 
-// NEW: Event counter functions
-function updateEventCounter() {
-  const counter = document.getElementById('eventCounter');
-  if (!counter) return;
-  
-  const eventCount = notificationsHistory.filter(n => n.source === 'Reis_KYC').length;
-  counter.innerHTML = eventCount.toString();
-  
-  if (eventCount === 0) {
-    counter.style.backgroundColor = '#6c757d';
-  } else {
-    counter.style.backgroundColor = '#dc3545';
-  }
-}
-
-// NEW: Test polling function with your code
-function startTestPolling() {
-  const button = document.getElementById('testPollingBtn');
-  button.innerHTML = 'Testing...';
-  button.disabled = true;
-  
-  showNotification('Resetting event tracking to show popups for existing events...', 'info');
-  console.log('TESTING: Resetting lastEventId to 0 to trigger popups for existing events');
-  
-  // Reset the event tracking for testing (this will make all existing events show popups)
-  localStorage.setItem('lastEventId', '0');
-  lastEventId = 0;
-  
-  logMessage('Event tracking reset - existing events will now trigger popups', 'success');
-  
-  // Reset button after 3 seconds
-  setTimeout(() => {
-    button.innerHTML = 'Reset Events';
-    button.disabled = false;
-  }, 3000);
-}
+// NEW: Token status functions
 function updateTokenStatusButton() {
   const button = document.getElementById('tokenStatusBtn');
   if (!button) return;
@@ -489,15 +440,12 @@ function updateNotificationBadge() {
   ).length;
 
   if (unfinishedCount > 0) {
-    button.innerHTML = `Notifs (${unfinishedCount})`;
-    button.style.backgroundColor = '#dc3545';
+    button.innerHTML = `Notifications (${unfinishedCount})`;
+    button.style.backgroundColor = '#dc3545'; // Red background for pending items
   } else {
-    button.innerHTML = 'Notifs';
-    button.style.backgroundColor = '#007ACC';
+    button.innerHTML = 'Notifications';
+    button.style.backgroundColor = '#007ACC'; // Default blue
   }
-  
-  // Update event counter too
-  updateEventCounter();
 }
 
 function showNotificationHistory() {
@@ -541,112 +489,60 @@ function showNotificationHistory() {
     // Sort by timestamp, newest first
     const sortedHistory = [...notificationsHistory].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
     
-    // Separate completed onboarding from others
-    const completedOnboarding = sortedHistory.filter(n => n.onboardingCompleted);
-    const pendingActions = sortedHistory.filter(n => !n.onboardingCompleted);
-    
-    // Show completed onboarding first
-    if (completedOnboarding.length > 0) {
-      historyHTML += '<h3 style="color: #28a745; margin: 20px 0 10px 0;">✅ Onboarding Completed</h3>';
-      completedOnboarding.forEach((notification, index) => {
-        const isReis = notification.source === 'Reis_KYC';
-        const statusColor = notification.isSanctioned ? '#dc3545' : '#28a745';
-        const statusText = notification.isSanctioned ? 'SANCTIONED' : 'CLEARED';
-        
-        historyHTML += `
-          <div style="
-            border: 1px solid #c3e6cb;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-            background: #d4edda;
-            border-left: 4px solid #28a745;
-          ">
-            <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 10px;">
-              <h4 style="margin: 0; color: #155724;">✅ Customer ${notification.customerId}</h4>
-              <span style="
-                background: ${statusColor};
-                color: white;
-                padding: 2px 8px;
-                border-radius: 12px;
-                font-size: 12px;
-                font-weight: bold;
-              ">${statusText}</span>
-            </div>
-            
-            ${isReis ? `
-              <div style="font-size: 14px; margin: 5px 0;">
-                <span style="color: ${notification.isPEP ? '#ffc107' : '#28a745'};">PEP: ${notification.isPEP ? 'YES' : 'NO'}</span> | 
-                <span style="color: ${notification.isSanctioned ? '#dc3545' : '#28a745'};">Sanctions: ${notification.isSanctioned ? 'YES' : 'NO'}</span> | 
-                <span style="color: ${notification.isAdverseMedia ? '#ffc107' : '#28a745'};">Adverse Media: ${notification.isAdverseMedia ? 'YES' : 'NO'}</span>
-              </div>
-            ` : ''}
-            
-            <p style="margin: 10px 0; color: #155724; font-size: 14px;">${notification.message}</p>
-            <small style="color: #155724;">Onboarding completed: ${new Date(notification.timestamp).toLocaleString()}</small>
+    sortedHistory.forEach((notification, index) => {
+      const isReis = notification.source === 'Reis_KYC';
+      const canContinueOnboarding = isReis && !notification.isSanctioned && !notification.onboardingCompleted;
+      const statusColor = notification.isSanctioned ? '#dc3545' : '#28a745';
+      const statusText = notification.isSanctioned ? 'SANCTIONED' : 'CLEARED';
+      
+      historyHTML += `
+        <div style="
+          border: 1px solid #ddd;
+          border-radius: 8px;
+          padding: 15px;
+          margin-bottom: 15px;
+          background: ${canContinueOnboarding ? '#f8f9fa' : 'white'};
+          ${canContinueOnboarding ? 'border-left: 4px solid #007ACC;' : ''}
+        ">
+          <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 10px;">
+            <h4 style="margin: 0; color: #004080;">Customer ${notification.customerId}</h4>
+            <span style="
+              background: ${statusColor};
+              color: white;
+              padding: 2px 8px;
+              border-radius: 12px;
+              font-size: 12px;
+              font-weight: bold;
+            ">${statusText}</span>
           </div>
-        `;
-      });
-    }
-    
-    // Show pending actions
-    if (pendingActions.length > 0) {
-      historyHTML += '<h3 style="color: #ffc107; margin: 20px 0 10px 0;">⏳ Pending Actions</h3>';
-      pendingActions.forEach((notification, index) => {
-        const isReis = notification.source === 'Reis_KYC';
-        const canContinueOnboarding = isReis && !notification.isSanctioned && !notification.onboardingCompleted;
-        const statusColor = notification.isSanctioned ? '#dc3545' : '#28a745';
-        const statusText = notification.isSanctioned ? 'SANCTIONED' : 'CLEARED';
-        
-        historyHTML += `
-          <div style="
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-            background: ${canContinueOnboarding ? '#f8f9fa' : 'white'};
-            ${canContinueOnboarding ? 'border-left: 4px solid #007ACC;' : ''}
-          ">
-            <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 10px;">
-              <h4 style="margin: 0; color: #004080;">Customer ${notification.customerId}</h4>
-              <span style="
-                background: ${statusColor};
-                color: white;
-                padding: 2px 8px;
-                border-radius: 12px;
-                font-size: 12px;
-                font-weight: bold;
-              ">${statusText}</span>
+          
+          ${isReis ? `
+            <div style="font-size: 14px; margin: 5px 0;">
+              <span style="color: ${notification.isPEP ? '#ffc107' : '#28a745'};">PEP: ${notification.isPEP ? 'YES' : 'NO'}</span> | 
+              <span style="color: ${notification.isSanctioned ? '#dc3545' : '#28a745'};">Sanctions: ${notification.isSanctioned ? 'YES' : 'NO'}</span> | 
+              <span style="color: ${notification.isAdverseMedia ? '#ffc107' : '#28a745'};">Adverse Media: ${notification.isAdverseMedia ? 'YES' : 'NO'}</span>
             </div>
-            
-            ${isReis ? `
-              <div style="font-size: 14px; margin: 5px 0;">
-                <span style="color: ${notification.isPEP ? '#ffc107' : '#28a745'};">PEP: ${notification.isPEP ? 'YES' : 'NO'}</span> | 
-                <span style="color: ${notification.isSanctioned ? '#dc3545' : '#28a745'};">Sanctions: ${notification.isSanctioned ? 'YES' : 'NO'}</span> | 
-                <span style="color: ${notification.isAdverseMedia ? '#ffc107' : '#28a745'};">Adverse Media: ${notification.isAdverseMedia ? 'YES' : 'NO'}</span>
-              </div>
-            ` : ''}
-            
-            <p style="margin: 10px 0; color: #666; font-size: 14px;">${notification.message}</p>
-            <small style="color: #999;">${new Date(notification.timestamp).toLocaleString()}</small>
-            
-            ${canContinueOnboarding ? `
-              <div style="margin-top: 15px;">
-                <button onclick="continueOnboardingFromHistory('${notification.customerId}', ${index})" style="
-                  background: #28a745;
-                  color: white;
-                  border: none;
-                  padding: 8px 15px;
-                  border-radius: 5px;
-                  cursor: pointer;
-                  font-size: 14px;
-                ">Continue Onboarding</button>
-              </div>
-            ` : ''}
-          </div>
-        `;
-      });
-    }
+          ` : ''}
+          
+          <p style="margin: 10px 0; color: #666; font-size: 14px;">${notification.message}</p>
+          <small style="color: #999;">${new Date(notification.timestamp).toLocaleString()}</small>
+          
+          ${canContinueOnboarding ? `
+            <div style="margin-top: 15px;">
+              <button onclick="continueOnboardingFromHistory('${notification.customerId}', ${index})" style="
+                background: #28a745;
+                color: white;
+                border: none;
+                padding: 8px 15px;
+                border-radius: 5px;
+                cursor: pointer;
+                font-size: 14px;
+              ">Continue Onboarding</button>
+            </div>
+          ` : ''}
+        </div>
+      `;
+    });
   }
 
   historyHTML += `
@@ -722,22 +618,6 @@ function continueOnboardingFromHistory(customerId, historyIndex) {
   window.location.href = `${onboardingPage}?customerId=${customerId}`;
   updateNotificationBadge();
 }
-
-// NEW: Function to mark onboarding as completed
-function markOnboardingCompleted(customerId) {
-  const customerIndex = notificationsHistory.findIndex(n => n.customerId === customerId);
-  if (customerIndex !== -1) {
-    notificationsHistory[customerIndex].onboardingCompleted = true;
-    notificationsHistory[customerIndex].onboardingCompletedDate = new Date().toISOString();
-    localStorage.setItem('notificationsHistory', JSON.stringify(notificationsHistory));
-    updateNotificationBadge();
-    console.log('Onboarding marked as completed for customer:', customerId);
-  }
-}
-
-// Make it globally available for onboarding page to call
-window.markOnboardingCompleted = markOnboardingCompleted;
-
 function showNotification(message, type = 'info', duration = 5000) {
   const container = document.getElementById('notificationContainer');
   if (!container) return;
@@ -828,103 +708,60 @@ let notificationsHistory = JSON.parse(localStorage.getItem('notificationsHistory
 let lastEventTimestamp = parseInt(localStorage.getItem('lastEventTimestamp')) || (Date.now() - 300000); // Start from 5 minutes ago
 
 function setupEventPolling() {
-  // Clear existing polling
+  // Reset the event tracking
+  localStorage.setItem('lastEventId', '0');
+  lastEventId = 0;
+  
+  // Stop current polling
   if (pollingInterval) {
     clearInterval(pollingInterval);
     pollingInterval = null;
   }
-
-  logMessage('Starting event polling...', 'info');
-
-  // Start polling
+  
+  // Start new polling with popup logic
   pollingInterval = setInterval(async () => {
     try {
       console.log('Checking for events since:', lastEventId);
       const response = await fetch(`https://kyc-simulator-api.kyc-simulator.workers.dev/api/events?since=${lastEventId}`);
-      
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
-
       const data = await response.json();
+      
       console.log('Polling found:', data.events.length, 'events');
       
-      // Process only NEW events (with ID > lastEventId)
       if (data.events && data.events.length > 0) {
         data.events.forEach(event => {
-          console.log('Processing event:', event.customerId, 'ID:', event.id, 'Last saved ID:', lastEventId);
+          console.log('Processing event:', event.customerId);
           
-          // Only process if this event ID is greater than our saved lastEventId
-          if (event.id > lastEventId) {
-            console.log('NEW event found:', event.customerId);
+          // Update lastEventId
+          lastEventId = event.id;
+          localStorage.setItem('lastEventId', lastEventId.toString());
+          
+          // Show popup for Reis events
+          if (event.source === 'Reis_KYC') {
+            console.log('Showing popup for:', event.customerId);
+            showScreeningResultsPopup(event);
+            showNotification(`Screening completed for ${event.customerId}`, 'warning');
             
-            // Update lastEventId to this new event
-            lastEventId = event.id;
-            localStorage.setItem('lastEventId', lastEventId.toString());
-            
-            // Process Reis KYC events
-            if (event.source === 'Reis_KYC') {
-              console.log('Showing popup for NEW Reis event:', event.customerId);
-              
-              // Show popup immediately
-              showScreeningResultsPopup(event);
-              showNotification(`Screening completed for ${event.customerId}`, 'warning');
-              
-              // Add to notifications history (this happens when popup is closed or viewed)
-              addEventToHistory(event);
+            // Add to notifications history
+            const existingIndex = notificationsHistory.findIndex(n => 
+              n.customerId === event.customerId && n.search_query_id === event.search_query_id
+            );
+            if (existingIndex === -1) {
+              notificationsHistory.unshift(event);
+              if (notificationsHistory.length > 50) {
+                notificationsHistory = notificationsHistory.slice(0, 50);
+              }
+              localStorage.setItem('notificationsHistory', JSON.stringify(notificationsHistory));
+              updateNotificationBadge();
             }
-          } else {
-            console.log('Event already processed (ID <= lastEventId):', event.id, '<=', lastEventId);
           }
         });
       }
-
     } catch (error) {
       console.error('Polling error:', error);
-      
-      if (reconnectAttempts === 0) {
-        logMessage('Polling connection lost', 'error');
-      }
-      
-      clearInterval(pollingInterval);
-      pollingInterval = null;
-      
-      if (reconnectAttempts < maxReconnectAttempts) {
-        reconnectAttempts++;
-        showNotification(`Connection lost. Reconnecting... (${reconnectAttempts}/${maxReconnectAttempts})`, 'warning');
-        
-        setTimeout(() => {
-          if (!pollingInterval) {
-            setupEventPolling();
-          }
-        }, reconnectDelay);
-      } else {
-        logMessage('Max reconnection attempts reached. Please refresh the page.', 'error');
-        showNotification('Connection failed. Please refresh the page.', 'error', 10000);
-      }
     }
-  }, 3000); // Poll every 3 seconds
-}
-
-// NEW: Function to add event to history
-function addEventToHistory(event) {
-  // Check if event already exists in history
-  const existingIndex = notificationsHistory.findIndex(n => 
-    n.customerId === event.customerId && n.search_query_id === event.search_query_id
-  );
+  }, 3000);
   
-  if (existingIndex === -1) {
-    // Add new event to history
-    notificationsHistory.unshift(event);
-    if (notificationsHistory.length > 50) {
-      notificationsHistory = notificationsHistory.slice(0, 50);
-    }
-    localStorage.setItem('notificationsHistory', JSON.stringify(notificationsHistory));
-    updateNotificationBadge();
-    console.log('Event added to history:', event.customerId);
-  } else {
-    console.log('Event already in history:', event.customerId);
-  }
+  console.log('Updated polling started - you should see popups for existing events');
 }
 
 // Helper function to link customer ID to systemId using search_query_id
@@ -1344,6 +1181,7 @@ document.getElementById('closePopup').addEventListener('click', () => {
   resetPopup();
 });
 
+// --- Navigate to onboarding function ---
 // --- Navigate to onboarding function with tenant-specific page ---
 function navigateToOnboarding(customerId) {
   // Get current tenant from localStorage or default
@@ -1548,26 +1386,27 @@ function showCentralizedPopup(message, showContinueButton = false) {
     receiveDirectWebhook(testWebhookData);
   }
 
-function addDirectWebhookTestButton() {
-  // Only create the direct webhook test button
-  const testButton = document.createElement('button');
-  testButton.textContent = 'Test Direct Webhook';
-  testButton.style.cssText = `
-    position: fixed;
-    top: 45px;
-    left: 20px;
-    z-index: 10000;
-    padding: 10px 15px;
-    background-color: #007ACC;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 14px;
-  `;
-  testButton.onclick = simulateDirectWebhook;
-  document.body.appendChild(testButton);
-}
+  // Add test button to your page
+  function addDirectWebhookTestButton() {
+    const testButton = document.createElement('button');
+    testButton.textContent = 'Test Direct Webhook';
+    testButton.style.cssText = `
+      position: fixed;
+      top: 45px;
+      left: 20px;
+      z-index: 10000;
+      padding: 10px 15px;
+      background-color: #007ACC;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    `;
+    testButton.onclick = simulateDirectWebhook;
+    document.body.appendChild(testButton);
+  }
+
   // Add close button
   const closeButton = document.createElement('button');
   closeButton.textContent = 'Close';
