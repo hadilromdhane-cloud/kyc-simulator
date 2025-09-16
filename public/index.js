@@ -374,7 +374,7 @@ function createNotificationElements() {
   tokenStatusButton.innerHTML = 'Token Status';
   tokenStatusButton.style.cssText = `
     position: fixed;
-    top: 85px;
+    top: 70px;
     right: 20px;
     z-index: 10000;
     padding: 10px 15px;
@@ -391,7 +391,7 @@ function createNotificationElements() {
     width: auto;
     margin-top: 0;
     min-width: 120px;
-    right: 140px;
+   
   `;
   tokenStatusButton.onclick = showTokenStatus;
   document.body.appendChild(tokenStatusButton);
