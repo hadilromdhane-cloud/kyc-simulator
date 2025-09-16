@@ -377,7 +377,7 @@ function createNotificationElements() {
     top: 85px;
     right: 20px;
     z-index: 10000;
-    padding: 8px 15px;
+    padding: 10px 15px;
     background-color: #007ACC;
     color: white;
     border: none;
@@ -391,6 +391,7 @@ function createNotificationElements() {
     width: auto;
     margin-top: 0;
     min-width: 120px;
+    right: 140px;
   `;
   tokenStatusButton.onclick = showTokenStatus;
   document.body.appendChild(tokenStatusButton);
