@@ -357,18 +357,20 @@ function createNotificationElements() {
   notificationButton.id = 'notificationHistoryBtn';
   notificationButton.innerHTML = 'Notifications';
   notificationButton.style.cssText = `
-    position: fixed;
-    top: 50px;
-    right: 20px;
-    z-index: 10000;
-    padding: 6px 10px;
-    background-color: #007ACC;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 12px;
-    font-weight: 600;
+ padding: 10px 15px; 
+  background-color: #007ACC;
+  color: white; border: none; 
+  border-radius: 6px; 
+  cursor: pointer; 
+  font-size: 14px; f
+  ont-weight: 600; 
+  font-family: 'Roboto', 
+  sans-serif; 
+  box-shadow: 0 3px 8px rgb(0 0 0 / 0.1); 
+  transition: background-color 0.2s ease; 
+  width: auto; 
+  margin-top: 0; 
+  min-width: 120px;
   `;
   
   notificationButton.onmouseover = () => {
