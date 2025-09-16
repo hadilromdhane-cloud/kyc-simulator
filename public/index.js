@@ -971,7 +971,7 @@ function renderFields(containerId, entityType, processType) {
   });
 }
 
-// --- Popup function ---
+// --- Popup function with clickable link ---
 function showPopup(message, link = '') {
   const popup = document.getElementById('popup');
   const popupText = document.getElementById('popupText');
@@ -988,17 +988,30 @@ function showPopup(message, link = '') {
   popupText.style.fontSize = '';
   popupText.style.lineHeight = '';
   
-  // Set content
-  popupText.textContent = message;
-
-  if (link) {
+  // Check if this is a hits message with link
+  if (link && message.includes('You can treat the hits via this link:')) {
+    // Create custom HTML for clickable link message
+    popupText.innerHTML = `You can treat the hits via this <a href="${link}" target="_blank" style="color: #007bff; text-decoration: underline; cursor: pointer;">link</a>:`;
+    
+    // Show the link field for copy-paste option
     popupLink.value = link;
     popupLink.style.display = 'block';
     popupLink.readOnly = true;
-    popupLink.onclick = null;
-    popupLink.style.cursor = 'default';
+    popupLink.onclick = () => popupLink.select(); // Allow selection for copying
+    popupLink.style.cursor = 'text';
   } else {
-    popupLink.style.display = 'none';
+    // Regular text content
+    popupText.textContent = message;
+    
+    if (link) {
+      popupLink.value = link;
+      popupLink.style.display = 'block';
+      popupLink.readOnly = true;
+      popupLink.onclick = () => popupLink.select();
+      popupLink.style.cursor = 'text';
+    } else {
+      popupLink.style.display = 'none';
+    }
   }
 
   // Ensure the original close button exists and is functional
@@ -1019,7 +1032,7 @@ function showPopup(message, link = '') {
     popupText.style.whiteSpace = 'normal';
     popupText.style.fontSize = '';
     popupText.style.lineHeight = '';
-    popupText.textContent = '';
+    popupText.innerHTML = ''; // Use innerHTML to clear properly
     
     // Reset link field
     popupLink.onclick = null;
@@ -1043,7 +1056,9 @@ function showPopup(message, link = '') {
 
   popup.style.display = 'block';
 
-  if (link) popupLink.select();
+  if (link && !message.includes('You can treat the hits via this link:')) {
+    popupLink.select();
+  }
 }
 
 // --- Enhanced popup for screening results ---
