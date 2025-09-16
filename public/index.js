@@ -384,7 +384,7 @@ function createNotificationElements() {
       border-radius: 6px;
       cursor: pointer;
       font-size: 12px;
-      font-weight: 600;
+      font-weight: 10;
   `;
   tokenStatusButton.onclick = showTokenStatus;
   document.body.appendChild(tokenStatusButton);
