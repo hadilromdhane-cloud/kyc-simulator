@@ -691,54 +691,38 @@ let notificationsHistory = JSON.parse(localStorage.getItem('notificationsHistory
 let lastEventTimestamp = parseInt(localStorage.getItem('lastEventTimestamp')) || (Date.now() - 300000); // Start from 5 minutes ago
 
 function setupEventPolling() {
-  // Clear existing polling
+  // Reset the event tracking
+  localStorage.setItem('lastEventId', '0');
+  lastEventId = 0;
+  
+  // Stop current polling
   if (pollingInterval) {
     clearInterval(pollingInterval);
     pollingInterval = null;
   }
-
-  if (reconnectAttempts === 0) {
-    logMessage('Starting Supabase event polling...', 'info');
-  } else {
-    logMessage(`Polling reconnection attempt ${reconnectAttempts}/${maxReconnectAttempts}...`, 'warning');
-  }
-
-  // Start polling
+  
+  // Start new polling with popup logic
   pollingInterval = setInterval(async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/events?since=${lastEventId}`);
-      
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
-
+      console.log('Checking for events since:', lastEventId);
+      const response = await fetch(`https://kyc-simulator-api.kyc-simulator.workers.dev/api/events?since=${lastEventId}`);
       const data = await response.json();
       
-      // Connection successful
-      if (reconnectAttempts > 0) {
-        logMessage('Connected to Supabase polling', 'success');
-        showNotification('Real-time notifications connected', 'success');
-        reconnectAttempts = 0;
-      }
-
-      // Process new events and show popups immediately
+      console.log('Polling found:', data.events.length, 'events');
+      
       if (data.events && data.events.length > 0) {
         data.events.forEach(event => {
-          logMessage(`New event received from database: ${JSON.stringify(event)}`, 'info');
+          console.log('Processing event:', event.customerId);
           
-          // Update last event ID
-          if (event.id > lastEventId) {
-            lastEventId = event.id;
-            localStorage.setItem('lastEventId', lastEventId.toString());
-          }
-
-          // Show immediate popup for Reis KYC events
-          if (event.source === 'Reis_KYC' && event.customerId) {
-            // Show notification
-            showNotification(`Screening completed for customer ${event.customerId}`, 'warning');
-            
-            // Show detailed popup immediately
+          // Update lastEventId
+          lastEventId = event.id;
+          localStorage.setItem('lastEventId', lastEventId.toString());
+          
+          // Show popup for Reis events
+          if (event.source === 'Reis_KYC') {
+            console.log('Showing popup for:', event.customerId);
             showScreeningResultsPopup(event);
+            showNotification(`Screening completed for ${event.customerId}`, 'warning');
             
             // Add to notifications history
             const existingIndex = notificationsHistory.findIndex(n => 
@@ -755,32 +739,12 @@ function setupEventPolling() {
           }
         });
       }
-
     } catch (error) {
-      console.error('Supabase polling error:', error);
-      
-      if (reconnectAttempts === 0) {
-        logMessage('Supabase polling connection lost', 'error');
-      }
-      
-      clearInterval(pollingInterval);
-      pollingInterval = null;
-      
-      if (reconnectAttempts < maxReconnectAttempts) {
-        reconnectAttempts++;
-        showNotification(`Connection lost. Reconnecting... (${reconnectAttempts}/${maxReconnectAttempts})`, 'warning');
-        
-        setTimeout(() => {
-          if (!pollingInterval) {
-            setupEventPolling();
-          }
-        }, reconnectDelay);
-      } else {
-        logMessage('Max reconnection attempts reached. Please refresh the page.', 'error');
-        showNotification('Connection failed. Please refresh the page.', 'error', 10000);
-      }
+      console.error('Polling error:', error);
     }
-  }, pollingFrequency);
+  }, 3000);
+  
+  console.log('Updated polling started - you should see popups for existing events');
 }
 
 // Helper function to link customer ID to systemId using search_query_id
