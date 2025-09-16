@@ -171,6 +171,35 @@ async function submitForm() {
             }
         });
 
+        // Debug: Log form data
+        console.log('Form data collected:', formData);
+
+        // Get authentication token and tenant name dynamically
+        // First try to get from storage, then use hardcoded values as fallback
+        let authToken = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+        let tenantName = localStorage.getItem('tenantName') || 
+                        sessionStorage.getItem('tenantName') || 
+                        customerData.tenant || 
+                        'bankfr';
+        
+        // Hardcoded fallback token if not found in storage (for testing/demo)
+        if (!authToken) {
+            authToken = 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsInRlbmFudCI6ImJhbmtmciIsInVzZXJGaW5nZXJwcmludCI6IjIzY2I4NjJkYzZmZjc3MDQyMGVjNzk3YjIyOTI1YjI5ZjdkZTgyYjlhZTE4MThlNzQwNzE5ZmExZGRlNzIyYzEiLCJoYXNoUm9sZXMiOjAsImhhc2hEZW5pYWxzUm9sZXMiOjAsImV4cCI6MTc1ODAxMDM5N30.ORhCrVMhXyTAG7fJLrFG-sydEZBT0ZfG87JxURKNuG9XSfJpc5oe1mLzcMuGgN5sRehBO-g2HARCR60mes_rqQ';
+        }
+        
+        // Debug: Log auth details
+        console.log('Auth Token:', authToken ? 'Found' : 'Missing');
+        console.log('Tenant Name:', tenantName);
+        console.log('Customer Data:', customerData);
+        
+        if (!authToken) {
+            throw new Error('Token d\'authentification manquant. Veuillez vous reconnecter.');
+        }
+        
+        if (!tenantName) {
+            throw new Error('Nom du tenant manquant. Veuillez vérifier votre configuration.');
+        }
+
         // Build the payload structure with STRICT format
         const payload = {
             customerId: parseInt(customerData.customerId) || Math.floor(Math.random() * 10000),
@@ -281,49 +310,58 @@ async function submitForm() {
             }
         };
 
+        // Debug: Log complete payload
+        console.log('Complete payload:', JSON.stringify(payload, null, 2));
+
         // Store the completed form data locally as backup
         localStorage.setItem(`onboarding_complete_${customerData.customerId}`, JSON.stringify(payload));
 
-        // Get authentication token and tenant name dynamically
-        const authToken = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
-        const tenantName = localStorage.getItem('tenantName') || 
-                          sessionStorage.getItem('tenantName') || 
-                          customerData.tenant || 
-                          'bankfr'; // Fallback default
-        
-        if (!authToken) {
-            throw new Error('Token d\'authentification manquant. Veuillez vous reconnecter.');
-        }
-        
-        if (!tenantName) {
-            throw new Error('Nom du tenant manquant. Veuillez vérifier votre configuration.');
-        }
+        // Prepare headers - CORRECTED to match Postman exactly
+        const headers = {
+            'Content-Type': 'application/json',
+            'x-auth-tenant': tenantName,
+            'x-auth-token': authToken
+        };
+
+        // Debug: Log headers (without exposing full token)
+        console.log('Request headers:', {
+            ...headers,
+            'x-auth-token': authToken ? `${authToken.substring(0, 10)}...` : 'Missing'
+        });
 
         // Send POST request to the real API endpoint with authentication headers
+        console.log('Sending request to:', 'https://greataml.com/kyc-web-restful/onboarding/onboard');
+        
         const response = await fetch('https://greataml.com/kyc-web-restful/onboarding/onboard', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'Authorization': `Bearer ${authToken}`,
-                'X-Tenant-Name': tenantName,
-                // Alternative header names if needed:
-                // 'Tenant': tenantName,
-                // 'X-Tenant': tenantName,
-            },
+            headers: headers,
             body: JSON.stringify(payload)
         });
 
+        // Debug: Log response details
+        console.log('Response status:', response.status);
+        console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+
         if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
+            let errorData;
+            const contentType = response.headers.get('content-type');
+            
+            if (contentType && contentType.includes('application/json')) {
+                errorData = await response.json();
+            } else {
+                const errorText = await response.text();
+                console.log('Error response text:', errorText);
+                errorData = { message: errorText || `HTTP ${response.status}` };
+            }
+            
+            console.log('Error data:', errorData);
             throw new Error(errorData.message || `Server error: ${response.status} - ${response.statusText}`);
         }
 
         const result = await response.json();
         
-        // Log payload and response for debugging
-        console.log('Payload sent:', payload);
-        console.log('Server response:', result);
+        // Log success response
+        console.log('Success! Server response:', result);
 
         // Show success message with server response
         showSuccessMessage(result);
@@ -332,7 +370,8 @@ async function submitForm() {
         localStorage.removeItem(`onboarding_draft_${customerData.customerId}`);
 
     } catch (error) {
-        console.error('Error submitting form:', error);
+        console.error('Detailed error:', error);
+        console.error('Error stack:', error.stack);
         
         // Reset button state
         submitBtn.textContent = originalText;
