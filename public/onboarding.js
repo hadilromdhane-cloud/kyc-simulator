@@ -284,12 +284,32 @@ async function submitForm() {
         // Store the completed form data locally as backup
         localStorage.setItem(`onboarding_complete_${customerData.customerId}`, JSON.stringify(payload));
 
-        // Send POST request to the real API endpoint
+        // Get authentication token and tenant name dynamically
+        const authToken = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+        const tenantName = localStorage.getItem('tenantName') || 
+                          sessionStorage.getItem('tenantName') || 
+                          customerData.tenant || 
+                          'bankfr'; // Fallback default
+        
+        if (!authToken) {
+            throw new Error('Token d\'authentification manquant. Veuillez vous reconnecter.');
+        }
+        
+        if (!tenantName) {
+            throw new Error('Nom du tenant manquant. Veuillez vérifier votre configuration.');
+        }
+
+        // Send POST request to the real API endpoint with authentication headers
         const response = await fetch('https://greataml.com/kyc-web-restful/onboarding/onboard', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Accept': 'application/json'
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${authToken}`,
+                'X-Tenant-Name': tenantName,
+                // Alternative header names if needed:
+                // 'Tenant': tenantName,
+                // 'X-Tenant': tenantName,
             },
             body: JSON.stringify(payload)
         });
