@@ -373,8 +373,8 @@ function createNotificationElements() {
   tokenStatusButton.id = 'tokenStatusBtn';
   tokenStatusButton.innerHTML = 'Token Status';
   tokenStatusButton.style.cssText = `
-    position: fixed;
-    top: 50px;
+position: fixed;
+    top: 35px;
     right: 20px;
     z-index: 10000;
     padding: 10px 15px;
