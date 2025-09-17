@@ -1,6 +1,7 @@
 /**
  * Onboarding Handler - Reusable JavaScript module for handling KYC onboarding forms
  * This module can be used across multiple HTML forms by simply including it and calling init()
+ * Supports both BankFR and Banque EN tenants with different payload structures
  */
 
 const OnboardingHandler = (function() {
@@ -71,8 +72,9 @@ const OnboardingHandler = (function() {
         }
     };
 
-    // Data mapping functions
+    // Data mapping functions - now supports both tenants
     const DataMapper = {
+        // BankFR document type mappings (original)
         getDocumentTypeId: function(docType) {
             const typeMap = {
                 'cin': 1,
@@ -93,118 +95,256 @@ const OnboardingHandler = (function() {
             return nameMap[docType] || 'Carte d\'identité nationale';
         },
 
+        // Banque EN document type mappings
+        getDocumentTypeIdEN: function(docType) {
+            const typeMap = {
+                'cin': 14,
+                'passeport': 13,
+                'titre_sejour': 2,
+                'permis_conduire': 3
+            };
+            return typeMap[docType] || 14;
+        },
+
+        getDocumentTypeNameEN: function(docType) {
+            const nameMap = {
+                'cin': 'National identity card',
+                'passeport': 'Passport',
+                'titre_sejour': 'Residence permit',
+                'permis_conduire': 'Driver\'s license'
+            };
+            return nameMap[docType] || 'National identity card';
+        },
+
         mapFormDataToPayload: function(formData) {
             const customerId = parseInt(customerData.customerId) || Utils.generateCustomerId();
             const currentDateTime = new Date().toISOString();
 
-            return {
-                customerId: customerId,
-                customerRelationName: "",
-                formId: "1",
-                items: {
-                    isSanctionnedWorkflow: "Non",
-                    AddressDataGrid: [],
-                    PaysDeResidence: formData.paysResidence || "",
-                    address: [],
-                    address_doc: [],
-                    address_proof_type: {},
-                    adresseDeResidence: formData.adresse || "",
-                    agence: "headquarters",
-                    agencyId: 3,
-                    agencyName: "headquarters",
-                    agency_location: null,
-                    birth_date: formData.dateNaissance || "",
-                    businessName: "",
-                    canal_de_distribution: formData.canal || "",
-                    citizenship: formData.nationalite || "",
-                    containerelm: {
-                        "profession-2": "",
-                        retrieved_dob: "",
-                        retrieved_last_name: "",
-                        retrieved_first_name: "",
-                        "citizenship-2": "",
-                        retrieved_address: ""
-                    },
-                    createdBy: "admin",
-                    createdOn: currentDateTime,
-                    creatorFirstName: "System",
-                    creatorId: 1,
-                    creatorLastName: "User",
-                    current_date: currentDateTime,
-                    current_user_id: 1,
-                    current_user_name: "System User",
-                    cus_birth_date: formData.dateNaissance || "",
-                    customerUrl: "https://greataml.com/",
-                    customer_type: "manual-entry",
-                    dataGrid: [{
+            // Check tenant and create appropriate payload
+            const isBanqueEN = tenantName === 'banque_en';
+            
+            if (isBanqueEN) {
+                // Banque EN payload structure (based on successful example)
+                return {
+                    customerId: customerId,
+                    customerRelationName: "",
+                    formId: "1",
+                    items: {
+                        isSanctionnedWorkflow: "No",
+                        isPepWorkflow: "<li>PEP : <b> <span> No </span></b></li>",
+                        agence: "headquarters",
+                        rm_username: "admin",
+                        rm_fn: "System",
+                        rm_ln: "User",
+                        process_type: "",
+                        createdOn: currentDateTime,
+                        dpr: "",
+                        last_update: currentDateTime,
+                        first_name: formData.firstName || "",
+                        last_name: formData.lastName || "",
+                        birth_date: formData.dateOfBirth || "",
+                        nationality: formData.nationality || "",
+                        marital_status: formData.civilStatus || "",
+                        tel1: formData.landlinePhone || "",
+                        email: formData.email || "",
+                        adresseDeResidence: formData.residentialAddress || "",
+                        postal_code: formData.postalCode || "",
+                        fiscale_ville: formData.city || "",
+                        Country_of_residence: formData.countryOfResidence || "",
+                        tin_: {
+                            id: this.getDocumentTypeIdEN(formData.idType),
+                            name: this.getDocumentTypeNameEN(formData.idType),
+                            value: formData.idType || "",
+                            translate: this.getDocumentTypeNameEN(formData.idType),
+                            parentId: null,
+                            parentName: null,
+                            uniqueCode: `${this.getDocumentTypeNameEN(formData.idType)}:${formData.idType}:tin`,
+                            tags: ["tin"]
+                        },
+                        nid: formData.idNumber || "",
+                        delivery_date: formData.dateOfIssue || "",
+                        expiry_date: formData.expiryDate || "",
+                        profession: formData.profession || "",
+                        product: [formData.productsServices || ""],
+                        onboarding_channel: formData.onboardingChannel || "",
+                        source_of_funds: [formData.sourceOfFunds || ""],
+                        dataGrid: [{"select": "", "nature": "", "tx_nature": {}}],
+                        mscq: "",
+                        pep: "",
+                        pliberal: "",
+                        id_doc: [],
+                        address_proof_type: {},
+                        address_doc: [],
+                        tiin_doc: [],
+                        dataGrid1: [{"source_of_funds_doctype": {}, "source_of_funds_doc": []}],
+                        invokeElm: false,
+                        containerelm: {
+                            "profession-2": "",
+                            retrieved_dob: "",
+                            retrieved_last_name: "",
+                            retrieved_first_name: "",
+                            "citizenship-2": "",
+                            retrieved_address: ""
+                        },
+                        name: "",
                         select: "",
-                        nature: "",
-                        tx_nature: {}
-                    }],
-                    dataGrid1: [{
-                        source_of_funds_doctype: {},
-                        source_of_funds_doc: []
-                    }],
-                    delivery_date: formData.dateDelivrance || "",
-                    distribution_channel: null,
-                    dpr: "",
-                    eaiIds: {},
-                    email: formData.email || "",
-                    entityType: "PP",
-                    expiry_date: formData.dateExpiration || "",
-                    extendedProperties: {},
-                    first_name: formData.prenom || "",
-                    fiscale_ville: formData.ville || "",
-                    form_entity_type: "PP",
-                    hasRiskedCountry: false,
-                    id: customerId,
-                    id_doc: [],
-                    invokeElm: false,
-                    isPEP: false,
-                    isPepWorkflow: "<li>Personne politiquement exposée : <b> <span> Non</span></b></li>",
-                    isSanctioned: false,
-                    isSanctionned: false,
-                    is_hq_user: false,
-                    last_name: formData.nom || "",
-                    last_update: currentDateTime,
-                    listsNames: [],
-                    luneDeVosRelationsPresenteTElleLunDesIndicesDamericaniteDefinisParLaLoiFatca: "",
-                    marital_status: formData.etatCivil || "",
-                    modificationDate: currentDateTime,
-                    mscq: "",
-                    nationality: formData.nationalite || "",
-                    nid: formData.numeroPiece || "",
-                    obnl_name: formData.nom || "",
-                    origine_des_fonds: [formData.origineFonds || ""],
-                    outboundSystems: null,
-                    pays: formData.nationalite || "",
-                    pep: "",
-                    pliberal: "",
-                    postal_code: formData.codePostal || "",
-                    process_type: "",
-                    produit: [formData.produits || ""],
-                    profession: formData.profession || "",
-                    revenuAnnuelNet: parseInt(formData.revenu) || 0,
-                    rm_fn: "System",
-                    rm_ln: "User",
-                    rm_username: "admin",
-                    searchId: Math.floor(Math.random() * 100000),
-                    tel1: formData.telephone || "",
-                    tel2: formData.portable || "",
-                    tiin_doc: [],
-                    tin_: {
-                        id: this.getDocumentTypeId(formData.typePiece),
-                        name: this.getDocumentTypeName(formData.typePiece),
-                        value: formData.typePiece || "",
-                        translate: this.getDocumentTypeName(formData.typePiece),
-                        parentId: null,
-                        parentName: null,
-                        uniqueCode: `${this.getDocumentTypeName(formData.typePiece)}:${formData.typePiece}:tin`,
-                        tags: ["tin"]
+                        businessName: "",
+                        entityType: "PP",
+                        id: customerId,
+                        customer_type: "manual-entry",
+                        createdBy: "admin",
+                        creatorId: 2,
+                        creatorFirstName: "System",
+                        creatorLastName: "User",
+                        modificationDate: currentDateTime,
+                        extendedProperties: {},
+                        citizenship: formData.nationality || "",
+                        listsNames: [],
+                        agencyId: 3,
+                        agencyName: "headquarters",
+                        eaiIds: {},
+                        searchId: Math.floor(Math.random() * 100000),
+                        outboundSystems: null,
+                        AddressDataGrid: [],
+                        current_date: currentDateTime,
+                        isPEP: false,
+                        isSanctionned: false,
+                        isSanctioned: false,
+                        hasRiskedCountry: false,
+                        form_entity_type: "PP",
+                        cus_birth_date: formData.dateOfBirth || "",
+                        url: "https://greataml.com/",
+                        is_hq_user: false,
+                        current_user_name: "System User",
+                        current_user_id: 2,
+                        agency_location: null,
+                        distribution_channel: null,
+                        obnl_name: formData.lastName || "",
+                        customerUrl: "https://greataml.com/",
+                        revenuAnnuelNet: parseInt(formData.netAnnualIncome) || 0,
+                        address: []
                     },
-                    url: "https://greataml.com/"
-                }
-            };
+                    fatcaIdentification: {
+                        americanCitizen: "false",
+                        greenCard: "false",
+                        americanResident: "false",
+                        americanVisit: "false",
+                        address: null,
+                        beneficialOwners: null,
+                        hasBeneficialOwners: null
+                    }
+                };
+            } else {
+                // BankFR payload structure (keep the exact working structure)
+                return {
+                    customerId: customerId,
+                    customerRelationName: "",
+                    formId: "1",
+                    items: {
+                        isSanctionnedWorkflow: "Non",
+                        AddressDataGrid: [],
+                        PaysDeResidence: formData.paysResidence || "",
+                        address: [],
+                        address_doc: [],
+                        address_proof_type: {},
+                        adresseDeResidence: formData.adresse || "",
+                        agence: "headquarters",
+                        agencyId: 3,
+                        agencyName: "headquarters",
+                        agency_location: null,
+                        birth_date: formData.dateNaissance || "",
+                        businessName: "",
+                        canal_de_distribution: formData.canal || "",
+                        citizenship: formData.nationalite || "",
+                        containerelm: {
+                            "profession-2": "",
+                            retrieved_dob: "",
+                            retrieved_last_name: "",
+                            retrieved_first_name: "",
+                            "citizenship-2": "",
+                            retrieved_address: ""
+                        },
+                        createdBy: "admin",
+                        createdOn: currentDateTime,
+                        creatorFirstName: "System",
+                        creatorId: 1,
+                        creatorLastName: "User",
+                        current_date: currentDateTime,
+                        current_user_id: 1,
+                        current_user_name: "System User",
+                        cus_birth_date: formData.dateNaissance || "",
+                        customerUrl: "https://greataml.com/",
+                        customer_type: "manual-entry",
+                        dataGrid: [{
+                            select: "",
+                            nature: "",
+                            tx_nature: {}
+                        }],
+                        dataGrid1: [{
+                            source_of_funds_doctype: {},
+                            source_of_funds_doc: []
+                        }],
+                        delivery_date: formData.dateDelivrance || "",
+                        distribution_channel: null,
+                        dpr: "",
+                        eaiIds: {},
+                        email: formData.email || "",
+                        entityType: "PP",
+                        expiry_date: formData.dateExpiration || "",
+                        extendedProperties: {},
+                        first_name: formData.prenom || "",
+                        fiscale_ville: formData.ville || "",
+                        form_entity_type: "PP",
+                        hasRiskedCountry: false,
+                        id: customerId,
+                        id_doc: [],
+                        invokeElm: false,
+                        isPEP: false,
+                        isPepWorkflow: "<li>Personne politiquement exposée : <b> <span> Non</span></b></li>",
+                        isSanctioned: false,
+                        isSanctionned: false,
+                        is_hq_user: false,
+                        last_name: formData.nom || "",
+                        last_update: currentDateTime,
+                        listsNames: [],
+                        luneDeVosRelationsPresenteTElleLunDesIndicesDamericaniteDefinisParLaLoiFatca: "",
+                        marital_status: formData.etatCivil || "",
+                        modificationDate: currentDateTime,
+                        mscq: "",
+                        nationality: formData.nationalite || "",
+                        nid: formData.numeroPiece || "",
+                        obnl_name: formData.nom || "",
+                        origine_des_fonds: [formData.origineFonds || ""],
+                        outboundSystems: null,
+                        pays: formData.nationalite || "",
+                        pep: "",
+                        pliberal: "",
+                        postal_code: formData.codePostal || "",
+                        process_type: "",
+                        produit: [formData.produits || ""],
+                        profession: formData.profession || "",
+                        revenuAnnuelNet: parseInt(formData.revenu) || 0,
+                        rm_fn: "System",
+                        rm_ln: "User",
+                        rm_username: "admin",
+                        searchId: Math.floor(Math.random() * 100000),
+                        tel1: formData.telephone || "",
+                        tel2: formData.portable || "",
+                        tiin_doc: [],
+                        tin_: {
+                            id: this.getDocumentTypeId(formData.typePiece),
+                            name: this.getDocumentTypeName(formData.typePiece),
+                            value: formData.typePiece || "",
+                            translate: this.getDocumentTypeName(formData.typePiece),
+                            parentId: null,
+                            parentName: null,
+                            uniqueCode: `${this.getDocumentTypeName(formData.typePiece)}:${formData.typePiece}:tin`,
+                            tags: ["tin"]
+                        },
+                        url: "https://greataml.com/"
+                    }
+                };
+            }
         }
     };
 
@@ -228,7 +368,7 @@ const OnboardingHandler = (function() {
             });
 
             if (!isValid) {
-                alert('Veuillez remplir tous les champs obligatoires marqués d\'un *');
+                alert('Please fill in all required fields marked with *');
                 if (firstInvalid) {
                     firstInvalid.focus();
                 }
@@ -263,7 +403,7 @@ const OnboardingHandler = (function() {
     const UI = {
         showLoading: function(button) {
             const originalText = button.textContent;
-            button.textContent = 'Envoi en cours...';
+            button.textContent = 'Sending...';
             button.disabled = true;
             return originalText;
         },
@@ -280,47 +420,47 @@ const OnboardingHandler = (function() {
 
             if (onboardingResult) {
                 if (onboardingResult.errorMessage) {
-                    statusMessage = 'Dossier soumis avec des remarques';
+                    statusMessage = 'Application submitted with remarks';
                     statusColor = '#ffc107';
                     additionalInfo = `
                         <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 8px; margin: 20px auto; max-width: 500px;">
-                            <h4 style="color: #856404; margin-bottom: 10px;">Remarque:</h4>
+                            <h4 style="color: #856404; margin-bottom: 10px;">Remark:</h4>
                             <p style="color: #856404; margin: 0;">${onboardingResult.errorMessage}</p>
                         </div>
                     `;
                 } else if (onboardingResult.instruction) {
                     if (onboardingResult.instruction.blocking) {
-                        statusMessage = 'Dossier rejeté';
+                        statusMessage = 'Application rejected';
                         statusColor = '#dc3545';
                         additionalInfo = `
                             <div style="background: #f8d7da; border: 1px solid #f5c6cb; padding: 15px; border-radius: 8px; margin: 20px auto; max-width: 500px;">
-                                <h4 style="color: #721c24; margin-bottom: 10px;">Instruction bloquante:</h4>
+                                <h4 style="color: #721c24; margin-bottom: 10px;">Blocking instruction:</h4>
                                 <p style="color: #721c24; margin: 0;"><strong>${onboardingResult.instruction.label}</strong></p>
                                 <p style="color: #721c24; margin: 5px 0 0 0;">${onboardingResult.instruction.description}</p>
                             </div>
                         `;
                     } else {
-                        statusMessage = 'Dossier soumis - Action requise';
+                        statusMessage = 'Application submitted - Action required';
                         statusColor = '#ffc107';
                         additionalInfo = `
                             <div style="background: #d1ecf1; border: 1px solid #bee5eb; padding: 15px; border-radius: 8px; margin: 20px auto; max-width: 500px;">
-                                <h4 style="color: #0c5460; margin-bottom: 10px;">Instruction informative:</h4>
+                                <h4 style="color: #0c5460; margin-bottom: 10px;">Information instruction:</h4>
                                 <p style="color: #0c5460; margin: 0;"><strong>${onboardingResult.instruction.label}</strong></p>
                                 <p style="color: #0c5460; margin: 5px 0 0 0;">${onboardingResult.instruction.description}</p>
                             </div>
                         `;
                     }
                 } else {
-                    statusMessage = 'Dossier approuvé avec succès';
+                    statusMessage = 'Application approved successfully';
                     additionalInfo = `
                         <div style="background: #d4edda; border: 1px solid #c3e6cb; padding: 15px; border-radius: 8px; margin: 20px auto; max-width: 500px;">
-                            <h4 style="color: #155724; margin-bottom: 10px;">✓ Validation réussie</h4>
-                            <p style="color: #155724; margin: 0;">Le client a été approuvé et peut être intégré au système.</p>
+                            <h4 style="color: #155724; margin-bottom: 10px;">✓ Validation successful</h4>
+                            <p style="color: #155724; margin: 0;">The customer has been approved and can be integrated into the system.</p>
                         </div>
                     `;
                 }
             } else {
-                statusMessage = 'Dossier soumis avec succès';
+                statusMessage = 'Application submitted successfully';
             }
 
             const container = document.querySelector('.container');
@@ -331,23 +471,23 @@ const OnboardingHandler = (function() {
                     </div>
                     <h2 style="color: ${statusColor}; margin-bottom: 20px;">${statusMessage}</h2>
                     <p style="font-size: 1.2em; color: #6c757d; margin-bottom: 30px;">
-                        Le dossier KYC pour le client <strong>${customerData.customerId}</strong> a été traité par le système Reis.
+                        KYC application for customer <strong>${customerData.customerId}</strong> has been processed by the Reis system.
                     </p>
                     
                     ${additionalInfo}
                     
                     <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px auto; max-width: 400px;">
-                        <h4 style="margin-bottom: 15px;">Informations du dossier:</h4>
-                        <p><strong>Client:</strong> ${customerData.customerId}</p>
-                        <p><strong>Type:</strong> Personne Physique</p>
+                        <h4 style="margin-bottom: 15px;">Application Information:</h4>
+                        <p><strong>Customer:</strong> ${customerData.customerId}</p>
+                        <p><strong>Type:</strong> Individual</p>
                         <p><strong>Tenant:</strong> ${tenantName.toUpperCase()}</p>
-                        <p><strong>Date de soumission:</strong> ${new Date().toLocaleDateString('fr-FR')}</p>
+                        <p><strong>Submission Date:</strong> ${new Date().toLocaleDateString('en-US')}</p>
                         ${onboardingResult && onboardingResult.riskCalculationId ? 
-                            `<p><strong>ID Calcul de Risque:</strong> ${onboardingResult.riskCalculationId}</p>` : ''}
+                            `<p><strong>Risk Calculation ID:</strong> ${onboardingResult.riskCalculationId}</p>` : ''}
                     </div>
                     
                     <button class="btn btn-primary" onclick="window.location.href='index.html'" style="margin-top: 20px; padding: 15px 30px; background: linear-gradient(45deg, #007bff, #0056b3); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
-                        Retour à l'accueil
+                        Back to Home
                     </button>
                 </div>
             `;
@@ -358,22 +498,22 @@ const OnboardingHandler = (function() {
             container.innerHTML = `
                 <div style="text-align: center; padding: 50px;">
                     <div style="font-size: 4em; color: #dc3545; margin-bottom: 20px;">❌</div>
-                    <h2 style="color: #dc3545; margin-bottom: 20px;">Erreur lors de la soumission</h2>
+                    <h2 style="color: #dc3545; margin-bottom: 20px;">Submission Error</h2>
                     <p style="font-size: 1.2em; color: #6c757d; margin-bottom: 30px;">
-                        Une erreur s'est produite lors de l'envoi du dossier KYC pour le client <strong>${customerData.customerId}</strong>.
+                        An error occurred while sending the KYC application for customer <strong>${customerData.customerId}</strong>.
                     </p>
                     
                     <div style="background: #f8d7da; border: 1px solid #f5c6cb; padding: 20px; border-radius: 10px; margin: 20px auto; max-width: 500px;">
-                        <h4 style="color: #721c24; margin-bottom: 10px;">Détail de l'erreur:</h4>
+                        <h4 style="color: #721c24; margin-bottom: 10px;">Error Details:</h4>
                         <p style="color: #721c24; margin: 0; word-break: break-word;">${errorMessage}</p>
                     </div>
                     
                     <div style="margin-top: 30px;">
                         <button class="btn btn-primary" onclick="location.reload()" style="margin-right: 10px; padding: 15px 30px; background: linear-gradient(45deg, #007bff, #0056b3); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
-                            Réessayer
+                            Try Again
                         </button>
                         <button class="btn btn-secondary" onclick="window.location.href='index.html'" style="padding: 15px 30px; background: #6c757d; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
-                            Retour à l'accueil
+                            Back to Home
                         </button>
                     </div>
                 </div>
@@ -499,8 +639,9 @@ const OnboardingHandler = (function() {
             if (customerData && customerData.customerId) {
                 const parts = customerData.customerId.toString().split('_');
                 if (parts.length >= 2) {
-                    const firstNameField = document.getElementById('prenom');
-                    const lastNameField = document.getElementById('nom');
+                    // Try both naming conventions
+                    const firstNameField = document.getElementById('prenom') || document.getElementById('firstName');
+                    const lastNameField = document.getElementById('nom') || document.getElementById('lastName');
                     if (firstNameField) firstNameField.value = parts[0] || '';
                     if (lastNameField) lastNameField.value = parts[1] || '';
                 }
@@ -544,11 +685,11 @@ const OnboardingHandler = (function() {
                 const tenant = Auth.getTenant();
                 
                 if (!authToken) {
-                    throw new Error('Token d\'authentification manquant. Veuillez vous reconnecter.');
+                    throw new Error('Authentication token missing. Please log in again.');
                 }
                 
                 if (!tenant) {
-                    throw new Error('Nom du tenant manquant. Veuillez vérifier votre configuration.');
+                    throw new Error('Tenant name missing. Please check your configuration.');
                 }
 
                 const payload = DataMapper.mapFormDataToPayload(formData);
@@ -581,7 +722,6 @@ const OnboardingHandler = (function() {
     // Public API
     return {
         init: function(formElementId, tenant) {
-            Utils.log('Initializing OnboardingHandler', { formId: formElementId, tenant: tenant });
             
             formId = formElementId;
             tenantName = tenant || CONFIG.DEFAULT_TENANT;
