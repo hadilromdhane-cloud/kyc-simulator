@@ -241,7 +241,6 @@ const OnboardingHandler = (function() {
                     customerRelationName: "",
                     formId: "1",
                     items: {
-                        isSanctionnedWorkflow: "Non",
                         AddressDataGrid: [],
                         PaysDeResidence: formData.paysResidence || "",
                         address: [],
@@ -301,8 +300,6 @@ const OnboardingHandler = (function() {
                         invokeElm: false,
                         isPEP: false,
                         isPepWorkflow: "<li>Personne politiquement exposée : <b> <span> Non</span></b></li>",
-                        isSanctioned: false,
-                        isSanctionned: false,
                         is_hq_user: false,
                         last_name: formData.nom || "",
                         last_update: currentDateTime,
@@ -377,7 +374,7 @@ const OnboardingHandler = (function() {
             return isValid;
         },
 
-        collectFormData: function() {
+                        collectFormData: function() {
             const formData = {};
             const allInputs = currentForm.querySelectorAll('input, select, textarea');
             
@@ -391,7 +388,13 @@ const OnboardingHandler = (function() {
                         formData[input.name] = input.value;
                     }
                 } else {
-                    formData[input.name] = input.value;
+                    // Clean the input value to avoid regex issues
+                    let value = input.value;
+                    if (typeof value === 'string') {
+                        // Remove any problematic characters that might be interpreted as regex
+                        value = value.replace(/[*+?^${}()|[\]\\]/g, '');
+                    }
+                    formData[input.name] = value;
                 }
             });
 
