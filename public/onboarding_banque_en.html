@@ -123,6 +123,10 @@
             font-size: 0.95rem;
         }
 
+        .required {
+            color: #dc3545;
+        }
+
         input[type="text"],
         input[type="email"],
         input[type="tel"],
@@ -208,15 +212,10 @@
             transform: translateY(-2px);
         }
 
-        .success-message {
-            background: linear-gradient(135deg, #2ecc71, #27ae60);
-            color: white;
-            padding: 20px;
-            text-align: center;
-            font-size: 1.1rem;
-            margin-top: 20px;
-            border-radius: 8px;
-            display: none;
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
         }
 
         @media (max-width: 768px) {
@@ -270,32 +269,36 @@
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="firstName">First Name *</label>
+                            <label for="firstName">First Name <span class="required">*</span></label>
                             <input type="text" id="firstName" name="firstName" required>
                         </div>
                         <div class="form-group">
-                            <label for="lastName">Last Name *</label>
+                            <label for="lastName">Last Name <span class="required">*</span></label>
                             <input type="text" id="lastName" name="lastName" required>
                         </div>
                     </div>
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="dateOfBirth">Date of Birth *</label>
+                            <label for="dateOfBirth">Date of Birth <span class="required">*</span></label>
                             <input type="date" id="dateOfBirth" name="dateOfBirth" required>
                         </div>
                         <div class="form-group">
-                            <label for="nationality">Nationality *</label>
+                            <label for="nationality">Nationality <span class="required">*</span></label>
                             <select id="nationality" name="nationality" required>
-                                <option value="">Select Nationality</option>
-                                <option value="American">American</option>
-                                <option value="British">British</option>
-                                <option value="Canadian">Canadian</option>
-                                <option value="French">French</option>
-                                <option value="German">German</option>
-                                <option value="Italian">Italian</option>
-                                <option value="Spanish">Spanish</option>
-                                <option value="Other">Other</option>
+                                <option value="">-- Select --</option>
+                                <option value="France">France</option>
+                                <option value="Tunisia">Tunisia</option>
+                                <option value="Morocco">Morocco</option>
+                                <option value="Algeria">Algeria</option>
+                                <option value="Italy">Italy</option>
+                                <option value="Spain">Spain</option>
+                                <option value="Germany">Germany</option>
+                                <option value="United Kingdom">United Kingdom</option>
+                                <option value="Belgium">Belgium</option>
+                                <option value="Switzerland">Switzerland</option>
+                                <option value="Canada">Canada</option>
+                                <option value="United States">United States</option>
                             </select>
                         </div>
                     </div>
@@ -304,24 +307,28 @@
                         <div class="form-group">
                             <label for="civilStatus">Civil Status</label>
                             <select id="civilStatus" name="civilStatus">
-                                <option value="">Select Status</option>
+                                <option value="">-- Select --</option>
                                 <option value="Single">Single</option>
                                 <option value="Married">Married</option>
                                 <option value="Divorced">Divorced</option>
                                 <option value="Widowed">Widowed</option>
-                                <option value="Separated">Separated</option>
+                                <option value="Civil Partnership">Civil Partnership</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="phone">Phone *</label>
-                            <input type="tel" id="phone" name="phone" required>
+                            <label for="mobilePhone">Mobile Phone</label>
+                            <input type="tel" id="mobilePhone" name="mobilePhone">
                         </div>
                     </div>
 
-                    <div class="form-row full-width">
+                    <div class="form-row">
                         <div class="form-group">
-                            <label for="email">E-mail *</label>
-                            <input type="email" id="email" name="email" required>
+                            <label for="landlinePhone">Landline Phone</label>
+                            <input type="tel" id="landlinePhone" name="landlinePhone">
+                        </div>
+                        <div class="form-group">
+                            <label for="email">E-mail</label>
+                            <input type="email" id="email" name="email">
                         </div>
                     </div>
                 </div>
@@ -333,35 +340,39 @@
                     
                     <div class="form-row full-width">
                         <div class="form-group">
-                            <label for="residentialAddress">Residential Address *</label>
-                            <textarea id="residentialAddress" name="residentialAddress" required placeholder="Enter your complete address"></textarea>
+                            <label for="residentialAddress">Residential Address</label>
+                            <textarea id="residentialAddress" name="residentialAddress" placeholder="Enter your complete address"></textarea>
                         </div>
                     </div>
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="postalCode">Postal Code *</label>
-                            <input type="text" id="postalCode" name="postalCode" required>
+                            <label for="postalCode">Postal Code</label>
+                            <input type="text" id="postalCode" name="postalCode">
                         </div>
                         <div class="form-group">
-                            <label for="city">City *</label>
-                            <input type="text" id="city" name="city" required>
+                            <label for="city">City</label>
+                            <input type="text" id="city" name="city">
                         </div>
                     </div>
 
                     <div class="form-row full-width">
                         <div class="form-group">
-                            <label for="countryOfResidence">Country of Residence *</label>
+                            <label for="countryOfResidence">Country of Residence <span class="required">*</span></label>
                             <select id="countryOfResidence" name="countryOfResidence" required>
-                                <option value="">Select Country</option>
-                                <option value="United States">United States</option>
-                                <option value="United Kingdom">United Kingdom</option>
-                                <option value="Canada">Canada</option>
+                                <option value="">-- Select --</option>
                                 <option value="France">France</option>
-                                <option value="Germany">Germany</option>
+                                <option value="Tunisia">Tunisia</option>
+                                <option value="Morocco">Morocco</option>
+                                <option value="Algeria">Algeria</option>
                                 <option value="Italy">Italy</option>
                                 <option value="Spain">Spain</option>
-                                <option value="Other">Other</option>
+                                <option value="Germany">Germany</option>
+                                <option value="United Kingdom">United Kingdom</option>
+                                <option value="Belgium">Belgium</option>
+                                <option value="Switzerland">Switzerland</option>
+                                <option value="Canada">Canada</option>
+                                <option value="United States">United States</option>
                             </select>
                         </div>
                     </div>
@@ -374,17 +385,17 @@
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="idType">Type of Identity Document *</label>
+                            <label for="idType">Type of Identity Document <span class="required">*</span></label>
                             <select id="idType" name="idType" required>
-                                <option value="">Select Document Type</option>
-                                <option value="Passport">Passport</option>
-                                <option value="National ID Card">National ID Card</option>
-                                <option value="Driver's License">Driver's License</option>
-                                <option value="Other">Other</option>
+                                <option value="">-- Select --</option>
+                                <option value="cin">National ID Card</option>
+                                <option value="passeport">Passport</option>
+                                <option value="titre_sejour">Residence Permit</option>
+                                <option value="permis_conduire">Driver's License</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="idNumber">ID Number *</label>
+                            <label for="idNumber">ID Number <span class="required">*</span></label>
                             <input type="text" id="idNumber" name="idNumber" required>
                         </div>
                     </div>
@@ -411,49 +422,73 @@
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="profession">Profession *</label>
-                            <input type="text" id="profession" name="profession" required placeholder="Enter your profession">
+                            <label for="profession">Profession <span class="required">*</span></label>
+                            <select id="profession" name="profession" required>
+                                <option value="">-- Select --</option>
+                                <option value="NOTARY PUBLIC">NOTARY PUBLIC</option>
+                                <option value="UNKNOWN">UNKNOWN</option>
+                                <option value="AGRICULTURAL WORKERS">AGRICULTURAL WORKERS</option>
+                                <option value="FARMERS">FARMERS</option>
+                                <option value="INDUSTRIAL WORKERS">INDUSTRIAL WORKERS</option>
+                                <option value="CRAFTSMEN">CRAFTSMEN</option>
+                                <option value="FISHING INDUSTRY OWNERS">FISHING INDUSTRY OWNERS</option>
+                                <option value="MAJOR CORPORATION & CEO">MAJOR CORPORATION & CEO</option>
+                                <option value="SMALL RETAILERS">SMALL RETAILERS</option>
+                                <option value="MERCHANTS">MERCHANTS</option>
+                                <option value="COMM.ARTISAN">COMM.ARTISAN</option>
+                                <option value="NURSING ASSISTANT">NURSING ASSISTANT</option>
+                                <option value="SELF-EMPLOYED PROFESSIONAL: PHYSICAL PERSON">SELF-EMPLOYED PROFESSIONAL: PHYSICAL PERSON</option>
+                                <option value="SCIENTIFIC PROFESSIONALS">SCIENTIFIC PROFESSIONALS</option>
+                                <option value="ENGINEERS & SIMILAR PROFESSIONS">ENGINEERS & SIMILAR PROFESSIONS</option>
+                            </select>
                         </div>
                         <div class="form-group">
-                            <label for="onboardingChannel">Onboarding Channel</label>
-                            <select id="onboardingChannel" name="onboardingChannel">
-                                <option value="">Select Channel</option>
-                                <option value="Online">Online</option>
-                                <option value="Branch">Branch</option>
-                                <option value="Phone">Phone</option>
-                                <option value="Mobile App">Mobile App</option>
-                                <option value="Agent">Agent</option>
+                            <label for="onboardingChannel">Onboarding Channel <span class="required">*</span></label>
+                            <select id="onboardingChannel" name="onboardingChannel" required>
+                                <option value="">-- Select --</option>
+                                <option value="online">Online / Virtual meeting</option>
+                                <option value="inagency">In person / Physical meeting</option>
                             </select>
                         </div>
                     </div>
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="productsServices">Products/Services Targeting</label>
-                            <textarea id="productsServices" name="productsServices" placeholder="Describe the products or services you're interested in"></textarea>
+                            <label for="productsServices">Products/Services Targeting <span class="required">*</span></label>
+                            <select id="productsServices" name="productsServices" required>
+                                <option value="">-- Select --</option>
+                                <option value="currentAccount">Current Account</option>
+                                <option value="savingAccount">Saving Account</option>
+                                <option value="timeDeposit">Time Deposit</option>
+                                <option value="debitCard">Debit Card</option>
+                                <option value="internetBanking">Internet Banking</option>
+                                <option value="remittances">Remittances</option>
+                                <option value="mobileBanking">Mobile Banking</option>
+                                <option value="creditCard">Credit Card</option>
+                            </select>
                         </div>
                         <div class="form-group">
-                            <label for="sourceOfFunds">Source of Funds *</label>
-                            <select id="sourceOfFunds" name="sourceOfFunds" required>
-                                <option value="">Select Source</option>
-                                <option value="Employment Salary">Employment Salary</option>
-                                <option value="Business Income">Business Income</option>
-                                <option value="Investment Returns">Investment Returns</option>
-                                <option value="Inheritance">Inheritance</option>
-                                <option value="Savings">Savings</option>
-                                <option value="Real Estate">Real Estate</option>
-                                <option value="Other">Other</option>
-                            </select>
+                            <label for="netAnnualIncome">Net Annual Income (USD) <span class="required">*</span></label>
+                            <div class="currency-input">
+                                <span class="currency-symbol">$</span>
+                                <input type="number" id="netAnnualIncome" name="netAnnualIncome" required min="0" step="1000" placeholder="0">
+                            </div>
                         </div>
                     </div>
 
                     <div class="form-row full-width">
                         <div class="form-group">
-                            <label for="netAnnualIncome">Net Annual Income (USD) *</label>
-                            <div class="currency-input">
-                                <span class="currency-symbol">$</span>
-                                <input type="number" id="netAnnualIncome" name="netAnnualIncome" required min="0" step="1000" placeholder="0">
-                            </div>
+                            <label for="sourceOfFunds">Source of Funds <span class="required">*</span></label>
+                            <select id="sourceOfFunds" name="sourceOfFunds" required>
+                                <option value="">-- Select --</option>
+                                <option value="employmentIncome">Employment Income</option>
+                                <option value="businessProfits">Business Profits</option>
+                                <option value="inheritance">Inheritance</option>
+                                <option value="retirementPension">Retirement Pension</option>
+                                <option value="investmentReturns">Investment Returns</option>
+                                <option value="Project Manager">Project Manager</option>
+                                <option value="other">Other</option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -461,35 +496,15 @@
 
             <div class="button-container">
                 <button type="button" class="btn btn-secondary" onclick="goBack()">Go Back</button>
-                <button type="submit" class="btn btn-primary">Complete Onboarding</button>
+                <button type="submit" class="btn btn-primary" id="submitBtn">Complete Onboarding</button>
             </div>
         </form>
-
-        <div class="success-message" id="successMessage">
-            <h3>🎉 Onboarding Completed Successfully!</h3>
-            <p>Your account has been set up. Welcome to Banque EN!</p>
-        </div>
     </div>
 
+    <!-- Include the shared JavaScript module -->
+    <script src="onboarding.js"></script>
+    
     <script>
-        // Get customer ID from URL parameters
-        function getUrlParameter(name) {
-            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
-            var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
-            var results = regex.exec(location.search);
-            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
-        }
-
-        // Set customer ID in the header
-        document.addEventListener('DOMContentLoaded', function() {
-            const customerId = getUrlParameter('customerId');
-            if (customerId) {
-                document.getElementById('customerId').textContent = customerId;
-            } else {
-                document.getElementById('customerId').textContent = 'Not specified';
-            }
-        });
-
         // Tab switching functionality
         function showTab(tabName) {
             // Hide all tab contents
@@ -507,35 +522,6 @@
             event.target.classList.add('active');
         }
 
-        // Form submission
-        document.getElementById('onboardingForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Get form data
-            const formData = new FormData(this);
-            const data = {};
-            for (let [key, value] of formData.entries()) {
-                data[key] = value;
-            }
-
-            console.log('Onboarding data:', data);
-            
-            // Show success message
-            document.querySelector('.container').style.display = 'none';
-            document.getElementById('successMessage').style.display = 'block';
-
-            // Mark onboarding as completed for this customer
-            const customerId = getUrlParameter('customerId');
-            if (customerId && window.parent.markOnboardingCompleted) {
-                window.parent.markOnboardingCompleted(customerId);
-            }
-
-            // Redirect back to main page after 3 seconds
-            setTimeout(() => {
-                window.location.href = 'index.html';
-            }, 3000);
-        });
-
         // Go back function
         function goBack() {
             if (confirm('Are you sure you want to go back? Unsaved data will be lost.')) {
@@ -543,27 +529,9 @@
             }
         }
 
-        // Auto-fill form based on customer screening data if available
+        // Initialize the onboarding handler when the page loads
         document.addEventListener('DOMContentLoaded', function() {
-            const customerId = getUrlParameter('customerId');
-            if (customerId) {
-                // Try to get stored screening data
-                const screeningData = localStorage.getItem(`screeningData_${customerId}`);
-                if (screeningData) {
-                    try {
-                        const data = JSON.parse(screeningData);
-                        console.log('Found screening data for auto-fill:', data);
-                        
-                        // Auto-fill available fields
-                        if (data.firstName) document.getElementById('firstName').value = data.firstName;
-                        if (data.lastName) document.getElementById('lastName').value = data.lastName;
-                        if (data.birthDate) document.getElementById('dateOfBirth').value = data.birthDate;
-                        
-                    } catch (error) {
-                        console.error('Error parsing screening data:', error);
-                    }
-                }
-            }
+            OnboardingHandler.init('onboardingForm', 'banque_en');
         });
     </script>
 </body>
