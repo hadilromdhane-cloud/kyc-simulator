@@ -131,7 +131,7 @@ const OnboardingHandler = (function() {
                     formId: "1",
                     items: {
                         isSanctionnedWorkflow: "No",
-                        isPepWorkflow: "<li>PEP : <b> <span id=\"m_-6565793956881070177m_5147999647471681674is_pep\"> No </span></b></li>",
+                        isPepWorkflow: "<li>PEP : <b> <span> No </span></b></li>",
                         agence: "headquarters",
                         rm_username: "admin",
                         rm_fn: "System",
