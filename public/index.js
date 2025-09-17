@@ -1077,6 +1077,73 @@ function showPopup(message, link = '') {
     popupLink.select();
   }
 }
+// New function for no hits popup with continue onboarding button
+function showNoHitsPopup(customerData) {
+  const popup = document.getElementById('popup');
+  const popupText = document.getElementById('popupText');
+  const popupLink = document.getElementById('popupLink');
+
+  // Clean up any previous content first
+  const extraButtons = popup.querySelectorAll('button:not(#closePopup)');
+  extraButtons.forEach(btn => btn.remove());
+  const extraDivs = popup.querySelectorAll('div');
+  extraDivs.forEach(div => div.remove());
+
+  // Reset text styling
+  popupText.style.whiteSpace = 'normal';
+  popupText.style.fontSize = '';
+  popupText.style.lineHeight = '';
+  
+  // Set message
+  popupText.textContent = "Your customer doesn't have any hits. You can continue with the onboarding process.";
+
+  // Hide the link field
+  popupLink.style.display = 'none';
+
+  // Create Continue Onboarding button
+  const continueButton = document.createElement('button');
+  continueButton.textContent = 'Continue Onboarding';
+  continueButton.style.cssText = `
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    margin: 20px 10px 0 0;
+  `;
+  
+  continueButton.onclick = () => {
+    // Generate customer ID from the search data
+    const customerId = `${customerData.firstName}_${customerData.lastName}`;
+    
+    // Store customer data for onboarding
+    localStorage.setItem(`screeningData_${customerId}`, JSON.stringify({
+      customerId: customerId,
+      firstName: customerData.firstName,
+      lastName: customerData.lastName,
+      birthDate: customerData.birthDate,
+      nationality: customerData.nationality,
+      citizenship: customerData.citizenship,
+      screeningResult: 'NO_HITS',
+      timestamp: new Date().toISOString()
+    }));
+    
+    // Navigate to onboarding
+    navigateToOnboarding(customerId);
+    popup.style.display = 'none';
+    resetPopup();
+  };
+
+  // Insert the button before the close button
+  const closeButton = document.getElementById('closePopup');
+  closeButton.parentNode.insertBefore(continueButton, closeButton);
+
+  popup.style.display = 'block';
+}
+
+
 
 // --- Enhanced popup for screening results ---
 function showScreeningResultsPopup(event) {
@@ -1269,7 +1336,6 @@ async function callSearch(entityType, containerId, responseId, isDecentralized =
 
     logMessage(`Search completed for ${entityType}`, 'success');
     showNotification('Search completed successfully', 'success');
-
     if (isDecentralized) {
       // Decentralized process - show popup based on hits
       if (data.maxScore && data.maxScore > 0) {
@@ -1278,7 +1344,7 @@ async function callSearch(entityType, containerId, responseId, isDecentralized =
         showPopup('You can treat the hits via this link:', link);
       } else {
         logMessage('No hits found for customer', 'info');
-        showPopup("Your customer doesn't have any hits.");
+        showNoHitsPopup(payload); // Use new function with customer data
       }
     } else {
       // Centralized synchronous process - new popup logic
