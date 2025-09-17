@@ -131,7 +131,7 @@ const OnboardingHandler = (function() {
                     formId: "1",
                     items: {
                         isSanctionnedWorkflow: "No",
-                        isPepWorkflow: "<li>PEP : <b> <span> No </span></b></li>",
+                        isPepWorkflow: "<li>PEP : <b> <span id=\"m_-6565793956881070177m_5147999647471681674is_pep\"> No </span></b></li>",
                         agence: "headquarters",
                         rm_username: "admin",
                         rm_fn: "System",
@@ -145,7 +145,7 @@ const OnboardingHandler = (function() {
                         birth_date: formData.dateOfBirth || "",
                         nationality: formData.nationality || "",
                         marital_status: formData.civilStatus || "",
-                        tel1: formData.landlinePhone || "",
+                        tel1: "", // Keep empty like successful example
                         email: formData.email || "",
                         adresseDeResidence: formData.residentialAddress || "",
                         postal_code: formData.postalCode || "",
@@ -191,7 +191,7 @@ const OnboardingHandler = (function() {
                         businessName: "",
                         entityType: "PP",
                         id: customerId,
-                        customer_type: "manual-entry",
+                        customer_type: "manual-entry", // Changed from search-result to manual-entry
                         createdBy: "admin",
                         creatorId: 2,
                         creatorFirstName: "System",
