@@ -212,15 +212,10 @@
             transform: translateY(-2px);
         }
 
-        .success-message {
-            background: linear-gradient(135deg, #2ecc71, #27ae60);
-            color: white;
-            padding: 20px;
-            text-align: center;
-            font-size: 1.1rem;
-            margin-top: 20px;
-            border-radius: 8px;
-            display: none;
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
         }
 
         @media (max-width: 768px) {
@@ -508,35 +503,15 @@
 
             <div class="button-container">
                 <button type="button" class="btn btn-secondary" onclick="goBack()">Retour</button>
-                <button type="submit" class="btn btn-primary">Finaliser l'Onboarding</button>
+                <button type="submit" class="btn btn-primary" id="submitBtn">Finaliser l'Onboarding</button>
             </div>
         </form>
-
-        <div class="success-message" id="successMessage">
-            <h3>🎉 Onboarding Terminé avec Succès!</h3>
-            <p>Votre compte a été configuré. Bienvenue chez BankFR!</p>
-        </div>
     </div>
 
+    <!-- Include the shared JavaScript module -->
+    <script src="onbarding.js"></script>
+    
     <script>
-        // Get customer ID from URL parameters
-        function getUrlParameter(name) {
-            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
-            var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
-            var results = regex.exec(location.search);
-            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
-        }
-
-        // Set customer ID in the header
-        document.addEventListener('DOMContentLoaded', function() {
-            const customerId = getUrlParameter('customerId');
-            if (customerId) {
-                document.getElementById('customerId').textContent = customerId;
-            } else {
-                document.getElementById('customerId').textContent = 'Non spécifié';
-            }
-        });
-
         // Tab switching functionality
         function showTab(tabName) {
             // Hide all tab contents
@@ -554,35 +529,6 @@
             event.target.classList.add('active');
         }
 
-        // Form submission
-        document.getElementById('onboardingForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Get form data
-            const formData = new FormData(this);
-            const data = {};
-            for (let [key, value] of formData.entries()) {
-                data[key] = value;
-            }
-
-            console.log('Onboarding data:', data);
-            
-            // Show success message
-            document.querySelector('.container').style.display = 'none';
-            document.getElementById('successMessage').style.display = 'block';
-
-            // Mark onboarding as completed for this customer
-            const customerId = getUrlParameter('customerId');
-            if (customerId && window.parent.markOnboardingCompleted) {
-                window.parent.markOnboardingCompleted(customerId);
-            }
-
-            // Redirect back to main page after 3 seconds
-            setTimeout(() => {
-                window.location.href = 'index.html';
-            }, 3000);
-        });
-
         // Go back function
         function goBack() {
             if (confirm('Êtes-vous sûr de vouloir retourner? Les données non sauvegardées seront perdues.')) {
@@ -590,36 +536,10 @@
             }
         }
 
-        // Auto-fill form based on customer screening data if available
+        // Initialize the onboarding handler when the page loads
         document.addEventListener('DOMContentLoaded', function() {
-            const customerId = getUrlParameter('customerId');
-            if (customerId) {
-                // Try to get stored screening data
-                const screeningData = localStorage.getItem(`screeningData_${customerId}`);
-                if (screeningData) {
-                    try {
-                        const data = JSON.parse(screeningData);
-                        console.log('Found screening data for auto-fill:', data);
-                        
-                        // Auto-fill available fields
-                        if (data.firstName) document.getElementById('prenom').value = data.firstName;
-                        if (data.lastName) document.getElementById('nom').value = data.lastName;
-                        if (data.birthDate) document.getElementById('dateNaissance').value = data.birthDate;
-                        
-                    } catch (error) {
-                        console.error('Error parsing screening data:', error);
-                    }
-                }
-            }
+            OnboardingHandler.init('onboardingForm', 'bankfr');
         });
-
-        // Configuration spécifique au tenant BankFR
-        window.TENANT_CONFIG = {
-            name: 'bankfr',
-            displayName: 'BankFR',
-            currency: '€',
-            language: 'fr'
-        };
     </script>
 </body>
 </html>
