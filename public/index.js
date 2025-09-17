@@ -1078,7 +1078,7 @@ function showPopup(message, link = '') {
   }
 }
 // New function for no hits popup with continue onboarding button
-function showNoHitsPopup(customerData) {
+function showNoHitsPopup(customerData, apiResponse) {
   const popup = document.getElementById('popup');
   const popupText = document.getElementById('popupText');
   const popupLink = document.getElementById('popupLink');
@@ -1115,10 +1115,16 @@ function showNoHitsPopup(customerData) {
   `;
   
   continueButton.onclick = () => {
-    // Generate customer ID from the search data
-    const customerId = `${customerData.firstName}_${customerData.lastName}`;
+    // Use the customer ID from the API response
+    const customerId = apiResponse.customerId || apiResponse.customer_id || apiResponse.id;
     
-    // Store customer data for onboarding
+    if (!customerId) {
+      console.error('No customer ID found in API response:', apiResponse);
+      showNotification('Error: Customer ID not found in response', 'error');
+      return;
+    }
+    
+    // Store customer data for onboarding with the correct ID
     localStorage.setItem(`screeningData_${customerId}`, JSON.stringify({
       customerId: customerId,
       firstName: customerData.firstName,
@@ -1126,11 +1132,17 @@ function showNoHitsPopup(customerData) {
       birthDate: customerData.birthDate,
       nationality: customerData.nationality,
       citizenship: customerData.citizenship,
+      systemId: customerData.systemId,
+      searchQueryId: apiResponse.search_query_id,
       screeningResult: 'NO_HITS',
-      timestamp: new Date().toISOString()
+      maxScore: 0,
+      timestamp: new Date().toISOString(),
+      apiResponse: apiResponse
     }));
     
-    // Navigate to onboarding
+    console.log('Stored screening data for customer:', customerId);
+    
+    // Navigate to onboarding with the correct customer ID
     navigateToOnboarding(customerId);
     popup.style.display = 'none';
     resetPopup();
@@ -1142,7 +1154,6 @@ function showNoHitsPopup(customerData) {
 
   popup.style.display = 'block';
 }
-
 
 
 // --- Enhanced popup for screening results ---
@@ -1344,9 +1355,9 @@ async function callSearch(entityType, containerId, responseId, isDecentralized =
         showPopup('You can treat the hits via this link:', link);
       } else {
         logMessage('No hits found for customer', 'info');
-        showNoHitsPopup(payload); // Use new function with customer data
+        showNoHitsPopup(payload, data); // Pass both customer data and API response
       }
-    } else {
+    }else {
       // Centralized synchronous process - new popup logic
       if (data.maxScore && data.maxScore > 0) {
         logMessage(`Hits found for customer (Score: ${data.maxScore})`, 'warning');
