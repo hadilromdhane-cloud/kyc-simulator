@@ -66,6 +66,7 @@ const OnboardingHandler = (function() {
         getHeaders: function() {
             return {
                 'Content-Type': 'application/json',
+                'Accept': 'application/json',
                 'x-auth-tenant': this.getTenant(),
                 'x-auth-token': this.getToken()
             };
@@ -123,7 +124,7 @@ const OnboardingHandler = (function() {
             // Check tenant and create appropriate payload
             const isBanqueEN = tenantName === 'banque_en';
             
-                        if (isBanqueEN) {
+            if (isBanqueEN) {
                 // Banque EN payload structure (based on successful example)
                 return {
                     customerId: customerId,
@@ -233,14 +234,15 @@ const OnboardingHandler = (function() {
                         beneficialOwners: null,
                         hasBeneficialOwners: null
                     }
-            } ;
-        } else {
+                };
+            } else {
                 // BankFR payload structure (keep the exact working structure)
                 return {
                     customerId: customerId,
                     customerRelationName: "",
                     formId: "1",
                     items: {
+                        isSanctionnedWorkflow: "Non",
                         AddressDataGrid: [],
                         PaysDeResidence: formData.paysResidence || "",
                         address: [],
@@ -300,6 +302,8 @@ const OnboardingHandler = (function() {
                         invokeElm: false,
                         isPEP: false,
                         isPepWorkflow: "<li>Personne politiquement exposée : <b> <span> Non</span></b></li>",
+                        isSanctioned: false,
+                        isSanctionned: false,
                         is_hq_user: false,
                         last_name: formData.nom || "",
                         last_update: currentDateTime,
