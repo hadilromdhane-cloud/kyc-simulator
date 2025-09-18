@@ -692,8 +692,12 @@ let notificationsHistory = JSON.parse(localStorage.getItem('notificationsHistory
 let lastEventTimestamp = parseInt(localStorage.getItem('lastEventTimestamp')) || (Date.now() - 300000);
 
 function setupEventPolling() {
-  localStorage.setItem('lastEventId', '0');
-  lastEventId = 0;
+  // Don't reset lastEventId to 0 - keep the existing value to avoid reprocessing old events
+  // Only reset if there's no stored value (first time)
+  if (!localStorage.getItem('lastEventId')) {
+    localStorage.setItem('lastEventId', '0');
+    lastEventId = 0;
+  }
   
   if (pollingInterval) {
     clearInterval(pollingInterval);
@@ -712,25 +716,29 @@ function setupEventPolling() {
         data.events.forEach(event => {
           console.log('Processing event:', event.customerId);
           
+          // Only show popups for events that are newer than what we had when the page loaded
+          const wasEventProcessedBefore = notificationsHistory.some(n => 
+            n.customerId === event.customerId && n.search_query_id === event.search_query_id
+          );
+          
+          // Update lastEventId
           lastEventId = event.id;
           localStorage.setItem('lastEventId', lastEventId.toString());
           
-          if (event.source === 'Reis_KYC') {
-            console.log('Showing popup for:', event.customerId);
+          if (event.source === 'Reis_KYC' && !wasEventProcessedBefore) {
+            console.log('Showing popup for new event:', event.customerId);
             showScreeningResultsPopup(event);
             showNotification(`Screening completed for ${event.customerId}`, 'warning');
             
-            const existingIndex = notificationsHistory.findIndex(n => 
-              n.customerId === event.customerId && n.search_query_id === event.search_query_id
-            );
-            if (existingIndex === -1) {
-              notificationsHistory.unshift(event);
-              if (notificationsHistory.length > 50) {
-                notificationsHistory = notificationsHistory.slice(0, 50);
-              }
-              localStorage.setItem('notificationsHistory', JSON.stringify(notificationsHistory));
-              updateNotificationBadge();
+            // Add to notifications history
+            notificationsHistory.unshift(event);
+            if (notificationsHistory.length > 50) {
+              notificationsHistory = notificationsHistory.slice(0, 50);
             }
+            localStorage.setItem('notificationsHistory', JSON.stringify(notificationsHistory));
+            updateNotificationBadge();
+          } else if (event.source === 'Reis_KYC' && wasEventProcessedBefore) {
+            console.log('Skipping popup for already processed event:', event.customerId);
           }
         });
       }
@@ -739,7 +747,7 @@ function setupEventPolling() {
     }
   }, 3000);
   
-  console.log('Updated polling started - you should see popups for existing events');
+  console.log('Event polling started - will only show popups for new events');
 }
 
 function linkCustomerToSystemId(customerId, searchQueryId) {
