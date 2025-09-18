@@ -1154,7 +1154,110 @@ function showNoHitsPopup(customerData, apiResponse) {
 
   popup.style.display = 'block';
 }
+// NEW: Function for synchronous centralized popup (no continue button)
+function showSynchronousCentralizedPopup() {
+  const popup = document.getElementById('popup');
+  const popupText = document.getElementById('popupText');
+  const popupLink = document.getElementById('popupLink');
 
+  // Clean up any previous content first
+  const extraButtons = popup.querySelectorAll('button:not(#closePopup)');
+  extraButtons.forEach(btn => btn.remove());
+  const extraDivs = popup.querySelectorAll('div');
+  extraDivs.forEach(div => div.remove());
+
+  // Reset text styling
+  popupText.style.whiteSpace = 'normal';
+  popupText.style.fontSize = '';
+  popupText.style.lineHeight = '';
+  
+  // Set content - same message for hits and no hits
+  popupText.textContent = "The alert is being treated by the compliance team. You will receive a notification once it is processed.";
+
+  // Hide the link field
+  popupLink.style.display = 'none';
+
+  // Make sure only one close button exists and is properly configured
+  const existingCloseButton = document.getElementById('closePopup');
+  if (existingCloseButton) {
+    existingCloseButton.style.display = 'block';
+    existingCloseButton.textContent = 'Close';
+  }
+
+  popup.style.display = 'block';
+}
+
+// NEW: Function for asynchronous centralized popup (with continue button)
+function showAsynchronousCentralizedPopup(customerData, apiResponse) {
+  const popup = document.getElementById('popup');
+  const popupText = document.getElementById('popupText');
+  const popupLink = document.getElementById('popupLink');
+
+  // Clean up any previous content first
+  const extraButtons = popup.querySelectorAll('button:not(#closePopup)');
+  extraButtons.forEach(btn => btn.remove());
+  const extraDivs = popup.querySelectorAll('div');
+  extraDivs.forEach(div => div.remove());
+
+  // Reset text styling
+  popupText.style.whiteSpace = 'normal';
+  popupText.style.fontSize = '';
+  popupText.style.lineHeight = '';
+  
+  // Set content - same message for hits and no hits
+  popupText.textContent = "The alert is being treated by the compliance team. You will receive a notification once it is processed. but you can now proceed with the onboarding";
+
+  // Hide the link field
+  popupLink.style.display = 'none';
+
+  // Create Continue Onboarding button
+  const continueButton = document.createElement('button');
+  continueButton.textContent = 'Continue Onboarding';
+  continueButton.style.cssText = `
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    margin: 20px 10px 0 0;
+  `;
+  
+  continueButton.onclick = () => {
+    // Get customer ID from API response or generate from form data
+    const customerId = apiResponse?.customerId || apiResponse?.customer_id || apiResponse?.id || 
+                      `${customerData.firstName}_${customerData.lastName}`;
+    
+    // Store customer data for onboarding
+    localStorage.setItem(`screeningData_${customerId}`, JSON.stringify({
+      customerId: customerId,
+      firstName: customerData.firstName,
+      lastName: customerData.lastName,
+      birthDate: customerData.birthDate,
+      nationality: customerData.nationality,
+      citizenship: customerData.citizenship,
+      systemId: customerData.systemId,
+      searchQueryId: apiResponse?.search_query_id,
+      screeningResult: 'ASYNC_PROCESSING',
+      timestamp: new Date().toISOString(),
+      apiResponse: apiResponse
+    }));
+    
+    console.log('Stored screening data for async customer:', customerId);
+    
+    // Navigate to onboarding
+    navigateToOnboarding(customerId);
+    popup.style.display = 'none';
+    resetPopup();
+  };
+
+  // Insert the button before the close button
+  const closeButton = document.getElementById('closePopup');
+  closeButton.parentNode.insertBefore(continueButton, closeButton);
+
+  popup.style.display = 'block';
+}
 
 // --- Enhanced popup for screening results ---
 function showScreeningResultsPopup(event) {
@@ -1357,92 +1460,41 @@ async function callSearch(entityType, containerId, responseId, isDecentralized =
         logMessage('No hits found for customer', 'info');
         showNoHitsPopup(payload, data); // Pass both customer data and API response
       }
-    }else {
-      // Centralized synchronous process - new popup logic
-      if (data.maxScore && data.maxScore > 0) {
-        logMessage(`Hits found for customer (Score: ${data.maxScore})`, 'warning');
-        showCentralizedPopup("The alert is being treated by the compliance team. You will receive a notification once it is processed.", false);
-      } else {
-        logMessage('No hits found for customer', 'info');
-        showCentralizedPopup("Your customer doesn't have any matches. You can continue the onboarding.", true);
-      }
-    }
-  } catch (err) {
+} else {
+  // Centralized process - distinguish between sync and async
+  const isAsync = containerId.includes('async'); // Check if this is async fields
+  
+  if (isAsync) {
+    // Asynchronous centralized - show continue button for both hits and no hits
+    showAsynchronousCentralizedPopup(payload, data);
+  } else {
+    // Synchronous centralized - no continue button, just wait for notification
+    showSynchronousCentralizedPopup();
+  }
+}
+} catch (err) {
     const errorMsg = `Search error: ${err.message}`;
     logMessage(errorMsg, 'error');
     showNotification('Search failed', 'error');
   }
 }
 
-// New function for centralized popup
-function showCentralizedPopup(message, showContinueButton = false) {
-  const popup = document.getElementById('popup');
-  const popupText = document.getElementById('popupText');
-  const popupLink = document.getElementById('popupLink');
-
-  // Clean up any previous content first
-  const extraButtons = popup.querySelectorAll('button:not(#closePopup)');
-  extraButtons.forEach(btn => btn.remove());
-  const extraDivs = popup.querySelectorAll('div');
-  extraDivs.forEach(div => div.remove());
-
-  // Reset text styling
-  popupText.style.whiteSpace = 'normal';
-  popupText.style.fontSize = '';
-  popupText.style.lineHeight = '';
-  
-  // Set content
-  popupText.textContent = message;
-
-  // Hide the link field
-  popupLink.style.display = 'none';
-
-  // Create button container
-  const buttonContainer = document.createElement('div');
-  buttonContainer.style.cssText = `
-    margin-top: 20px;
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-  `;
-
-  if (showContinueButton) {
-    // Show Continue Onboarding button
-    const continueButton = document.createElement('button');
-    continueButton.textContent = 'Continue Onboarding';
-    continueButton.style.cssText = `
-      padding: 10px 20px;
-      background-color: #28a745;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 14px;
-      margin-right: 10px;
-    `;
-    continueButton.onclick = () => {
-      // You can add onboarding logic here if needed
-      popup.style.display = 'none';
-      showNotification('Continuing with onboarding process...', 'success');
-    };
-    buttonContainer.appendChild(continueButton);
+// Add webhook receiver function (place this with other utility functions)
+async function receiveDirectWebhook(event) {
+  try {
+    const webhookData = typeof event === 'string' ? JSON.parse(event) : event;
+    console.log('Direct webhook received from Reis:', webhookData);
+    
+    // Process the real webhook data
+    handleRealWebhookEvent(webhookData);
+    
+    return { status: 'ok', message: 'Webhook processed successfully' };
+  } catch (error) {
+    console.error('Error processing direct webhook:', error);
+    return { status: 'error', message: error.message };
   }
+}
 
-  // Add webhook receiver function (add this after your existing functions)
-  async function receiveDirectWebhook(event) {
-    try {
-      const webhookData = typeof event === 'string' ? JSON.parse(event) : event;
-      console.log('Direct webhook received from Reis:', webhookData);
-      
-      // Process the real webhook data
-      handleRealWebhookEvent(webhookData);
-      
-      return { status: 'ok', message: 'Webhook processed successfully' };
-    } catch (error) {
-      console.error('Error processing direct webhook:', error);
-      return { status: 'error', message: error.message };
-    }
-  }
 
   // Make it globally accessible for webhook calls
   window.receiveDirectWebhook = receiveDirectWebhook;
