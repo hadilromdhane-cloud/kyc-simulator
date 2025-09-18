@@ -396,7 +396,8 @@ const OnboardingHandler = (function() {
                     let value = input.value;
                     if (typeof value === 'string') {
                         // Remove any problematic characters that might be interpreted as regex
-                        value = value.replace(/[*+?^${}()|[\]\\]/g, '');
+                        value = value.replace(/[*+?^${}()|\\[\]]/g, '');
+
                     }
                     formData[input.name] = value;
                 }
