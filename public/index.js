@@ -1343,10 +1343,19 @@ async function callSearch(entityType, containerId, responseId, isDecentralized =
         showNoHitsPopup(payload, data);
       }
     } else {
-      // Centralized synchronous process - show popup
+      // Determine if this is sync or async based on containerId
+      const isAsync = containerId === 'asyncFields';
+      
+      // Centralized process - different behavior for sync vs async
       if (data.maxScore && data.maxScore > 0) {
         logMessage(`Hits found for customer (Score: ${data.maxScore})`, 'warning');
-        showCentralizedPopup("The alert is being treated by the compliance team. You will receive a notification once it is processed.", false);
+        if (isAsync) {
+          // Async: allow continuing onboarding even with hits
+          showCentralizedPopup("The alert is being treated by the compliance team. You can now continue the onboarding.", true, payload, data);
+        } else {
+          // Sync: wait for compliance team
+          showCentralizedPopup("The alert is being treated by the compliance team. You will receive a notification once it is processed.", false);
+        }
       } else {
         logMessage('No hits found for customer', 'info');
         showCentralizedPopup("Your customer doesn't have any matches. You can continue the onboarding.", true, payload, data);
