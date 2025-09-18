@@ -257,6 +257,7 @@ const defaultValues = {
     queueName: 'Default'
   }
 };
+
 let sessionEvents = JSON.parse(sessionStorage.getItem('kycEvents')) || [];
 let sessionEventCounter = parseInt(sessionStorage.getItem('kycEventCounter')) || 0;
 
@@ -373,7 +374,7 @@ function createNotificationElements() {
   tokenStatusButton.id = 'tokenStatusBtn';
   tokenStatusButton.innerHTML = 'Token Status';
   tokenStatusButton.style.cssText = `
-position: fixed;
+    position: fixed;
     top: 35px;
     right: 20px;
     z-index: 10000;
@@ -391,17 +392,16 @@ position: fixed;
     width: auto;
     margin-top: 0;
     min-width: 120px;
-   
   `;
   tokenStatusButton.onclick = showTokenStatus;
   document.body.appendChild(tokenStatusButton);
 
   // Update button badge
   updateNotificationBadge();
-  updateTokenStatusButton(); // NEW
+  updateTokenStatusButton();
 }
 
-// NEW: Token status functions
+// Token status functions
 function updateTokenStatusButton() {
   const button = document.getElementById('tokenStatusBtn');
   if (!button) return;
@@ -441,15 +441,14 @@ function updateNotificationBadge() {
 
   if (unfinishedCount > 0) {
     button.innerHTML = `Notifications (${unfinishedCount})`;
-    button.style.backgroundColor = '#dc3545'; // Red background for pending items
+    button.style.backgroundColor = '#dc3545';
   } else {
     button.innerHTML = 'Notifications';
-    button.style.backgroundColor = '#007ACC'; // Default blue
+    button.style.backgroundColor = '#007ACC';
   }
 }
 
 function showNotificationHistory() {
-  // Create history overlay
   const historyOverlay = document.createElement('div');
   historyOverlay.id = 'notificationHistoryOverlay';
   historyOverlay.style.cssText = `
@@ -486,7 +485,6 @@ function showNotificationHistory() {
   if (notificationsHistory.length === 0) {
     historyHTML += '<p style="text-align: center; color: #666;">No notifications yet.</p>';
   } else {
-    // Sort by timestamp, newest first
     const sortedHistory = [...notificationsHistory].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
     
     sortedHistory.forEach((notification, index) => {
@@ -563,26 +561,22 @@ function showNotificationHistory() {
   historyOverlay.appendChild(historyContent);
   document.body.appendChild(historyOverlay);
 
-  // Add event listener for clear history
   document.getElementById('clearHistory').onclick = () => {
-  if (confirm('Clear all notification history and reset event tracking?')) {
-    notificationsHistory = [];
-    localStorage.setItem('notificationsHistory', JSON.stringify(notificationsHistory));
-    
-    // Reset event tracking too
-    localStorage.setItem('lastEventId', '0');
-    lastEventId = 0;
-    
-    updateNotificationBadge();
-    updateEventCounter(); // NEW: Update counter
-    closeNotificationHistory();
-    
-    showNotification('History cleared and event tracking reset', 'success');
-    console.log('Reset complete. lastEventId is now:', lastEventId);
-  }
-};
+    if (confirm('Clear all notification history and reset event tracking?')) {
+      notificationsHistory = [];
+      localStorage.setItem('notificationsHistory', JSON.stringify(notificationsHistory));
+      
+      localStorage.setItem('lastEventId', '0');
+      lastEventId = 0;
+      
+      updateNotificationBadge();
+      closeNotificationHistory();
+      
+      showNotification('History cleared and event tracking reset', 'success');
+      console.log('Reset complete. lastEventId is now:', lastEventId);
+    }
+  };
 
-  // Close on background click
   historyOverlay.onclick = (e) => {
     if (e.target === historyOverlay) {
       closeNotificationHistory();
@@ -598,12 +592,10 @@ function closeNotificationHistory() {
 }
 
 function continueOnboardingFromHistory(customerId, historyIndex) {
-  // Mark as onboarding started
   notificationsHistory[historyIndex].onboardingCompleted = false;
   notificationsHistory[historyIndex].onboardingStarted = true;
   localStorage.setItem('notificationsHistory', JSON.stringify(notificationsHistory));
   
-  // Get current tenant and navigate to appropriate onboarding page
   const currentTenant = localStorage.getItem('tenantName') || 'bankfr';
   const tenantPageMap = {
     'bankfr': 'onboarding_bankfr.html',
@@ -614,10 +606,10 @@ function continueOnboardingFromHistory(customerId, historyIndex) {
   
   console.log(`Continuing onboarding for ${customerId} on ${onboardingPage} (tenant: ${currentTenant})`);
   
-  // Navigate to tenant-specific onboarding page
   window.location.href = `${onboardingPage}?customerId=${customerId}`;
   updateNotificationBadge();
 }
+
 function showNotification(message, type = 'info', duration = 5000) {
   const container = document.getElementById('notificationContainer');
   if (!container) return;
@@ -651,14 +643,12 @@ function showNotification(message, type = 'info', duration = 5000) {
   notification.appendChild(closeBtn);
   container.appendChild(notification);
 
-  // Auto remove after duration
   setTimeout(() => {
     if (notification.parentNode) {
       notification.remove();
     }
   }, duration);
 
-  // Add CSS animation
   const style = document.createElement('style');
   style.textContent = `
     @keyframes slideIn {
@@ -683,42 +673,33 @@ function getNotificationColor(type) {
 }
 
 function logMessage(message, type = 'info') {
-  // Keep function for backward compatibility but only log to console
   console.log(`[${new Date().toLocaleTimeString()}] ${message}`);
 }
 
 function getLogColor(type) {
-  // Keep function for backward compatibility
   return '#00ff00';
 }
 
 function updateConnectionStatus(connected) {
   // Keep function for backward compatibility but do nothing
-  // No connection status display anymore
 }
 
-// --- POLLING-BASED Event System (instead of SSE) ---
-// Update this line at the top of your file
+// --- POLLING-BASED Event System ---
 let lastEventId = parseInt(localStorage.getItem('lastEventId')) || 0;
 let pollingInterval = null;
-const pollingFrequency = 2000; // Poll every 2 seconds
+const pollingFrequency = 2000;
 let notificationsHistory = JSON.parse(localStorage.getItem('notificationsHistory')) || [];
-
-// Replace the polling section in your index.js
-let lastEventTimestamp = parseInt(localStorage.getItem('lastEventTimestamp')) || (Date.now() - 300000); // Start from 5 minutes ago
+let lastEventTimestamp = parseInt(localStorage.getItem('lastEventTimestamp')) || (Date.now() - 300000);
 
 function setupEventPolling() {
-  // Reset the event tracking
   localStorage.setItem('lastEventId', '0');
   lastEventId = 0;
   
-  // Stop current polling
   if (pollingInterval) {
     clearInterval(pollingInterval);
     pollingInterval = null;
   }
   
-  // Start new polling with popup logic
   pollingInterval = setInterval(async () => {
     try {
       console.log('Checking for events since:', lastEventId);
@@ -731,17 +712,14 @@ function setupEventPolling() {
         data.events.forEach(event => {
           console.log('Processing event:', event.customerId);
           
-          // Update lastEventId
           lastEventId = event.id;
           localStorage.setItem('lastEventId', lastEventId.toString());
           
-          // Show popup for Reis events
           if (event.source === 'Reis_KYC') {
             console.log('Showing popup for:', event.customerId);
             showScreeningResultsPopup(event);
             showNotification(`Screening completed for ${event.customerId}`, 'warning');
             
-            // Add to notifications history
             const existingIndex = notificationsHistory.findIndex(n => 
               n.customerId === event.customerId && n.search_query_id === event.search_query_id
             );
@@ -764,12 +742,10 @@ function setupEventPolling() {
   console.log('Updated polling started - you should see popups for existing events');
 }
 
-// Helper function to link customer ID to systemId using search_query_id
 function linkCustomerToSystemId(customerId, searchQueryId) {
   try {
     console.log('Attempting to link customer to systemId:', { customerId, searchQueryId });
     
-    // Look for temporary screening data that matches this search_query_id
     const keys = Object.keys(localStorage);
     for (const key of keys) {
       if (key.startsWith('temp_screening_')) {
@@ -784,7 +760,6 @@ function linkCustomerToSystemId(customerId, searchQueryId) {
               searchQueryId: searchQueryId
             });
             
-            // Clean up temporary data
             localStorage.removeItem(key);
             console.log('Cleaned up temporary screening data:', key);
             
@@ -792,7 +767,6 @@ function linkCustomerToSystemId(customerId, searchQueryId) {
           }
         } catch (parseError) {
           console.error('Error parsing temp screening data:', key, parseError);
-          // Remove corrupted data
           localStorage.removeItem(key);
         }
       }
@@ -810,7 +784,6 @@ function linkCustomerToSystemId(customerId, searchQueryId) {
   }
 }
 
-// Helper function to store systemId for screening
 function storeSystemIdForScreening(customerId, systemId, additionalData = {}) {
   try {
     const screeningData = {
@@ -820,10 +793,7 @@ function storeSystemIdForScreening(customerId, systemId, additionalData = {}) {
       ...additionalData
     };
     
-    // Store by customerId for easy lookup during onboarding
     localStorage.setItem(`customerSystemId_${customerId}`, systemId);
-    
-    // Store detailed screening data
     localStorage.setItem(`screeningData_${customerId}`, JSON.stringify(screeningData));
     
     console.log('Successfully stored systemId for screening:', {
@@ -839,7 +809,6 @@ function storeSystemIdForScreening(customerId, systemId, additionalData = {}) {
   }
 }
 
-// Function to manually reset connection
 function resetConnection() {
   reconnectAttempts = 0;
   if (pollingInterval) {
@@ -879,18 +848,15 @@ authBtn.addEventListener('click', async () => {
 
     authToken = data.token;
     
-    // UPDATED: Use TokenManager to store token with proper expiry tracking
-    tokenManager.storeToken(authToken, tenantName, 300); // 300 seconds = 5 minutes
+    tokenManager.storeToken(authToken, tenantName, 300);
     
     logMessage('Authentication successful', 'success');
     showNotification('Authenticated successfully!', 'success');
 
-    // Keep backward compatibility for now
     localStorage.setItem('authToken', authToken);
     localStorage.setItem('tenantName', tenantName);
     console.log('Auth tokens stored for onboarding page');
     
-    // Update token status display
     updateTokenStatusButton();
   } catch(err) {
     logMessage(`Authentication error: ${err.message}`, 'error');
@@ -963,7 +929,6 @@ function renderFields(containerId, entityType, processType) {
         input.appendChild(option);
       });
     } else if (field.key === 'queueName') {
-      // Queue Name as select field
       input = document.createElement('select');
       input.id = containerId + '_' + field.key;
 
@@ -975,7 +940,6 @@ function renderFields(containerId, entityType, processType) {
         input.appendChild(option);
       });
       
-      // Set default to 'Default'
       input.value = 'Default';
     } else {
       input = document.createElement('input');
@@ -994,30 +958,24 @@ function showPopup(message, link = '') {
   const popupText = document.getElementById('popupText');
   const popupLink = document.getElementById('popupLink');
 
-  // Clean up any previous content first
   const extraButtons = popup.querySelectorAll('button:not(#closePopup)');
   extraButtons.forEach(btn => btn.remove());
   const extraDivs = popup.querySelectorAll('div');
   extraDivs.forEach(div => div.remove());
 
-  // Reset text styling
   popupText.style.whiteSpace = 'normal';
   popupText.style.fontSize = '';
   popupText.style.lineHeight = '';
   
-  // Check if this is a hits message with link
   if (link && message.includes('You can treat the hits via this link:')) {
-    // Create custom HTML for clickable link message
     popupText.innerHTML = `You can treat the hits via this <a href="${link}" target="_blank" style="color: #007bff; text-decoration: underline; cursor: pointer;">link</a>:`;
     
-    // Show the link field for copy-paste option
     popupLink.value = link;
     popupLink.style.display = 'block';
     popupLink.readOnly = true;
-    popupLink.onclick = () => popupLink.select(); // Allow selection for copying
+    popupLink.onclick = () => popupLink.select();
     popupLink.style.cursor = 'text';
   } else {
-    // Regular text content
     popupText.textContent = message;
     
     if (link) {
@@ -1031,10 +989,8 @@ function showPopup(message, link = '') {
     }
   }
 
-  // Ensure the original close button exists and is functional
   let closeButton = document.getElementById('closePopup');
   if (!closeButton) {
-    // Create the close button if it doesn't exist
     closeButton = document.createElement('button');
     closeButton.id = 'closePopup';
     closeButton.textContent = 'Close';
@@ -1042,16 +998,14 @@ function showPopup(message, link = '') {
     popup.appendChild(closeButton);
   }
   
-  // Make sure it's visible and functional
   closeButton.style.display = 'block';
   closeButton.onclick = () => {
     popup.style.display = 'none';
     popupText.style.whiteSpace = 'normal';
     popupText.style.fontSize = '';
     popupText.style.lineHeight = '';
-    popupText.innerHTML = ''; // Use innerHTML to clear properly
+    popupText.innerHTML = '';
     
-    // Reset link field
     popupLink.onclick = null;
     popupLink.style.cursor = 'default';
     popupLink.style.display = 'none';
@@ -1059,11 +1013,9 @@ function showPopup(message, link = '') {
     popupLink.value = '';
     popupLink.placeholder = '';
     
-    // Remove any extra buttons that might have been added
     const extraButtons = popup.querySelectorAll('button:not(#closePopup)');
     extraButtons.forEach(btn => btn.remove());
     
-    // Remove any extra divs that might have been added
     const extraDivs = popup.querySelectorAll('div');
     extraDivs.forEach(div => div.remove());
     
@@ -1077,30 +1029,25 @@ function showPopup(message, link = '') {
     popupLink.select();
   }
 }
-// New function for no hits popup with continue onboarding button
+
 function showNoHitsPopup(customerData, apiResponse) {
   const popup = document.getElementById('popup');
   const popupText = document.getElementById('popupText');
   const popupLink = document.getElementById('popupLink');
 
-  // Clean up any previous content first
   const extraButtons = popup.querySelectorAll('button:not(#closePopup)');
   extraButtons.forEach(btn => btn.remove());
   const extraDivs = popup.querySelectorAll('div');
   extraDivs.forEach(div => div.remove());
 
-  // Reset text styling
   popupText.style.whiteSpace = 'normal';
   popupText.style.fontSize = '';
   popupText.style.lineHeight = '';
   
-  // Set message
   popupText.textContent = "Your customer doesn't have any hits. You can continue with the onboarding process.";
 
-  // Hide the link field
   popupLink.style.display = 'none';
 
-  // Create Continue Onboarding button
   const continueButton = document.createElement('button');
   continueButton.textContent = 'Continue Onboarding';
   continueButton.style.cssText = `
@@ -1115,7 +1062,6 @@ function showNoHitsPopup(customerData, apiResponse) {
   `;
   
   continueButton.onclick = () => {
-    // Use the customer ID from the API response
     const customerId = apiResponse.customerId || apiResponse.customer_id || apiResponse.id;
     
     if (!customerId) {
@@ -1124,7 +1070,6 @@ function showNoHitsPopup(customerData, apiResponse) {
       return;
     }
     
-    // Store customer data for onboarding with the correct ID
     localStorage.setItem(`screeningData_${customerId}`, JSON.stringify({
       customerId: customerId,
       firstName: customerData.firstName,
@@ -1142,136 +1087,27 @@ function showNoHitsPopup(customerData, apiResponse) {
     
     console.log('Stored screening data for customer:', customerId);
     
-    // Navigate to onboarding with the correct customer ID
     navigateToOnboarding(customerId);
     popup.style.display = 'none';
     resetPopup();
   };
 
-  // Insert the button before the close button
-  const closeButton = document.getElementById('closePopup');
-  closeButton.parentNode.insertBefore(continueButton, closeButton);
-
-  popup.style.display = 'block';
-}
-// NEW: Function for synchronous centralized popup (no continue button)
-function showSynchronousCentralizedPopup() {
-  const popup = document.getElementById('popup');
-  const popupText = document.getElementById('popupText');
-  const popupLink = document.getElementById('popupLink');
-
-  // Clean up any previous content first
-  const extraButtons = popup.querySelectorAll('button:not(#closePopup)');
-  extraButtons.forEach(btn => btn.remove());
-  const extraDivs = popup.querySelectorAll('div');
-  extraDivs.forEach(div => div.remove());
-
-  // Reset text styling
-  popupText.style.whiteSpace = 'normal';
-  popupText.style.fontSize = '';
-  popupText.style.lineHeight = '';
-  
-  // Set content - same message for hits and no hits
-  popupText.textContent = "The alert is being treated by the compliance team. You will receive a notification once it is processed.";
-
-  // Hide the link field
-  popupLink.style.display = 'none';
-
-  // Make sure only one close button exists and is properly configured
-  const existingCloseButton = document.getElementById('closePopup');
-  if (existingCloseButton) {
-    existingCloseButton.style.display = 'block';
-    existingCloseButton.textContent = 'Close';
-  }
-
-  popup.style.display = 'block';
-}
-
-// NEW: Function for asynchronous centralized popup (with continue button)
-function showAsynchronousCentralizedPopup(customerData, apiResponse) {
-  const popup = document.getElementById('popup');
-  const popupText = document.getElementById('popupText');
-  const popupLink = document.getElementById('popupLink');
-
-  // Clean up any previous content first
-  const extraButtons = popup.querySelectorAll('button:not(#closePopup)');
-  extraButtons.forEach(btn => btn.remove());
-  const extraDivs = popup.querySelectorAll('div');
-  extraDivs.forEach(div => div.remove());
-
-  // Reset text styling
-  popupText.style.whiteSpace = 'normal';
-  popupText.style.fontSize = '';
-  popupText.style.lineHeight = '';
-  
-  // Set content - same message for hits and no hits
-  popupText.textContent = "The alert is being treated by the compliance team. You will receive a notification once it is processed. but you can now proceed with the onboarding";
-
-  // Hide the link field
-  popupLink.style.display = 'none';
-
-  // Create Continue Onboarding button
-  const continueButton = document.createElement('button');
-  continueButton.textContent = 'Continue Onboarding';
-  continueButton.style.cssText = `
-    padding: 10px 20px;
-    background-color: #28a745;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-    margin: 20px 10px 0 0;
-  `;
-  
-  continueButton.onclick = () => {
-    // Get customer ID from API response or generate from form data
-    const customerId = apiResponse?.customerId || apiResponse?.customer_id || apiResponse?.id || 
-                      `${customerData.firstName}_${customerData.lastName}`;
-    
-    // Store customer data for onboarding
-    localStorage.setItem(`screeningData_${customerId}`, JSON.stringify({
-      customerId: customerId,
-      firstName: customerData.firstName,
-      lastName: customerData.lastName,
-      birthDate: customerData.birthDate,
-      nationality: customerData.nationality,
-      citizenship: customerData.citizenship,
-      systemId: customerData.systemId,
-      searchQueryId: apiResponse?.search_query_id,
-      screeningResult: 'ASYNC_PROCESSING',
-      timestamp: new Date().toISOString(),
-      apiResponse: apiResponse
-    }));
-    
-    console.log('Stored screening data for async customer:', customerId);
-    
-    // Navigate to onboarding
-    navigateToOnboarding(customerId);
-    popup.style.display = 'none';
-    resetPopup();
-  };
-
-  // Insert the button before the close button
   const closeButton = document.getElementById('closePopup');
   closeButton.parentNode.insertBefore(continueButton, closeButton);
 
   popup.style.display = 'block';
 }
 
-// --- Enhanced popup for screening results ---
 function showScreeningResultsPopup(event) {
   const popup = document.getElementById('popup');
   const popupText = document.getElementById('popupText');
   const popupLink = document.getElementById('popupLink');
 
-  // Clean up any previous content first
   const extraButtons = popup.querySelectorAll('button:not(#closePopup)');
   extraButtons.forEach(btn => btn.remove());
   const extraDivs = popup.querySelectorAll('div');
   extraDivs.forEach(div => div.remove());
 
-  // Create message
   let message = `Customer ${event.customerId} Screening Results:\n`;
   message += `🔍 Risk Assessment:\n`;
   message += `• PEP Status: ${event.isPEP ? '⚠️ YES' : '✅ NO'} (${event.pepDecision || 'N/A'})\n`;
@@ -1290,14 +1126,12 @@ function showScreeningResultsPopup(event) {
   popupText.style.lineHeight = '1.4';
   popupText.textContent = message;
 
-  // Hide the link field
   popupLink.style.display = 'none';
 
-  // Only add Continue Onboarding button if not sanctioned
   if (!event.isSanctioned) {
     const continueButton = document.createElement('button');
     continueButton.textContent = 'Continue Onboarding';
-    continueButton.id = 'continueOnboardingBtn'; // Give it an ID for cleanup
+    continueButton.id = 'continueOnboardingBtn';
     continueButton.style.cssText = `
       padding: 10px 20px;
       background-color: #28a745;
@@ -1314,7 +1148,6 @@ function showScreeningResultsPopup(event) {
       resetPopup();
     };
     
-    // Insert the button before the close button
     const closeButton = document.getElementById('closePopup');
     closeButton.parentNode.insertBefore(continueButton, closeButton);
   }
@@ -1322,19 +1155,16 @@ function showScreeningResultsPopup(event) {
   popup.style.display = 'block';
 }
 
-// Helper function to reset popup to clean state
 function resetPopup() {
   const popup = document.getElementById('popup');
   const popupText = document.getElementById('popupText');
   const popupLink = document.getElementById('popupLink');
   
-  // Reset text styling
   popupText.style.whiteSpace = 'normal';
   popupText.style.fontSize = '';
   popupText.style.lineHeight = '';
   popupText.textContent = '';
   
-  // Reset link field
   popupLink.onclick = null;
   popupLink.style.cursor = 'default';
   popupLink.style.display = 'none';
@@ -1342,44 +1172,34 @@ function resetPopup() {
   popupLink.value = '';
   popupLink.placeholder = '';
   
-  // Remove any extra buttons (keep only the original close button)
   const extraButtons = popup.querySelectorAll('button:not(#closePopup)');
   extraButtons.forEach(btn => btn.remove());
   
-  // Remove any extra divs
   const extraDivs = popup.querySelectorAll('div');
   extraDivs.forEach(div => div.remove());
   
-  // Clear text selection
   const sel = window.getSelection();
   sel.removeAllRanges();
 }
 
-// --- Update the close button event handler ---
 document.getElementById('closePopup').addEventListener('click', () => {
   const popup = document.getElementById('popup');
   popup.style.display = 'none';
   resetPopup();
 });
 
-// --- Navigate to onboarding function ---
-// --- Navigate to onboarding function with tenant-specific page ---
 function navigateToOnboarding(customerId) {
-  // Get current tenant from localStorage or default
   const currentTenant = localStorage.getItem('tenantName') || 'bankfr';
   
-  // Map tenant to onboarding page
   const tenantPageMap = {
     'bankfr': 'onboarding_bankfr.html',
     'banque_en': 'onboarding_banque_en.html',
-    // Add more tenants as needed
   };
   
   const onboardingPage = tenantPageMap[currentTenant] || 'onboarding_bankfr.html';
   
   console.log(`Navigating to tenant-specific onboarding: ${onboardingPage} for tenant: ${currentTenant}`);
   
-  // Navigate to tenant-specific onboarding page
   window.location.href = `${onboardingPage}?customerId=${customerId}`;
 }
 
@@ -1393,7 +1213,6 @@ async function callSearch(entityType, containerId, responseId, isDecentralized =
   logMessage(`Starting search for ${entityType}...`, 'info');
 
   try {
-    // UPDATED: Get valid token (auto-refresh if needed)
     let currentAuthToken;
     try {
       currentAuthToken = await tokenManager.getValidToken();
@@ -1412,23 +1231,19 @@ async function callSearch(entityType, containerId, responseId, isDecentralized =
       payload[input.id.replace(containerId + '_', '')] = input.value;
     });
 
-    // Generate systemId with the exact format: system_timestamp_random
     const generatedSystemId = `system_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
     payload.systemId = generatedSystemId;
     payload.systemName = defaultValues[entityType].systemName;
     payload.searchQuerySource = defaultValues[entityType].searchQuerySource;
 
-    // Store the systemId for this customer for later use in onboarding
     const customerIdentifier = payload.firstName + '_' + payload.lastName + '_' + payload.birthDate;
     localStorage.setItem(`systemId_${customerIdentifier}`, generatedSystemId);
     console.log('Stored systemId for customer:', customerIdentifier, '→', generatedSystemId);
 
-    // Add queueName for both PP and PM in centralized process
     if (!isDecentralized) {
       payload.queueName = payload.queueName || defaultValues[entityType].queueName;
     }
 
-    // Use different endpoint based on entity type
     const endpoint = entityType === 'PM' 
       ? 'https://greataml.com/kyc-web-restful/search/searchEntityCustomer'
       : 'https://greataml.com/kyc-web-restful/search/searchPersonCustomer';
@@ -1438,145 +1253,58 @@ async function callSearch(entityType, containerId, responseId, isDecentralized =
       headers: { 
         'Content-Type': 'application/json',
         'x-auth-tenant': tenantName,
-        'x-auth-token': currentAuthToken  // UPDATED: Use refreshed token
+        'x-auth-token': currentAuthToken
       },
       body: JSON.stringify(payload)
     });
 
     const data = await res.json();
     
-    // MOVE THIS LINE HERE - inside the try block after data is defined
     storeSearchEventForWebhook(payload, data);
 
     logMessage(`Search completed for ${entityType}`, 'success');
     showNotification('Search completed successfully', 'success');
+    
     if (isDecentralized) {
-      // Decentralized process - show popup based on hits
       if (data.maxScore && data.maxScore > 0) {
         const link = `https://greataml.com/search/searchdecision/${data.search_query_id}`;
         logMessage(`Hits found for customer (Score: ${data.maxScore})`, 'warning');
         showPopup('You can treat the hits via this link:', link);
       } else {
         logMessage('No hits found for customer', 'info');
-        showNoHitsPopup(payload, data); // Pass both customer data and API response
+        showNoHitsPopup(payload, data);
       }
-} else {
-  // Centralized process - distinguish between sync and async
-  const isAsync = containerId.includes('async'); // Check if this is async fields
-  
-  if (isAsync) {
-    // Asynchronous centralized - show continue button for both hits and no hits
-    showAsynchronousCentralizedPopup(payload, data);
-  } else {
-    // Synchronous centralized - no continue button, just wait for notification
-    showSynchronousCentralizedPopup();
-  }
-}
-} catch (err) {
+    } else {
+      // Centralized synchronous process - show simple notification
+      if (data.maxScore && data.maxScore > 0) {
+        logMessage(`Hits found for customer (Score: ${data.maxScore})`, 'warning');
+        showNotification('Alert sent to compliance team. You will receive a notification once processed.', 'info');
+      } else {
+        logMessage('No hits found for customer', 'info');
+        showNotification('Customer cleared. Continue with onboarding.', 'success');
+        
+        const customerId = `${payload.firstName}_${payload.lastName}_${Date.now()}`;
+        localStorage.setItem(`screeningData_${customerId}`, JSON.stringify({
+          customerId: customerId,
+          firstName: payload.firstName,
+          lastName: payload.lastName,
+          birthDate: payload.birthDate,
+          nationality: payload.nationality,
+          citizenship: payload.citizenship,
+          systemId: payload.systemId,
+          searchQueryId: data.search_query_id,
+          screeningResult: 'NO_HITS',
+          maxScore: 0,
+          timestamp: new Date().toISOString(),
+          apiResponse: data
+        }));
+      }
+    }
+  } catch (err) {
     const errorMsg = `Search error: ${err.message}`;
     logMessage(errorMsg, 'error');
     showNotification('Search failed', 'error');
   }
-}
-
-// Add webhook receiver function (place this with other utility functions)
-async function receiveDirectWebhook(event) {
-  try {
-    const webhookData = typeof event === 'string' ? JSON.parse(event) : event;
-    console.log('Direct webhook received from Reis:', webhookData);
-    
-    // Process the real webhook data
-    handleRealWebhookEvent(webhookData);
-    
-    return { status: 'ok', message: 'Webhook processed successfully' };
-  } catch (error) {
-    console.error('Error processing direct webhook:', error);
-    return { status: 'error', message: error.message };
-  }
-}
-
-
-  // Make it globally accessible for webhook calls
-  window.receiveDirectWebhook = receiveDirectWebhook;
-
-  // Add webhook endpoint simulation for testing
-  function simulateDirectWebhook() {
-    const testWebhookData = {
-      customerId: `DIRECT_CUSTOMER_${Math.floor(Math.random() * 1000)}`,
-      searchQueryId: `direct_search_${Date.now()}`,
-      source: 'Reis_KYC',
-      isPEP: Math.random() > 0.7,
-      isSanctioned: Math.random() > 0.9,
-      isAdverseMedia: Math.random() > 0.8,
-      pepDecision: Math.random() > 0.7 ? 'HIT' : 'NO_HIT',
-      sanctionDecision: Math.random() > 0.9 ? 'HIT' : 'NO_HIT'
-    };
-    
-    receiveDirectWebhook(testWebhookData);
-  }
-
-  // Add test button to your page
-  function addDirectWebhookTestButton() {
-    const testButton = document.createElement('button');
-    testButton.textContent = 'Test Direct Webhook';
-    testButton.style.cssText = `
-      position: fixed;
-      top: 45px;
-      left: 20px;
-      z-index: 10000;
-      padding: 10px 15px;
-      background-color: #007ACC;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 14px;
-    `;
-    testButton.onclick = simulateDirectWebhook;
-    document.body.appendChild(testButton);
-  }
-
-  // Add close button
-  const closeButton = document.createElement('button');
-  closeButton.textContent = 'Close';
-  closeButton.id = 'closePopup';
-  closeButton.style.cssText = `
-    padding: 10px 20px;
-    background-color: #6c757d;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-  `;
-  closeButton.onclick = () => {
-    popup.style.display = 'none';
-    popupText.style.whiteSpace = 'normal';
-    popupText.style.fontSize = '';
-    popupText.style.lineHeight = '';
-    popupText.textContent = '';
-    
-    // Reset link field
-    popupLink.onclick = null;
-    popupLink.style.cursor = 'default';
-    popupLink.style.display = 'none';
-    popupLink.readOnly = true;
-    popupLink.value = '';
-    popupLink.placeholder = '';
-    
-    // Remove any extra elements
-    const extraButtons = popup.querySelectorAll('button:not(#closePopup)');
-    extraButtons.forEach(btn => btn.remove());
-    const extraDivs = popup.querySelectorAll('div');
-    extraDivs.forEach(div => div.remove());
-    
-    const sel = window.getSelection();
-    sel.removeAllRanges();
-  };
-
-  buttonContainer.appendChild(closeButton);
-  popup.appendChild(buttonContainer);
-  popup.style.display = 'block';
 }
 
 // --- Button Events ---
@@ -1586,16 +1314,13 @@ closeBtn.addEventListener('click', () => {
   const popupText = document.getElementById('popupText');
   const popupLink = document.getElementById('popupLink');
   
-  // Hide popup
   popup.style.display = 'none';
   
-  // Reset all popup content and styling
   popupText.style.whiteSpace = 'normal';
   popupText.style.fontSize = '';
   popupText.style.lineHeight = '';
   popupText.textContent = '';
   
-  // Reset link field
   popupLink.onclick = null;
   popupLink.style.cursor = 'default';
   popupLink.style.display = 'none';
@@ -1603,11 +1328,9 @@ closeBtn.addEventListener('click', () => {
   popupLink.value = '';
   popupLink.placeholder = '';
   
-  // Remove any extra buttons that might have been added
   const extraButtons = popup.querySelectorAll('button:not(#closePopup)');
   extraButtons.forEach(btn => btn.remove());
   
-  // Remove any extra divs that might have been added
   const extraDivs = popup.querySelectorAll('div');
   extraDivs.forEach(div => div.remove());
   
@@ -1635,7 +1358,6 @@ document.getElementById('submitAsync')
     callSearch(document.getElementById('entityTypeAsync').value, 'asyncFields', 'responseAsync')
   );
 
-// --- Entity type change events ---
 document.getElementById('entityTypeDecentralized')
   .addEventListener('change', () => renderFields('decentralizedFields', document.getElementById('entityTypeDecentralized').value, 'decentralized'));
 
@@ -1645,30 +1367,76 @@ document.getElementById('entityTypeSync')
 document.getElementById('entityTypeAsync')
   .addEventListener('change', () => renderFields('asyncFields', document.getElementById('entityTypeAsync').value, 'centralized'));
 
-// --- Initialize on page load ---
+async function receiveDirectWebhook(event) {
+  try {
+    const webhookData = typeof event === 'string' ? JSON.parse(event) : event;
+    console.log('Direct webhook received from Reis:', webhookData);
+    
+    handleRealWebhookEvent(webhookData);
+    
+    return { status: 'ok', message: 'Webhook processed successfully' };
+  } catch (error) {
+    console.error('Error processing direct webhook:', error);
+    return { status: 'error', message: error.message };
+  }
+}
+
+window.receiveDirectWebhook = receiveDirectWebhook;
+
+function simulateDirectWebhook() {
+  const testWebhookData = {
+    customerId: `DIRECT_CUSTOMER_${Math.floor(Math.random() * 1000)}`,
+    searchQueryId: `direct_search_${Date.now()}`,
+    source: 'Reis_KYC',
+    isPEP: Math.random() > 0.7,
+    isSanctioned: Math.random() > 0.9,
+    isAdverseMedia: Math.random() > 0.8,
+    pepDecision: Math.random() > 0.7 ? 'HIT' : 'NO_HIT',
+    sanctionDecision: Math.random() > 0.9 ? 'HIT' : 'NO_HIT'
+  };
+  
+  receiveDirectWebhook(testWebhookData);
+}
+
+function addDirectWebhookTestButton() {
+  const testButton = document.createElement('button');
+  testButton.textContent = 'Test Direct Webhook';
+  testButton.style.cssText = `
+    position: fixed;
+    top: 45px;
+    left: 20px;
+    z-index: 10000;
+    padding: 10px 15px;
+    background-color: #007ACC;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+  `;
+  testButton.onclick = simulateDirectWebhook;
+  document.body.appendChild(testButton);
+}
+
 document.addEventListener('DOMContentLoaded', function() {
   logMessage('Application initialized', 'info');
   createNotificationElements();
-  addDirectWebhookTestButton(); // Add this line
+  addDirectWebhookTestButton();
   
-  // Initialize token status display
   updateTokenStatusButton();
   
-  // Auto-start polling after a short delay
   setTimeout(() => {
     if (!pollingInterval) {
       setupEventPolling();
     }
-  }, 1000); // Wait 1 second after page load
+  }, 1000);
 });
 
-// Clean up on page unload
 window.addEventListener('beforeunload', function() {
   if (pollingInterval) {
     clearInterval(pollingInterval);
   }
 });
 
-// Global functions for HTML onclick handlers
 window.closeNotificationHistory = closeNotificationHistory;
 window.continueOnboardingFromHistory = continueOnboardingFromHistory;
