@@ -1136,8 +1136,16 @@ function showCentralizedPopup(message, showContinueButton = false, customerData 
       margin: 20px 10px 0 0;
     `;
     continueButton.onclick = () => {
-      // Store customer data for onboarding
-      const customerId = `${customerData.firstName}_${customerData.lastName}_${Date.now()}`;
+      // Use the customer ID from the API response
+      const customerId = apiResponse.customerId || apiResponse.customer_id || apiResponse.id;
+      
+      if (!customerId) {
+        console.error('No customer ID found in API response:', apiResponse);
+        showNotification('Error: Customer ID not found in response', 'error');
+        return;
+      }
+      
+      // Store customer data for onboarding with the correct ID from API response
       localStorage.setItem(`screeningData_${customerId}`, JSON.stringify({
         customerId: customerId,
         firstName: customerData.firstName,
@@ -1147,11 +1155,13 @@ function showCentralizedPopup(message, showContinueButton = false, customerData 
         citizenship: customerData.citizenship,
         systemId: customerData.systemId,
         searchQueryId: apiResponse.search_query_id,
-        screeningResult: 'NO_HITS',
-        maxScore: 0,
+        screeningResult: apiResponse.maxScore > 0 ? 'HITS_FOUND' : 'NO_HITS',
+        maxScore: apiResponse.maxScore || 0,
         timestamp: new Date().toISOString(),
         apiResponse: apiResponse
       }));
+      
+      console.log('Stored screening data for customer:', customerId);
       
       navigateToOnboarding(customerId);
       popup.style.display = 'none';
