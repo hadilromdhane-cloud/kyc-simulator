@@ -1098,6 +1098,74 @@ function showNoHitsPopup(customerData, apiResponse) {
   popup.style.display = 'block';
 }
 
+// New function for centralized popup
+function showCentralizedPopup(message, showContinueButton = false, customerData = null, apiResponse = null) {
+  const popup = document.getElementById('popup');
+  const popupText = document.getElementById('popupText');
+  const popupLink = document.getElementById('popupLink');
+
+  // Clean up any previous content first
+  const extraButtons = popup.querySelectorAll('button:not(#closePopup)');
+  extraButtons.forEach(btn => btn.remove());
+  const extraDivs = popup.querySelectorAll('div');
+  extraDivs.forEach(div => div.remove());
+
+  // Reset text styling
+  popupText.style.whiteSpace = 'normal';
+  popupText.style.fontSize = '';
+  popupText.style.lineHeight = '';
+  
+  // Set content
+  popupText.textContent = message;
+
+  // Hide the link field
+  popupLink.style.display = 'none';
+
+  if (showContinueButton && customerData && apiResponse) {
+    // Show Continue Onboarding button
+    const continueButton = document.createElement('button');
+    continueButton.textContent = 'Continue Onboarding';
+    continueButton.style.cssText = `
+      padding: 10px 20px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      margin: 20px 10px 0 0;
+    `;
+    continueButton.onclick = () => {
+      // Store customer data for onboarding
+      const customerId = `${customerData.firstName}_${customerData.lastName}_${Date.now()}`;
+      localStorage.setItem(`screeningData_${customerId}`, JSON.stringify({
+        customerId: customerId,
+        firstName: customerData.firstName,
+        lastName: customerData.lastName,
+        birthDate: customerData.birthDate,
+        nationality: customerData.nationality,
+        citizenship: customerData.citizenship,
+        systemId: customerData.systemId,
+        searchQueryId: apiResponse.search_query_id,
+        screeningResult: 'NO_HITS',
+        maxScore: 0,
+        timestamp: new Date().toISOString(),
+        apiResponse: apiResponse
+      }));
+      
+      navigateToOnboarding(customerId);
+      popup.style.display = 'none';
+      resetPopup();
+    };
+
+    // Insert the button before the close button
+    const closeButton = document.getElementById('closePopup');
+    closeButton.parentNode.insertBefore(continueButton, closeButton);
+  }
+
+  popup.style.display = 'block';
+}
+
 function showScreeningResultsPopup(event) {
   const popup = document.getElementById('popup');
   const popupText = document.getElementById('popupText');
@@ -1275,29 +1343,13 @@ async function callSearch(entityType, containerId, responseId, isDecentralized =
         showNoHitsPopup(payload, data);
       }
     } else {
-      // Centralized synchronous process - show simple notification
+      // Centralized synchronous process - show popup
       if (data.maxScore && data.maxScore > 0) {
         logMessage(`Hits found for customer (Score: ${data.maxScore})`, 'warning');
-        showNotification('Alert sent to compliance team. You will receive a notification once processed.', 'info');
+        showCentralizedPopup("The alert is being treated by the compliance team. You will receive a notification once it is processed.", false);
       } else {
         logMessage('No hits found for customer', 'info');
-        showNotification('Customer cleared. Continue with onboarding.', 'success');
-        
-        const customerId = `${payload.firstName}_${payload.lastName}_${Date.now()}`;
-        localStorage.setItem(`screeningData_${customerId}`, JSON.stringify({
-          customerId: customerId,
-          firstName: payload.firstName,
-          lastName: payload.lastName,
-          birthDate: payload.birthDate,
-          nationality: payload.nationality,
-          citizenship: payload.citizenship,
-          systemId: payload.systemId,
-          searchQueryId: data.search_query_id,
-          screeningResult: 'NO_HITS',
-          maxScore: 0,
-          timestamp: new Date().toISOString(),
-          apiResponse: data
-        }));
+        showCentralizedPopup("Your customer doesn't have any matches. You can continue the onboarding.", true, payload, data);
       }
     }
   } catch (err) {
@@ -1383,45 +1435,9 @@ async function receiveDirectWebhook(event) {
 
 window.receiveDirectWebhook = receiveDirectWebhook;
 
-function simulateDirectWebhook() {
-  const testWebhookData = {
-    customerId: `DIRECT_CUSTOMER_${Math.floor(Math.random() * 1000)}`,
-    searchQueryId: `direct_search_${Date.now()}`,
-    source: 'Reis_KYC',
-    isPEP: Math.random() > 0.7,
-    isSanctioned: Math.random() > 0.9,
-    isAdverseMedia: Math.random() > 0.8,
-    pepDecision: Math.random() > 0.7 ? 'HIT' : 'NO_HIT',
-    sanctionDecision: Math.random() > 0.9 ? 'HIT' : 'NO_HIT'
-  };
-  
-  receiveDirectWebhook(testWebhookData);
-}
-
-function addDirectWebhookTestButton() {
-  const testButton = document.createElement('button');
-  testButton.textContent = 'Test Direct Webhook';
-  testButton.style.cssText = `
-    position: fixed;
-    top: 45px;
-    left: 20px;
-    z-index: 10000;
-    padding: 10px 15px;
-    background-color: #007ACC;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 14px;
-  `;
-  testButton.onclick = simulateDirectWebhook;
-  document.body.appendChild(testButton);
-}
-
 document.addEventListener('DOMContentLoaded', function() {
   logMessage('Application initialized', 'info');
   createNotificationElements();
-  addDirectWebhookTestButton();
   
   updateTokenStatusButton();
   
