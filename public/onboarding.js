@@ -1,7 +1,6 @@
 /**
- * Onboarding Handler - Reusable JavaScript module for handling KYC onboarding forms
- * This module can be used across multiple HTML forms by simply including it and calling init()
- * Supports both BankFR and Banque EN tenants with different payload structures
+ * Onboarding Handler - Updated to pre-populate screening data
+ * Pre-fills and disables fields that were already provided during screening
  */
 
 const OnboardingHandler = (function() {
@@ -141,34 +140,34 @@ const OnboardingHandler = (function() {
                         createdOn: currentDateTime,
                         dpr: "",
                         last_update: currentDateTime,
-                        first_name: formData.firstName || "",
-                        last_name: formData.lastName || "",
-                        birth_date: formData.dateOfBirth || "",
-                        nationality: formData.nationality || "",
-                        marital_status: formData.civilStatus || "",
+                        first_name: formData.firstName || formData.prenom || "",
+                        last_name: formData.lastName || formData.nom || "",
+                        birth_date: formData.dateOfBirth || formData.dateNaissance || "",
+                        nationality: formData.nationality || formData.nationalite || "",
+                        marital_status: formData.civilStatus || formData.etatCivil || "",
                         tel1: "", // Keep empty like successful example
                         email: formData.email || "",
-                        adresseDeResidence: formData.residentialAddress || "",
-                        postal_code: formData.postalCode || "",
-                        fiscale_ville: formData.city || "",
-                        Country_of_residence: formData.countryOfResidence || "",
+                        adresseDeResidence: formData.residentialAddress || formData.adresse || "",
+                        postal_code: formData.postalCode || formData.codePostal || "",
+                        fiscale_ville: formData.city || formData.ville || "",
+                        Country_of_residence: formData.countryOfResidence || formData.paysResidence || "",
                         tin_: {
-                            id: this.getDocumentTypeIdEN(formData.idType),
-                            name: this.getDocumentTypeNameEN(formData.idType),
-                            value: formData.idType || "",
-                            translate: this.getDocumentTypeNameEN(formData.idType),
+                            id: this.getDocumentTypeIdEN(formData.idType || formData.typePiece),
+                            name: this.getDocumentTypeNameEN(formData.idType || formData.typePiece),
+                            value: formData.idType || formData.typePiece || "",
+                            translate: this.getDocumentTypeNameEN(formData.idType || formData.typePiece),
                             parentId: null,
                             parentName: null,
-                            uniqueCode: `${this.getDocumentTypeNameEN(formData.idType)}:${formData.idType}:tin`,
+                            uniqueCode: `${this.getDocumentTypeNameEN(formData.idType || formData.typePiece)}:${formData.idType || formData.typePiece}:tin`,
                             tags: ["tin"]
                         },
-                        nid: formData.idNumber || "",
-                        delivery_date: formData.dateOfIssue || "",
-                        expiry_date: formData.expiryDate || "",
+                        nid: formData.idNumber || formData.numeroPiece || "",
+                        delivery_date: formData.dateOfIssue || formData.dateDelivrance || "",
+                        expiry_date: formData.expiryDate || formData.dateExpiration || "",
                         profession: formData.profession || "",
-                        product: [formData.productsServices || ""],
-                        onboarding_channel: formData.onboardingChannel || "",
-                        source_of_funds: [formData.sourceOfFunds || ""],
+                        product: [formData.productsServices || formData.produits || ""],
+                        onboarding_channel: formData.onboardingChannel || formData.canal || "",
+                        source_of_funds: [formData.sourceOfFunds || formData.origineFonds || ""],
                         dataGrid: [{"select": "", "nature": "", "tx_nature": {}}],
                         mscq: "",
                         pep: "",
@@ -192,14 +191,14 @@ const OnboardingHandler = (function() {
                         businessName: "",
                         entityType: "PP",
                         id: customerId,
-                        customer_type: "manual-entry", // Changed from search-result to manual-entry
+                        customer_type: "manual-entry",
                         createdBy: "admin",
                         creatorId: 2,
                         creatorFirstName: "System",
                         creatorLastName: "User",
                         modificationDate: currentDateTime,
                         extendedProperties: {},
-                        citizenship: formData.nationality || "",
+                        citizenship: formData.nationality || formData.nationalite || "",
                         listsNames: [],
                         agencyId: 3,
                         agencyName: "headquarters",
@@ -213,16 +212,16 @@ const OnboardingHandler = (function() {
                         isSanctioned: false,
                         hasRiskedCountry: false,
                         form_entity_type: "PP",
-                        cus_birth_date: formData.dateOfBirth || "",
+                        cus_birth_date: formData.dateOfBirth || formData.dateNaissance || "",
                         url: "https://greataml.com/",
                         is_hq_user: false,
                         current_user_name: "System User",
                         current_user_id: 2,
                         agency_location: null,
                         distribution_channel: null,
-                        obnl_name: formData.lastName || "",
+                        obnl_name: formData.lastName || formData.nom || "",
                         customerUrl: "https://greataml.com/",
-                        revenuAnnuelNet: parseInt(formData.netAnnualIncome) || 0,
+                        revenuAnnuelNet: parseInt(formData.netAnnualIncome || formData.revenu) || 0,
                         address: []
                     },
                     fatcaIdentification: {
@@ -357,6 +356,9 @@ const OnboardingHandler = (function() {
             let firstInvalid = null;
 
             requiredFields.forEach(field => {
+                // Skip validation for disabled fields (pre-populated from screening)
+                if (field.disabled) return;
+                
                 if (!field.value.trim()) {
                     field.style.borderColor = '#dc3545';
                     if (!firstInvalid) {
@@ -378,7 +380,7 @@ const OnboardingHandler = (function() {
             return isValid;
         },
 
-                        collectFormData: function() {
+        collectFormData: function() {
             const formData = {};
             const allInputs = currentForm.querySelectorAll('input, select, textarea');
             
@@ -397,7 +399,6 @@ const OnboardingHandler = (function() {
                     if (typeof value === 'string') {
                         // Remove any problematic characters that might be interpreted as regex
                         value = value.replace(/[*+?^${}()|\\[\]]/g, '');
-
                     }
                     formData[input.name] = value;
                 }
@@ -618,6 +619,7 @@ const OnboardingHandler = (function() {
                 if (screeningData) {
                     try {
                         customerData = JSON.parse(screeningData);
+                        Utils.log('Loaded screening data', customerData);
                     } catch (error) {
                         Utils.logError('Error parsing screening data', error);
                     }
@@ -643,24 +645,76 @@ const OnboardingHandler = (function() {
         },
 
         prePopulateForm: function() {
-            // Auto-populate from customer data
-            if (customerData && customerData.customerId) {
-                const parts = customerData.customerId.toString().split('_');
-                if (parts.length >= 2) {
-                    // Try both naming conventions
-                    const firstNameField = document.getElementById('prenom') || document.getElementById('firstName');
-                    const lastNameField = document.getElementById('nom') || document.getElementById('lastName');
-                    if (firstNameField) firstNameField.value = parts[0] || '';
-                    if (lastNameField) lastNameField.value = parts[1] || '';
+            // Pre-populate from screening data if available
+            if (customerData && customerData.firstName && customerData.lastName) {
+                Utils.log('Pre-populating form with screening data');
+                
+                // Define field mappings between screening and onboarding forms
+                const fieldMappings = [
+                    // First name
+                    { screeningField: 'firstName', onboardingFields: ['prenom', 'firstName'], readonly: true },
+                    // Last name  
+                    { screeningField: 'lastName', onboardingFields: ['nom', 'lastName'], readonly: true },
+                    // Birth date
+                    { screeningField: 'birthDate', onboardingFields: ['dateNaissance', 'dateOfBirth'], readonly: true },
+                    // Nationality
+                    { screeningField: 'nationality', onboardingFields: ['nationalite', 'nationality'], readonly: true },
+                    // Citizenship (same as nationality in most cases)
+                    { screeningField: 'citizenship', onboardingFields: ['nationalite', 'nationality'], readonly: true }
+                ];
+
+                fieldMappings.forEach(mapping => {
+                    const screeningValue = customerData[mapping.screeningField];
+                    if (screeningValue) {
+                        mapping.onboardingFields.forEach(fieldId => {
+                            const field = document.getElementById(fieldId);
+                            if (field) {
+                                field.value = screeningValue;
+                                if (mapping.readonly) {
+                                    field.disabled = true;
+                                    // Add visual styling for disabled fields
+                                    field.style.backgroundColor = '#f8f9fa';
+                                    field.style.color = '#6c757d';
+                                    field.style.cursor = 'not-allowed';
+                                    
+                                    // Add a visual indicator
+                                    const label = field.closest('.form-group')?.querySelector('label');
+                                    if (label && !label.querySelector('.auto-filled')) {
+                                        const indicator = document.createElement('span');
+                                        indicator.className = 'auto-filled';
+                                        indicator.textContent = ' (Auto-filled from screening)';
+                                        indicator.style.cssText = `
+                                            color: #28a745;
+                                            font-size: 0.8em;
+                                            font-style: italic;
+                                        `;
+                                        label.appendChild(indicator);
+                                    }
+                                }
+                                Utils.log(`Pre-populated ${fieldId} with: ${screeningValue}`);
+                            }
+                        });
+                    }
+                });
+            } else {
+                // Fallback to old method if no screening data with proper fields
+                if (customerData && customerData.customerId) {
+                    const parts = customerData.customerId.toString().split('_');
+                    if (parts.length >= 2) {
+                        const firstNameField = document.getElementById('prenom') || document.getElementById('firstName');
+                        const lastNameField = document.getElementById('nom') || document.getElementById('lastName');
+                        if (firstNameField && !firstNameField.value) firstNameField.value = parts[0] || '';
+                        if (lastNameField && !lastNameField.value) lastNameField.value = parts[1] || '';
+                    }
                 }
             }
 
-            // Load draft data
+            // Load draft data for fields that aren't pre-populated
             const draftData = Storage.loadDraft();
             if (draftData) {
                 Object.keys(draftData).forEach(key => {
                     const field = document.getElementById(key) || document.querySelector(`[name="${key}"]`);
-                    if (field && draftData[key]) {
+                    if (field && !field.disabled && draftData[key]) {
                         field.value = draftData[key];
                     }
                 });
