@@ -1043,24 +1043,19 @@ function showNoHitsPopup(customerData, apiResponse) {
   const popupText = document.getElementById('popupText');
   const popupLink = document.getElementById('popupLink');
 
-  // Clean up any previous content first
   const extraButtons = popup.querySelectorAll('button:not(#closePopup)');
   extraButtons.forEach(btn => btn.remove());
   const extraDivs = popup.querySelectorAll('div');
   extraDivs.forEach(div => div.remove());
 
-  // Reset text styling
   popupText.style.whiteSpace = 'normal';
   popupText.style.fontSize = '';
   popupText.style.lineHeight = '';
   
-  // Set message
   popupText.textContent = "Your customer doesn't have any hits. You can continue with the onboarding process.";
 
-  // Hide the link field
   popupLink.style.display = 'none';
 
-  // Create Continue Onboarding button
   const continueButton = document.createElement('button');
   continueButton.textContent = 'Continue Onboarding';
   continueButton.style.cssText = `
@@ -1075,10 +1070,14 @@ function showNoHitsPopup(customerData, apiResponse) {
   `;
   
   continueButton.onclick = () => {
-    // FIXED: Create customer ID from the payload data we sent
-    const customerId = `${customerData.firstName}_${customerData.lastName}_${Date.now()}`;
+    const customerId = apiResponse.customerId || apiResponse.customer_id || apiResponse.id;
     
-    // Store customer data for onboarding using the payload data
+    if (!customerId) {
+      console.error('No customer ID found in API response:', apiResponse);
+      showNotification('Error: Customer ID not found in response', 'error');
+      return;
+    }
+    
     localStorage.setItem(`screeningData_${customerId}`, JSON.stringify({
       customerId: customerId,
       firstName: customerData.firstName,
@@ -1096,18 +1095,17 @@ function showNoHitsPopup(customerData, apiResponse) {
     
     console.log('Stored screening data for customer:', customerId);
     
-    // Navigate to onboarding with the correct customer ID
     navigateToOnboarding(customerId);
     popup.style.display = 'none';
     resetPopup();
   };
 
-  // Insert the button before the close button
   const closeButton = document.getElementById('closePopup');
   closeButton.parentNode.insertBefore(continueButton, closeButton);
 
   popup.style.display = 'block';
 }
+
 // New function for centralized popup
 function showCentralizedPopup(message, showContinueButton = false, customerData = null, apiResponse = null) {
   const popup = document.getElementById('popup');
