@@ -279,11 +279,15 @@ function storeSearchEventForWebhook(searchData, searchResponse) {
 function handleRealWebhookEvent(webhookData) {
   sessionEventCounter++;
   
+  // Get current tenant name
+  const currentTenant = tokenManager.getTenant() || localStorage.getItem('tenantName') || 'Unknown';
+  
   const realEvent = {
     id: sessionEventCounter,
     timestamp: new Date().toISOString(),
     customerId: webhookData.customerId,
     source: 'Reis_KYC',
+    tenant: currentTenant, // Add tenant to the event data
     search_query_id: webhookData.searchQueryId,
     isPEP: webhookData.isPEP || false,
     isSanctioned: webhookData.isSanctioned || false,
@@ -304,8 +308,8 @@ function handleRealWebhookEvent(webhookData) {
   sessionStorage.setItem('kycEvents', JSON.stringify(sessionEvents));
   sessionStorage.setItem('kycEventCounter', sessionEventCounter.toString());
   
-  // Show notifications
-  showNotification(`Real webhook received for customer ${realEvent.customerId}`, 'warning');
+  // Show notifications with tenant name
+  showNotification(`[${currentTenant}] Real webhook received for customer ${realEvent.customerId}`, 'warning');
   showScreeningResultsPopup(realEvent);
   
   // Update history
@@ -493,6 +497,9 @@ function showNotificationHistory() {
       const statusColor = notification.isSanctioned ? '#dc3545' : '#28a745';
       const statusText = notification.isSanctioned ? 'SANCTIONED' : 'CLEARED';
       
+      // Get tenant name for this notification
+      const notificationTenant = notification.tenant || tokenManager.getTenant() || localStorage.getItem('tenantName') || 'Unknown';
+      
       historyHTML += `
         <div style="
           border: 1px solid #ddd;
@@ -502,8 +509,11 @@ function showNotificationHistory() {
           background: ${canContinueOnboarding ? '#f8f9fa' : 'white'};
           ${canContinueOnboarding ? 'border-left: 4px solid #007ACC;' : ''}
         ">
-          <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 10px;">
-            <h4 style="margin: 0; color: #004080;">Customer ${notification.customerId}</h4>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <div>
+              <h4 style="margin: 0; color: #004080;">Customer ${notification.customerId}</h4>
+              <small style="color: #666; font-weight: normal;">🏦 Tenant: ${notificationTenant}</small>
+            </div>
             <span style="
               background: ${statusColor};
               color: white;
@@ -713,8 +723,15 @@ function setupEventPolling() {
       console.log('Polling found:', data.events.length, 'events');
       
       if (data.events && data.events.length > 0) {
+        const currentTenant = tokenManager.getTenant() || localStorage.getItem('tenantName') || 'Unknown';
+        
         data.events.forEach(event => {
           console.log('Processing event:', event.customerId);
+          
+          // Add tenant information to the event if not already present
+          if (!event.tenant) {
+            event.tenant = currentTenant;
+          }
           
           // Only show popups for events that are newer than what we had when the page loaded
           const wasEventProcessedBefore = notificationsHistory.some(n => 
@@ -728,7 +745,7 @@ function setupEventPolling() {
           if (event.source === 'Reis_KYC' && !wasEventProcessedBefore) {
             console.log('Showing popup for new event:', event.customerId);
             showScreeningResultsPopup(event);
-            showNotification(`Screening completed for ${event.customerId}`, 'warning');
+            showNotification(`[${currentTenant}] Screening completed for ${event.customerId}`, 'warning');
             
             // Add to notifications history
             notificationsHistory.unshift(event);
@@ -1194,7 +1211,11 @@ function showScreeningResultsPopup(event) {
   const extraDivs = popup.querySelectorAll('div');
   extraDivs.forEach(div => div.remove());
 
-  let message = `Customer ${event.customerId} Screening Results:\n`;
+  // Get tenant name for display
+  const currentTenant = tokenManager.getTenant() || localStorage.getItem('tenantName') || 'Unknown Tenant';
+
+  let message = `🏦 Tenant: ${currentTenant}\n`;
+  message += `Customer ${event.customerId} Screening Results:\n`;
   message += `🔍 Risk Assessment:\n`;
   message += `• PEP Status: ${event.isPEP ? '⚠️ YES' : '✅ NO'} (${event.pepDecision || 'N/A'})\n`;
   message += `• Sanctions: ${event.isSanctioned ? '🚨 YES' : '✅ NO'} (${event.sanctionDecision || 'N/A'})\n`;
