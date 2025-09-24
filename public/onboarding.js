@@ -649,13 +649,15 @@ const OnboardingHandler = (function() {
     if (customerData && customerData.isScreeningDataLocked) {
         Utils.log('Pre-populating form with locked screening data');
         
-        const secureFieldMappings = [
-            { screeningField: 'firstName', onboardingFields: ['prenom', 'firstName'], readonly: true, label: 'Prénom/First Name' },
-            { screeningField: 'lastName', onboardingFields: ['nom', 'lastName'], readonly: true, label: 'Nom/Last Name' },
-            { screeningField: 'birthDate', onboardingFields: ['dateNaissance', 'dateOfBirth'], readonly: true, label: 'Date de naissance/Birth Date' },
-            { screeningField: 'nationality', onboardingFields: ['nationalite', 'nationality'], readonly: true, label: 'Nationalité/Nationality' },
-            { screeningField: 'citizenship', onboardingFields: ['nationalite', 'nationality'], readonly: true, label: 'Citoyenneté/Citizenship' }
-        ];
+        // Update the secureFieldMappings array in your prePopulateForm function:
+
+const secureFieldMappings = [
+    { screeningField: 'firstName', onboardingFields: ['prenom', 'firstName'], readonly: true, label: 'Prénom/First Name' },
+    { screeningField: 'lastName', onboardingFields: ['nom', 'lastName'], readonly: true, label: 'Nom/Last Name' },
+    { screeningField: 'birthDate', onboardingFields: ['dateNaissance', 'dateOfBirth'], readonly: true, label: 'Date de naissance/Birth Date' },
+    { screeningField: 'nationality', onboardingFields: ['nationalite', 'nationality'], readonly: true, label: 'Nationalité/Nationality' },
+    { screeningField: 'citizenship', onboardingFields: ['paysResidence', 'countryOfResidence'], readonly: true, label: 'Pays de Résidence/Country of Residence' }
+];
 
         let fieldsLocked = 0;
 
