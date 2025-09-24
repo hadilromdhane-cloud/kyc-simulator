@@ -645,82 +645,106 @@ const OnboardingHandler = (function() {
         },
 
         prePopulateForm: function() {
-            // Pre-populate from screening data if available
-            if (customerData && customerData.firstName && customerData.lastName) {
-                Utils.log('Pre-populating form with screening data');
-                
-                // Define field mappings between screening and onboarding forms
-                const fieldMappings = [
-                    // First name
-                    { screeningField: 'firstName', onboardingFields: ['prenom', 'firstName'], readonly: true },
-                    // Last name  
-                    { screeningField: 'lastName', onboardingFields: ['nom', 'lastName'], readonly: true },
-                    // Birth date
-                    { screeningField: 'birthDate', onboardingFields: ['dateNaissance', 'dateOfBirth'], readonly: true },
-                    // Nationality
-                    { screeningField: 'nationality', onboardingFields: ['nationalite', 'nationality'], readonly: true },
-                    // Citizenship (same as nationality in most cases)
-                    { screeningField: 'citizenship', onboardingFields: ['nationalite', 'nationality'], readonly: true }
-                ];
+    // First, try to populate from stored screening data (security-first approach)
+    if (customerData && customerData.isScreeningDataLocked) {
+        Utils.log('Pre-populating form with locked screening data');
+        
+        const secureFieldMappings = [
+            { screeningField: 'firstName', onboardingFields: ['prenom', 'firstName'], readonly: true, label: 'Prénom/First Name' },
+            { screeningField: 'lastName', onboardingFields: ['nom', 'lastName'], readonly: true, label: 'Nom/Last Name' },
+            { screeningField: 'birthDate', onboardingFields: ['dateNaissance', 'dateOfBirth'], readonly: true, label: 'Date de naissance/Birth Date' },
+            { screeningField: 'nationality', onboardingFields: ['nationalite', 'nationality'], readonly: true, label: 'Nationalité/Nationality' },
+            { screeningField: 'citizenship', onboardingFields: ['nationalite', 'nationality'], readonly: true, label: 'Citoyenneté/Citizenship' }
+        ];
 
-                fieldMappings.forEach(mapping => {
-                    const screeningValue = customerData[mapping.screeningField];
-                    if (screeningValue) {
-                        mapping.onboardingFields.forEach(fieldId => {
-                            const field = document.getElementById(fieldId);
-                            if (field) {
-                                field.value = screeningValue;
-                                if (mapping.readonly) {
-                                    field.disabled = true;
-                                    // Add visual styling for disabled fields
-                                    field.style.backgroundColor = '#f8f9fa';
-                                    field.style.color = '#6c757d';
-                                    field.style.cursor = 'not-allowed';
-                                    
-                                    // Add a visual indicator
-                                    const label = field.closest('.form-group')?.querySelector('label');
-                                    if (label && !label.querySelector('.auto-filled')) {
-                                        const indicator = document.createElement('span');
-                                        indicator.className = 'auto-filled';
-                                        indicator.textContent = ' (Auto-filled from screening)';
-                                        indicator.style.cssText = `
-                                            color: #28a745;
-                                            font-size: 0.8em;
-                                            font-style: italic;
-                                        `;
-                                        label.appendChild(indicator);
-                                    }
+        let fieldsLocked = 0;
+
+        secureFieldMappings.forEach(mapping => {
+            const screeningValue = customerData[mapping.screeningField];
+            if (screeningValue) {
+                mapping.onboardingFields.forEach(fieldId => {
+                    const field = document.getElementById(fieldId);
+                    if (field) {
+                        field.value = screeningValue;
+                        
+                        if (mapping.readonly) {
+                            field.readOnly = true;
+                            field.disabled = false;
+                            field.style.backgroundColor = '#f8f9fa';
+                            field.style.border = '2px solid #28a745';
+                            field.style.color = '#495057';
+                            field.style.cursor = 'not-allowed';
+                            
+                            const parentGroup = field.closest('.form-group');
+                            if (parentGroup && !parentGroup.querySelector('.security-lock')) {
+                                const lockIndicator = document.createElement('span');
+                                lockIndicator.className = 'security-lock';
+                                lockIndicator.innerHTML = ' 🔒';
+                                lockIndicator.style.cssText = 'color: #28a745; font-weight: bold; margin-left: 8px;';
+                                lockIndicator.title = `${mapping.label} locked from screening data for security`;
+                                
+                                const label = parentGroup.querySelector('label');
+                                if (label) {
+                                    label.appendChild(lockIndicator);
                                 }
-                                Utils.log(`Pre-populated ${fieldId} with: ${screeningValue}`);
                             }
-                        });
+                            fieldsLocked++;
+                        }
+                        Utils.log(`Locked field ${fieldId} with screening value: ${screeningValue}`);
                     }
                 });
-            } else {
-                // Fallback to old method if no screening data with proper fields
-                if (customerData && customerData.customerId) {
-                    const parts = customerData.customerId.toString().split('_');
-                    if (parts.length >= 2) {
-                        const firstNameField = document.getElementById('prenom') || document.getElementById('firstName');
-                        const lastNameField = document.getElementById('nom') || document.getElementById('lastName');
-                        if (firstNameField && !firstNameField.value) firstNameField.value = parts[0] || '';
-                        if (lastNameField && !lastNameField.value) lastNameField.value = parts[1] || '';
-                    }
-                }
             }
+        });
 
-            // Load draft data for fields that aren't pre-populated
-            const draftData = Storage.loadDraft();
-            if (draftData) {
-                Object.keys(draftData).forEach(key => {
-                    const field = document.getElementById(key) || document.querySelector(`[name="${key}"]`);
-                    if (field && !field.disabled && draftData[key]) {
-                        field.value = draftData[key];
-                    }
-                });
-                Utils.log('Loaded draft data', draftData);
+        if (fieldsLocked > 0) {
+            const headerElement = document.querySelector('.header');
+            if (headerElement && !document.querySelector('.security-notice')) {
+                const securityNotice = document.createElement('div');
+                securityNotice.className = 'security-notice';
+                securityNotice.style.cssText = `
+                    background: linear-gradient(135deg, #d4edda, #c3e6cb);
+                    border: 2px solid #28a745;
+                    color: #155724;
+                    padding: 15px;
+                    border-radius: 10px;
+                    margin: 15px 0;
+                    font-size: 14px;
+                    text-align: left;
+                `;
+                securityNotice.innerHTML = `
+                    <strong>🔒 Sécurité / Security:</strong> 
+                    ${fieldsLocked} champ(s) pré-rempli(s) et verrouillé(s) depuis le screening pour des raisons de sécurité. 
+                    ${fieldsLocked} field(s) pre-filled and locked from screening data for security purposes.
+                    <br><small>Client ID: <code>${customerData.customerId}</code> | Tenant: <code>${customerData.tenant || tenantName}</code></small>
+                `;
+                headerElement.appendChild(securityNotice);
             }
-        },
+        }
+    } else {
+        // Keep your existing fallback logic here
+        if (customerData && customerData.customerId) {
+            const parts = customerData.customerId.toString().split('_');
+            if (parts.length >= 2) {
+                const firstNameField = document.getElementById('prenom') || document.getElementById('firstName');
+                const lastNameField = document.getElementById('nom') || document.getElementById('lastName');
+                if (firstNameField && !firstNameField.value) firstNameField.value = parts[0] || '';
+                if (lastNameField && !lastNameField.value) lastNameField.value = parts[1] || '';
+            }
+        }
+    }
+
+    // Load draft data for unlocked fields
+    const draftData = Storage.loadDraft();
+    if (draftData) {
+        Object.keys(draftData).forEach(key => {
+            const field = document.getElementById(key) || document.querySelector(`[name="${key}"]`);
+            if (field && !field.readOnly && !field.disabled && draftData[key]) {
+                field.value = draftData[key];
+            }
+        });
+        Utils.log('Loaded draft data for unlocked fields');
+    }
+},
 
         setupAutoSave: function() {
             setInterval(() => {

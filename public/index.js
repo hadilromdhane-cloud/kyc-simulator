@@ -1311,6 +1311,7 @@ function navigateToOnboarding(customerId) {
 }
 
 // --- Call searchPersonCustomer with TOKEN REFRESH ---
+// Updated callSearch function with secure customer data storage for onboarding
 async function callSearch(entityType, containerId, responseId, isDecentralized = false) {
   if (!tenantName) { 
     showNotification('Please authenticate first!', 'warning');
@@ -1367,6 +1368,15 @@ async function callSearch(entityType, containerId, responseId, isDecentralized =
 
     const data = await res.json();
     
+    // CRITICAL: Store customer data for secure onboarding transfer immediately after successful API call
+    const dataStored = storeCustomerDataForOnboarding(payload, data);
+    if (!dataStored) {
+      console.error('Failed to store customer data for onboarding');
+      showNotification('Warning: Customer data may not be available for onboarding', 'warning');
+    } else {
+      console.log('Customer data successfully stored for secure onboarding transfer');
+    }
+    
     storeSearchEventForWebhook(payload, data);
 
     logMessage(`Search completed for ${entityType}`, 'success');
@@ -1404,6 +1414,76 @@ async function callSearch(entityType, containerId, responseId, isDecentralized =
     const errorMsg = `Search error: ${err.message}`;
     logMessage(errorMsg, 'error');
     showNotification('Search failed', 'error');
+  }
+}
+
+// Enhanced customer data storage function for secure onboarding transfer
+function storeCustomerDataForOnboarding(customerData, apiResponse) {
+  try {
+    const customerId = apiResponse.customerId || apiResponse.customer_id || apiResponse.id;
+    
+    if (!customerId) {
+      console.error('Cannot store customer data: No customer ID found in API response');
+      return false;
+    }
+
+    // Create comprehensive customer data object with security flag
+    const completeCustomerData = {
+      // Core identification data (will be read-only in onboarding)
+      customerId: customerId,
+      firstName: customerData.firstName,
+      lastName: customerData.lastName,
+      birthDate: customerData.birthDate,
+      nationality: customerData.nationality,
+      citizenship: customerData.citizenship,
+      
+      // System data
+      systemId: customerData.systemId,
+      systemName: customerData.systemName,
+      searchQuerySource: customerData.searchQuerySource,
+      
+      // Screening results
+      searchQueryId: apiResponse.search_query_id,
+      maxScore: apiResponse.maxScore || 0,
+      screeningResult: apiResponse.maxScore > 0 ? 'HITS_FOUND' : 'NO_HITS',
+      
+      // Metadata
+      tenant: tokenManager.getTenant() || localStorage.getItem('tenantName') || 'Unknown',
+      timestamp: new Date().toISOString(),
+      
+      // SECURITY FLAG - marks this data as locked for onboarding
+      isScreeningDataLocked: true,
+      
+      // Full API response for reference
+      apiResponse: apiResponse
+    };
+
+    // Store with multiple keys for reliability
+    localStorage.setItem(`customerData_${customerId}`, JSON.stringify(completeCustomerData));
+    localStorage.setItem(`screeningData_${customerId}`, JSON.stringify(completeCustomerData));
+    
+    // Also store a mapping for easy lookup
+    const customerMappings = JSON.parse(localStorage.getItem('customerDataMappings') || '{}');
+    customerMappings[customerId] = {
+      firstName: customerData.firstName,
+      lastName: customerData.lastName,
+      storedAt: new Date().toISOString(),
+      isLocked: true
+    };
+    localStorage.setItem('customerDataMappings', JSON.stringify(customerMappings));
+    
+    console.log('Customer data stored for secure onboarding transfer:', {
+      customerId: customerId,
+      firstName: customerData.firstName,
+      lastName: customerData.lastName,
+      isLocked: true,
+      tenant: completeCustomerData.tenant
+    });
+    
+    return true;
+  } catch (error) {
+    console.error('Error storing customer data for onboarding:', error);
+    return false;
   }
 }
 
