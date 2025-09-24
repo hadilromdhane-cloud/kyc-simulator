@@ -645,29 +645,36 @@ const OnboardingHandler = (function() {
         },
 
         prePopulateForm: function() {
+    console.log('prePopulateForm called with customerData:', customerData); 
+    console.log('customerData.isScreeningDataLocked:', customerData?.isScreeningDataLocked); 
+    
     // First, try to populate from stored screening data (security-first approach)
     if (customerData && customerData.isScreeningDataLocked) {
+        console.log('Entering security lock branch'); 
         Utils.log('Pre-populating form with locked screening data');
         
-        // Update the secureFieldMappings array in your prePopulateForm function:
-
-const secureFieldMappings = [
-    { screeningField: 'firstName', onboardingFields: ['prenom', 'firstName'], readonly: true, label: 'Prénom/First Name' },
-    { screeningField: 'lastName', onboardingFields: ['nom', 'lastName'], readonly: true, label: 'Nom/Last Name' },
-    { screeningField: 'birthDate', onboardingFields: ['dateNaissance', 'dateOfBirth'], readonly: true, label: 'Date de naissance/Birth Date' },
-    { screeningField: 'nationality', onboardingFields: ['nationalite', 'nationality'], readonly: true, label: 'Nationalité/Nationality' },
-    { screeningField: 'citizenship', onboardingFields: ['paysResidence', 'countryOfResidence'], readonly: true, label: 'Pays de Résidence/Country of Residence' }
-];
+        const secureFieldMappings = [
+            { screeningField: 'firstName', onboardingFields: ['prenom', 'firstName'], readonly: true, label: 'Prénom/First Name' },
+            { screeningField: 'lastName', onboardingFields: ['nom', 'lastName'], readonly: true, label: 'Nom/Last Name' },
+            { screeningField: 'birthDate', onboardingFields: ['dateNaissance', 'dateOfBirth'], readonly: true, label: 'Date de naissance/Birth Date' },
+            { screeningField: 'nationality', onboardingFields: ['nationalite', 'nationality'], readonly: true, label: 'Nationalité/Nationality' },
+            { screeningField: 'citizenship', onboardingFields: ['paysResidence', 'countryOfResidence'], readonly: true, label: 'Pays de Résidence/Country of Residence' }
+        ];
 
         let fieldsLocked = 0;
 
         secureFieldMappings.forEach(mapping => {
             const screeningValue = customerData[mapping.screeningField];
+            console.log(`Checking mapping for ${mapping.screeningField}: ${screeningValue}`);
+            
             if (screeningValue) {
                 mapping.onboardingFields.forEach(fieldId => {
                     const field = document.getElementById(fieldId);
+                    console.log(`Looking for field: ${fieldId}, found:`, field);
+                    
                     if (field) {
                         field.value = screeningValue;
+                        console.log(`Set ${fieldId} value to: ${screeningValue}`);
                         
                         if (mapping.readonly) {
                             field.readOnly = true;
@@ -691,12 +698,19 @@ const secureFieldMappings = [
                                 }
                             }
                             fieldsLocked++;
+                            console.log(`Locked field ${fieldId}, total locked: ${fieldsLocked}`);
                         }
                         Utils.log(`Locked field ${fieldId} with screening value: ${screeningValue}`);
+                    } else {
+                        console.warn(`Field ${fieldId} not found in DOM`);
                     }
                 });
+            } else {
+                console.log(`No value found for ${mapping.screeningField}`);
             }
         });
+
+        console.log(`Total fields locked: ${fieldsLocked}`);
 
         if (fieldsLocked > 0) {
             const headerElement = document.querySelector('.header');
@@ -720,17 +734,47 @@ const secureFieldMappings = [
                     <br><small>Client ID: <code>${customerData.customerId}</code> | Tenant: <code>${customerData.tenant || tenantName}</code></small>
                 `;
                 headerElement.appendChild(securityNotice);
+                console.log('Added security notice');
             }
         }
     } else {
-        // Keep your existing fallback logic here
-        if (customerData && customerData.customerId) {
-            const parts = customerData.customerId.toString().split('_');
-            if (parts.length >= 2) {
-                const firstNameField = document.getElementById('prenom') || document.getElementById('firstName');
-                const lastNameField = document.getElementById('nom') || document.getElementById('lastName');
-                if (firstNameField && !firstNameField.value) firstNameField.value = parts[0] || '';
-                if (lastNameField && !lastNameField.value) lastNameField.value = parts[1] || '';
+        console.log('Security lock branch not entered - falling back to legacy method');
+        
+        // Fallback: if we have some customer data but not marked as secure screening data
+        if (customerData && (customerData.firstName || customerData.lastName)) {
+            Utils.log('Pre-populating form with available customer data (not locked)');
+            
+            const basicMappings = [
+                { screeningField: 'firstName', onboardingFields: ['prenom', 'firstName'] },
+                { screeningField: 'lastName', onboardingFields: ['nom', 'lastName'] },
+                { screeningField: 'birthDate', onboardingFields: ['dateNaissance', 'dateOfBirth'] },
+                { screeningField: 'nationality', onboardingFields: ['nationalite', 'nationality'] }
+            ];
+
+            basicMappings.forEach(mapping => {
+                const screeningValue = customerData[mapping.screeningField];
+                if (screeningValue) {
+                    mapping.onboardingFields.forEach(fieldId => {
+                        const field = document.getElementById(fieldId);
+                        if (field && !field.value) {
+                            field.value = screeningValue;
+                            Utils.log(`Pre-populated ${fieldId} with: ${screeningValue}`);
+                        }
+                    });
+                }
+            });
+        } else {
+            // Legacy fallback: parse from customer ID if available
+            Utils.log('Using legacy customer ID parsing for pre-population');
+            
+            if (customerData && customerData.customerId) {
+                const parts = customerData.customerId.toString().split('_');
+                if (parts.length >= 2) {
+                    const firstNameField = document.getElementById('prenom') || document.getElementById('firstName');
+                    const lastNameField = document.getElementById('nom') || document.getElementById('lastName');
+                    if (firstNameField && !firstNameField.value) firstNameField.value = parts[0] || '';
+                    if (lastNameField && !lastNameField.value) lastNameField.value = parts[1] || '';
+                }
             }
         }
     }
