@@ -279,15 +279,15 @@ function storeSearchEventForWebhook(searchData, searchResponse) {
 function handleRealWebhookEvent(webhookData) {
   sessionEventCounter++;
   
-  // Get current tenant name
-  const currentTenant = tokenManager.getTenant() || localStorage.getItem('tenantName') || 'Unknown';
+  // Get current tenant name AT THE TIME OF EVENT CREATION
+  const eventTenant = tokenManager.getTenant() || localStorage.getItem('tenantName') || 'Unknown';
   
   const realEvent = {
     id: sessionEventCounter,
     timestamp: new Date().toISOString(),
     customerId: webhookData.customerId,
     source: 'Reis_KYC',
-    tenant: currentTenant, // Add tenant to the event data
+    tenant: eventTenant, // Store the tenant active when this event was created
     search_query_id: webhookData.searchQueryId,
     isPEP: webhookData.isPEP || false,
     isSanctioned: webhookData.isSanctioned || false,
@@ -308,8 +308,8 @@ function handleRealWebhookEvent(webhookData) {
   sessionStorage.setItem('kycEvents', JSON.stringify(sessionEvents));
   sessionStorage.setItem('kycEventCounter', sessionEventCounter.toString());
   
-  // Show notifications with tenant name
-  showNotification(`[${currentTenant}] Real webhook received for customer ${realEvent.customerId}`, 'warning');
+  // Show notifications with tenant name (use the event's stored tenant)
+  showNotification(`[${eventTenant}] Real webhook received for customer ${realEvent.customerId}`, 'warning');
   showScreeningResultsPopup(realEvent);
   
   // Update history
@@ -497,8 +497,8 @@ function showNotificationHistory() {
       const statusColor = notification.isSanctioned ? '#dc3545' : '#28a745';
       const statusText = notification.isSanctioned ? 'SANCTIONED' : 'CLEARED';
       
-      // Get tenant name for this notification
-      const notificationTenant = notification.tenant || tokenManager.getTenant() || localStorage.getItem('tenantName') || 'Unknown';
+      // Get tenant name for this notification (use the stored tenant from when it was created)
+      const notificationTenant = notification.tenant || 'Unknown';
       
       historyHTML += `
         <div style="
@@ -728,7 +728,7 @@ function setupEventPolling() {
         data.events.forEach(event => {
           console.log('Processing event:', event.customerId);
           
-          // Add tenant information to the event if not already present
+          // Add tenant information to the event AT THE TIME OF PROCESSING (only if not already present)
           if (!event.tenant) {
             event.tenant = currentTenant;
           }
@@ -745,7 +745,7 @@ function setupEventPolling() {
           if (event.source === 'Reis_KYC' && !wasEventProcessedBefore) {
             console.log('Showing popup for new event:', event.customerId);
             showScreeningResultsPopup(event);
-            showNotification(`[${currentTenant}] Screening completed for ${event.customerId}`, 'warning');
+            showNotification(`[${event.tenant}] Screening completed for ${event.customerId}`, 'warning');
             
             // Add to notifications history
             notificationsHistory.unshift(event);
