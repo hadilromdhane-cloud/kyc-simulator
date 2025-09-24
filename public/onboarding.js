@@ -654,13 +654,12 @@ const OnboardingHandler = (function() {
         Utils.log('Pre-populating form with locked screening data');
         
         const secureFieldMappings = [
-            { screeningField: 'firstName', onboardingFields: ['prenom', 'firstName'], readonly: true, label: 'Prénom/First Name' },
-            { screeningField: 'lastName', onboardingFields: ['nom', 'lastName'], readonly: true, label: 'Nom/Last Name' },
-            { screeningField: 'birthDate', onboardingFields: ['dateNaissance', 'dateOfBirth'], readonly: true, label: 'Date de naissance/Birth Date' },
-            { screeningField: 'nationality', onboardingFields: ['nationalite', 'nationality'], readonly: true, label: 'Nationalité/Nationality' },
-            { screeningField: 'citizenship', onboardingFields: ['paysResidence', 'countryOfResidence'], readonly: true, label: 'Pays de Résidence/Country of Residence' }
-        ];
-
+        { screeningField: 'firstName', onboardingFields: ['prenom', 'firstName'], readonly: true, label: 'Prénom/First Name' },
+        { screeningField: 'lastName', onboardingFields: ['nom', 'lastName'], readonly: true, label: 'Nom/Last Name' },
+        { screeningField: 'birthDate', onboardingFields: ['dateNaissance', 'dateOfBirth'], readonly: true, label: 'Date de naissance/Birth Date' },
+        { screeningField: 'nationality', onboardingFields: ['nationalite', 'nationality'], readonly: true, label: 'Nationalité/Nationality', fieldType: 'select' },
+        { screeningField: 'citizenship', onboardingFields: ['paysResidence', 'countryOfResidence'], readonly: true, label: 'Pays de Résidence/Country of Residence', fieldType: 'select' }
+    ];
         let fieldsLocked = 0;
 
         secureFieldMappings.forEach(mapping => {
@@ -677,12 +676,21 @@ const OnboardingHandler = (function() {
                         console.log(`Set ${fieldId} value to: ${screeningValue}`);
                         
                         if (mapping.readonly) {
+                        // Handle select elements differently
+                        const isSelectField = mapping.fieldType === 'select' || field.tagName.toLowerCase() === 'select';
+                        
+                        if (isSelectField) {
+                            field.disabled = true;
+                            field.setAttribute('data-screening-locked', 'true');
+                        } else {
                             field.readOnly = true;
                             field.disabled = false;
-                            field.style.backgroundColor = '#f8f9fa';
-                            field.style.border = '2px solid #28a745';
-                            field.style.color = '#495057';
-                            field.style.cursor = 'not-allowed';
+                        }
+                        
+                        field.style.backgroundColor = '#f8f9fa';
+                        field.style.border = '2px solid #28a745';
+                        field.style.color = '#495057';
+                        field.style.cursor = 'not-allowed';
                             
                             const parentGroup = field.closest('.form-group');
                             if (parentGroup && !parentGroup.querySelector('.security-lock')) {
