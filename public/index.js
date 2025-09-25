@@ -1368,20 +1368,37 @@ document.getElementById('closePopup').addEventListener('click', () => {
 function navigateToOnboarding(customerId) {
   const currentTenant = localStorage.getItem('tenantName') || 'bankfr';
   
+  // Determine entity type by checking if we have businessName in stored data
+  let entityType = 'PP'; // default
+  try {
+    const screeningData = localStorage.getItem(`screeningData_${customerId}`);
+    if (screeningData) {
+      const data = JSON.parse(screeningData);
+      if (data.businessName) {
+        entityType = 'PM';
+      }
+    }
+  } catch (e) {
+    console.log('Could not determine entity type, defaulting to PP');
+  }
+  
   const tenantPageMap = {
-    'bankfr': 'onboarding_bankfr_PP.html',
-    'banque_en': 'onboarding_banque_en.html',
+    'bankfr': {
+      'PP': 'onboarding_bankfr_PP.html',
+      'PM': 'onboarding_bankfr_PM.html'
+    },
+    'banque_en': {
+      'PP': 'onboarding_banque_en.html', 
+      'PM': 'onboarding_banque_en_PM.html'  // If you create this later
+    }
   };
   
-  const onboardingPage = tenantPageMap[currentTenant] || 'onboarding_bankfr_PP.html';
+  const onboardingPage = tenantPageMap[currentTenant][entityType] || 'onboarding_bankfr_PP.html';
   
-  console.log(`Navigating to tenant-specific onboarding: ${onboardingPage} for tenant: ${currentTenant}`);
+  console.log(`Navigating to ${entityType} onboarding: ${onboardingPage} for tenant: ${currentTenant}`);
   
   window.location.href = `${onboardingPage}?customerId=${customerId}`;
 }
-
-// --- Call searchPersonCustomer with TOKEN REFRESH ---
-// Updated callSearch function with secure customer data storage for onboarding
 async function callSearch(entityType, containerId, responseId, isDecentralized = false) {
   if (!tenantName) { 
     showNotification('Please authenticate first!', 'warning');

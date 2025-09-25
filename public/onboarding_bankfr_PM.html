@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Onboarding PM - BankFR</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .customer-info {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-size: 1.1rem;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 20px;
+            background: none;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #6c757d;
+        }
+
+        .tab-button.active {
+            background: white;
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+        }
+
+        .tab-button:hover {
+            background: #e9ecef;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 40px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 1.4rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3498db;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-row.full-width {
+            grid-template-columns: 1fr;
+        }
+
+        .form-row.three-cols {
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .required {
+            color: #dc3545;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        input[type="date"],
+        input[type="number"],
+        select,
+        textarea {
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .currency-input {
+            position: relative;
+        }
+
+        .currency-input input {
+            padding-left: 35px;
+        }
+
+        .currency-symbol {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+            font-weight: bold;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 150px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 10px;
+            }
+
+            .form-row,
+            .form-row.three-cols {
+                grid-template-columns: 1fr;
+            }
+
+            .tab-button {
+                padding: 15px 5px;
+                font-size: 0.9rem;
+            }
+
+            .tab-content {
+                padding: 20px;
+            }
+
+            .button-container {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .info-box h4 {
+            margin-bottom: 10px;
+            color: #1976d2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Fiche de Connaissance Client</h1>
+            <p>Personne Morale - BankFR</p>
+            <div class="customer-info" id="customerInfo">
+                <strong>Client ID:</strong> <span id="customerId">Chargement...</span>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-button active" onclick="showTab('identification')">Identification</button>
+            <button class="tab-button" onclick="showTab('dirigeants')">Dirigeants</button>
+            <button class="tab-button" onclick="showTab('financial')">Informations Financières</button>
+            <button class="tab-button" onclick="showTab('beneficiaires')">Bénéficiaires Effectifs</button>
+        </div>
+
+        <form id="pmOnboardingForm">
+            <!-- Identification Tab -->
+            <div id="identification" class="tab-content active">
+                <div class="form-section">
+                    <h2 class="section-title">
+                        🏢 Identification de l'Entité
+                    </h2>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="raisonSociale">Raison sociale <span class="required">*</span></label>
+                            <input type="text" id="raisonSociale" name="raisonSociale" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="denominationCommerciale">Dénomination commerciale</label>
+                            <input type="text" id="denominationCommerciale" name="denominationCommerciale">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="formeJuridique">Forme juridique <span class="required">*</span></label>
+                            <select id="formeJuridique" name="formeJuridique" required>
+                                <option value="">-- Sélectionner --</option>
+                                <option value="SARL">SARL - Société à Responsabilité Limitée</option>
+                                <option value="SA">SA - Société Anonyme</option>
+                                <option value="SAS">SAS - Société par Actions Simplifiée</option>
+                                <option value="SASU">SASU - Société par Actions Simplifiée Unipersonnelle</option>
+                                <option value="EURL">EURL - Entreprise Unipersonnelle à Responsabilité Limitée</option>
+                                <option value="SNC">SNC - Société en Nom Collectif</option>
+                                <option value="SCS">SCS - Société en Commandite Simple</option>
+                                <option value="SCA">SCA - Société en Commandite par Actions</option>
+                                <option value="Association">Association</option>
+                                <option value="Coopérative">Coopérative</option>
+                                <option value="Autre">Autre</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="dateConstitution">Date de constitution <span class="required">*</span></label>
+                            <input type="date" id="dateConstitution" name="dateConstitution" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="numeroRegistre">Numéro d'immatriculation <span class="required">*</span></label>
+                            <input type="text" id="numeroRegistre" name="numeroRegistre" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="paysImmatriculation">Pays d'immatriculation <span class="required">*</span></label>
+                            <select id="paysImmatriculation" name="paysImmatriculation" required>
+                                <!-- Options will be populated by JavaScript -->
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="capital">Capital social (EUR) <span class="required">*</span></label>
+                            <div class="currency-input">
+                                <span class="currency-symbol">€</span>
+                                <input type="number" id="capital" name="capital" required min="0" step="1" placeholder="0">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="secteurActivite">Secteur d'activité <span class="required">*</span></label>
+                            <select id="secteurActivite" name="secteurActivite" required>
+                                <option value="">-- Sélectionner --</option>
+                                <option value="Agriculture">Agriculture, sylviculture et pêche</option>
+                                <option value="Industries">Industries extractives</option>
+                                <option value="Manufacture">Industries manufacturières</option>
+                                <option value="Energie">Production et distribution d'électricité, de gaz, de vapeur</option>
+                                <option value="Eau">Production et distribution d'eau</option>
+                                <option value="Construction">Construction</option>
+                                <option value="Commerce">Commerce de gros et de détail</option>
+                                <option value="Transport">Transports et entreposage</option>
+                                <option value="Hebergement">Hébergement et restauration</option>
+                                <option value="Information">Information et communication</option>
+                                <option value="Finance">Activités financières et d'assurance</option>
+                                <option value="Immobilier">Activités immobilières</option>
+                                <option value="Scientifiques">Activités spécialisées, scientifiques et techniques</option>
+                                <option value="Services">Activités de services administratifs et de soutien</option>
+                                <option value="Education">Enseignement</option>
+                                <option value="Sante">Santé humaine et action sociale</option>
+                                <option value="Arts">Arts, spectacles et activités récréatives</option>
+                                <option value="Autres">Autres activités de services</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h2 class="section-title">
+                        📍 Siège Social
+                    </h2>
+                    
+                    <div class="form-row full-width">
+                        <div class="form-group">
+                            <label for="adresseSiege">Adresse du siège social <span class="required">*</span></label>
+                            <textarea id="adresseSiege" name="adresseSiege" required placeholder="Adresse complète du siège social"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="codePostalSiege">Code postal <span class="required">*</span></label>
+                            <input type="text" id="codePostalSiege" name="codePostalSiege" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="villeSiege">Ville <span class="required">*</span></label>
+                            <input type="text" id="villeSiege" name="villeSiege" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="paysSiege">Pays du siège social <span class="required">*</span></label>
+                            <select id="paysSiege" name="paysSiege" required>
+                                <!-- Options will be populated by JavaScript -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="telephoneSociete">Téléphone de la société</label>
+                            <input type="tel" id="telephoneSociete" name="telephoneSociete">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="emailSociete">E-mail de la société</label>
+                            <input type="email" id="emailSociete" name="emailSociete">
+                        </div>
+                        <div class="form-group">
+                            <label for="siteWeb">Site web</label>
+                            <input type="text" id="siteWeb" name="siteWeb" placeholder="https://www.exemple.com">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dirigeants Tab -->
+            <div id="dirigeants" class="tab-content">
+                <div class="form-section">
+                    <h2 class="section-title">
+                        👔 Représentant Légal / Dirigeant Principal
+                    </h2>
+                    
+                    <div class="info-box">
+                        <h4>Information importante</h4>
+                        <p>Veuillez renseigner les informations du représentant légal ou du dirigeant principal de l'entité.</p>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="civilite">Civilité <span class="required">*</span></label>
+                            <select id="civilite" name="civilite" required>
+                                <option value="">-- Sélectionner --</option>
+                                <option value="M">Monsieur</option>
+                                <option value="Mme">Madame</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="fonction">Fonction <span class="required">*</span></label>
+                            <select id="fonction" name="fonction" required>
+                                <option value="">-- Sélectionner --</option>
+                                <option value="PDG">Président Directeur Général</option>
+                                <option value="DG">Directeur Général</option>
+                                <option value="Président">Président</option>
+                                <option value="Gérant">Gérant</option>
+                                <option value="Administrateur">Administrateur</option>
+                                <option value="Autre">Autre</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="nomDirigeant">Nom <span class="required">*</span></label>
+                            <input type="text" id="nomDirigeant" name="nomDirigeant" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="prenomDirigeant">Prénom <span class="required">*</span></label>
+                            <input type="text" id="prenomDirigeant" name="prenomDirigeant" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="dateNaissanceDirigeant">Date de naissance <span class="required">*</span></label>
+                            <input type="date" id="dateNaissanceDirigeant" name="dateNaissanceDirigeant" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="nationaliteDirigeant">Nationalité <span class="required">*</span></label>
+                            <select id="nationaliteDirigeant" name="nationaliteDirigeant" required>
+                                <!-- Options will be populated by JavaScript -->
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="telephoneDirigeant">Téléphone</label>
+                            <input type="tel" id="telephoneDirigeant" name="telephoneDirigeant">
+                        </div>
+                        <div class="form-group">
+                            <label for="emailDirigeant">E-mail</label>
+                            <input type="email" id="emailDirigeant" name="emailDirigeant">
+                        </div>
+                    </div>
+
+                    <div class="form-row full-width">
+                        <div class="form-group">
+                            <label for="adresseDirigeant">Adresse personnelle</label>
+                            <textarea id="adresseDirigeant" name="adresseDirigeant" placeholder="Adresse complète"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Financial Information Tab -->
+            <div id="financial" class="tab-content">
+                <div class="form-section">
+                    <h2 class="section-title">
+                        💰 Informations Financières
+                    </h2>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="chiffreAffaires">Chiffre d'affaires annuel (EUR)</label>
+                            <div class="currency-input">
+                                <span class="currency-symbol">€</span>
+                                <input type="number" id="chiffreAffaires" name="chiffreAffaires" min="0" step="1000" placeholder="0">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="nombreEmployes">Nombre d'employés</label>
+                            <input type="number" id="nombreEmployes" name="nombreEmployes" min="0" placeholder="0">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="canalDistribution">Canal de distribution <span class="required">*</span></label>
+                            <select id="canalDistribution" name="canalDistribution" required>
+                                <option value="">-- Sélectionner --</option>
+                                <option value="online">En ligne</option>
+                                <option value="inagency">En personne (vente directe)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="produitsCibles">Produits/Services cibles <span class="required">*</span></label>
+                            <select id="produitsCibles" name="produitsCibles" required>
+                                <option value="">-- Sélectionner --</option>
+                                <option value="currentAccount">Compte Courant Professionnel</option>
+                                <option value="businessLoan">Crédit Professionnel</option>
+                                <option value="cashManagement">Gestion de Trésorerie</option>
+                                <option value="tradeFinance">Financement du Commerce</option>
+                                <option value="corporateCard">Carte d'Entreprise</option>
+                                <option value="payroll">Services de Paie</option>
+                                <option value="internetBanking">Internet Banking Professionnel</option>
+                                <option value="remittances">Transferts Internationaux</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row full-width">
+                        <div class="form-group">
+                            <label for="origineFondsPM">Origine des fonds <span class="required">*</span></label>
+                            <select id="origineFondsPM" name="origineFondsPM" required>
+                                <option value="">-- Sélectionner --</option>
+                                <option value="businessRevenue">Revenus d'Activité</option>
+                                <option value="capitalContribution">Apport en Capital</option>
+                                <option value="businessLoan">Emprunt Commercial</option>
+                                <option value="investmentReturns">Rendements d'Investissement</option>
+                                <option value="grants">Subventions</option>
+                                <option value="other">Autres (veuillez préciser)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row full-width">
+                        <div class="form-group">
+                            <label for="objectifRelation">Objectif de la relation bancaire</label>
+                            <textarea id="objectifRelation" name="objectifRelation" placeholder="Décrivez l'objectif principal de votre relation avec la banque"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bénéficiaires Effectifs Tab -->
+            <div id="beneficiaires" class="tab-content">
+                <div class="form-section">
+                    <h2 class="section-title">
+                        👥 Bénéficiaires Effectifs
+                    </h2>
+                    
+                    <div class="info-box">
+                        <h4>Définition</h4>
+                        <p>Les bénéficiaires effectifs sont les personnes physiques qui détiennent ou contrôlent, directement ou indirectement, plus de 25% du capital ou des droits de vote de l'entité.</p>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="nomBeneficiaire">Nom du bénéficiaire effectif</label>
+                            <input type="text" id="nomBeneficiaire" name="nomBeneficiaire">
+                        </div>
+                        <div class="form-group">
+                            <label for="prenomBeneficiaire">Prénom du bénéficiaire effectif</label>
+                            <input type="text" id="prenomBeneficiaire" name="prenomBeneficiaire">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="dateNaissanceBeneficiaire">Date de naissance</label>
+                            <input type="date" id="dateNaissanceBeneficiaire" name="dateNaissanceBeneficiaire">
+                        </div>
+                        <div class="form-group">
+                            <label for="nationaliteBeneficiaire">Nationalité</label>
+                            <select id="nationaliteBeneficiaire" name="nationaliteBeneficiaire">
+                                <!-- Options will be populated by JavaScript -->
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="pourcentageDetention">Pourcentage de détention (%)</label>
+                            <input type="number" id="pourcentageDetention" name="pourcentageDetention" min="0" max="100" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label for="natureDroits">Nature des droits</label>
+                            <select id="natureDroits" name="natureDroits">
+                                <option value="">-- Sélectionner --</option>
+                                <option value="capital">Droits au capital</option>
+                                <option value="vote">Droits de vote</option>
+                                <option value="both">Droits au capital et de vote</option>
+                                <option value="control">Contrôle par d'autres moyens</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row full-width">
+                        <div class="form-group">
+                            <label for="adresseBeneficiaire">Adresse du bénéficiaire effectif</label>
+                            <textarea id="adresseBeneficiaire" name="adresseBeneficiaire" placeholder="Adresse complète"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>Information complémentaire</h4>
+                        <p>Si votre entité a plusieurs bénéficiaires effectifs, veuillez nous contacter pour compléter ces informations.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="button-container">
+                <button type="button" class="btn btn-secondary" onclick="goBack()">Retour</button>
+                <button type="submit" class="btn btn-primary" id="submitBtn">Finaliser l'Onboarding</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Define the French countries array
+        const countriesFrench = [
+            "Afghanistan", "Albanie", "Algérie", "Andorre", "Angola", "Antigua-et-Barbuda", 
+            "Argentine", "Arménie", "Australie", "Autriche", "Azerbaïdjan", "Bahamas", 
+            "Bahreïn", "Bangladesh", "Barbade", "Bélarus", "Belgique", "Belize", "Bénin", 
+            "Bhoutan", "Bolivie", "Bosnie-Herzégovine", "Botswana", "Brésil", 
+            "Brunei Darussalam", "Bulgarie", "Burkina Faso", "Burundi", "Cabo Verde", 
+            "Cambodge", "Cameroun", "Canada", "République centrafricaine", "Tchad", 
+            "Chili", "Chine", "Colombie", "Comores", "Congo", "Costa Rica", 
+            "Côte d'Ivoire", "Croatie", "Cuba", "Chypre", "Tchéquie", 
+            "République démocratique du Congo", "Danemark", "Djibouti", "Dominique", 
+            "République dominicaine", "Équateur", "Égypte", "El Salvador", 
+            "Guinée équatoriale", "Érythrée", "Estonie", "Éthiopie", "Fidji", 
+            "Finlande", "France", "Gabon", "Gambie", "Géorgie", "Allemagne", 
+            "Ghana", "Grèce", "Grenade", "Guatemala", "Guinée", "Guinée-Bissau", 
+            "Guyana", "Haïti", "Honduras", "Hongrie", "Islande", "Inde", 
+            "Indonésie", "Iran", "Iraq", "Irlande", "Israël", "Italie", 
+            "Jamaïque", "Japon", "Jordanie", "Kazakhstan", "Kenya", "Kiribati", 
+            "Koweït", "Kirghizistan", "République démocratique populaire lao", 
+            "Lettonie", "Liban", "Lesotho", "Libéria", "Libye", "Liechtenstein", 
+            "Lituanie", "Luxembourg", "Madagascar", "Malawi", "Malaisie", "Maldives", 
+            "Mali", "Malte", "Îles Marshall", "Mauritanie", "Maurice", "Mexique", 
+            "États fédérés de Micronésie", "République de Moldova", "Monaco", 
+            "Mongolie", "Monténégro", "Maroc", "Mozambique", "Myanmar", "Namibie", 
+            "Nauru", "Népal", "Pays-Bas", "Nouvelle-Zélande", "Nicaragua", "Niger", 
+            "Nigéria", "République populaire démocratique de Corée", "Macédoine du Nord", 
+            "Norvège", "Oman", "Pakistan", "Palaos", "Panama", "Papouasie-Nouvelle-Guinée", 
+            "Paraguay", "Pérou", "Philippines", "Pologne", "Portugal", "Qatar", 
+            "Roumanie", "Fédération de Russie", "Rwanda", "Saint-Kitts-et-Nevis", 
+            "Sainte-Lucie", "Saint-Vincent-et-les Grenadines", "Samoa", "Saint-Marin", 
+            "Sao Tomé-et-Principe", "Arabie saoudite", "Sénégal", "Serbie", 
+            "Seychelles", "Sierra Leone", "Singapour", "Slovaquie", "Slovénie", 
+            "Îles Salomon", "Somalie", "Afrique du Sud", "République de Corée", 
+            "Soudan du Sud", "Espagne", "Sri Lanka", "Soudan", "Suriname", "Suède", 
+            "Suisse", "République arabe syrienne", "Tadjikistan", 
+            "République-Unie de Tanzanie", "Thaïlande", "Timor-Leste", "Togo", 
+            "Tonga", "Trinité-et-Tobago", "Tunisie", "Turquie", "Turkménistan", 
+            "Tuvalu", "Ouganda", "Ukraine", "Émirats arabes unis", "Royaume-Uni", 
+            "États-Unis", "Uruguay", "Ouzbékistan", "Vanuatu", "Saint-Siège", 
+            "Venezuela", "Viet Nam", "Yémen", "Zambie", "Zimbabwe"
+        ];
+
+        // Function to populate select elements with countries
+        function populateCountriesSelect(selectId, countries, defaultText = "-- Sélectionner --") {
+            const selectElement = document.getElementById(selectId);
+            if (!selectElement) {
+                console.warn(`Select element with ID '${selectId}' not found`);
+                return;
+            }
+            
+            // Clear existing options except the default
+            selectElement.innerHTML = `<option value="">${defaultText}</option>`;
+            
+            // Add all countries
+            countries.forEach(country => {
+                const option = document.createElement('option');
+                option.value = country;
+                option.textContent = country;
+                selectElement.appendChild(option);
+            });
+        }
+
+        // Function to initialize all country dropdowns
+        function initializeCountryDropdowns() {
+            populateCountriesSelect('paysImmatriculation', countriesFrench);
+            populateCountriesSelect('paysSiege', countriesFrench);
+            populateCountriesSelect('nationaliteDirigeant', countriesFrench);
+            populateCountriesSelect('nationaliteBeneficiaire', countriesFrench);
+        }
+
+        // Tab switching functionality
+        function showTab(tabName) {
+            // Hide all tab contents
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => content.classList.remove('active'));
+
+            // Remove active class from all tab buttons
+            const tabButtons = document.querySelectorAll('.tab-button');
+            tabButtons.forEach(button => button.classList.remove('active'));
+
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+
+            // Add active class to clicked button
+            event.target.classList.add('active');
+        }
+
+        // Generate a random customer ID
+        function generateCustomerId() {
+            const prefix = 'PM';
+            const timestamp = Date.now().toString().slice(-6);
+            const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+            return `${prefix}-${timestamp}${random}`;
+        }
+
+        // Go back function
+        function goBack() {
+            if (confirm('Êtes-vous sûr de vouloir retourner? Les données non sauvegardées seront perdues.')) {
+                window.location.href = 'index.html';
+            }
+        }
+
+        // Form submission handler
+        function handleFormSubmission() {
+            const form = document.getElementById('pmOnboardingForm');
+            
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+                
+                // Basic validation
+                const requiredFields = form.querySelectorAll('[required]');
+                let isValid = true;
+                
+                requiredFields.forEach(field => {
+                    if (!field.value.trim()) {
+                        field.style.borderColor = '#dc3545';
+                        isValid = false;
+                    } else {
+                        field.style.borderColor = '#e9ecef';
+                    }
+                });
+                
+                if (!isValid) {
+                    alert('Veuillez remplir tous les champs obligatoires.');
+                    return;
+                }
+                
+                // Collect form data
+                const formData = new FormData(form);
+                const data = {};
+                
+                for (let [key, value] of formData.entries()) {
+                    data[key] = value;
+                }
+                
+                // Add customer ID and type
+                data.customerId = document.getElementById('customerId').textContent;
+                data.customerType = 'PM';
+                data.submissionDate = new Date().toISOString();
+                
+                // Simulate form submission
+                const submitBtn = document.getElementById('submitBtn');
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Traitement en cours...';
+                
+                setTimeout(() => {
+                    // Store data in localStorage for demo purposes
+                    localStorage.setItem('pmOnboardingData', JSON.stringify(data));
+                    
+                    alert('Onboarding PM terminé avec succès!\nClient ID: ' + data.customerId);
+                    
+                    // Reset button
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Finaliser l\'Onboarding';
+                    
+                    // Optionally redirect or reset form
+                    // window.location.href = 'success.html';
+                }, 2000);
+            });
+        }
+
+        // Initialize everything when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize country dropdowns
+            initializeCountryDropdowns();
+            
+            // Generate and display customer ID
+            const customerId = generateCustomerId();
+            document.getElementById('customerId').textContent = customerId;
+            
+            // Initialize form submission handler
+            handleFormSubmission();
+            
+            // Add input validation on blur
+            const inputs = document.querySelectorAll('input, select, textarea');
+            inputs.forEach(input => {
+                input.addEventListener('blur', function() {
+                    if (this.hasAttribute('required') && !this.value.trim()) {
+                        this.style.borderColor = '#dc3545';
+                    } else {
+                        this.style.borderColor = '#e9ecef';
+                    }
+                });
+            });
+        });
+
+        // Add some additional utility functions
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+
+        function validatePhone(phone) {
+            const re = /^[\+]?[1-9][\d]{0,15}$/;
+            return re.test(phone.replace(/\s+/g, ''));
+        }
+
+        // Enhanced validation on form submission
+        document.addEventListener('DOMContentLoaded', function() {
+            const emailInputs = document.querySelectorAll('input[type="email"]');
+            emailInputs.forEach(input => {
+                input.addEventListener('blur', function() {
+                    if (this.value && !validateEmail(this.value)) {
+                        this.style.borderColor = '#dc3545';
+                        // You could add a tooltip or message here
+                    }
+                });
+            });
+
+            const phoneInputs = document.querySelectorAll('input[type="tel"]');
+            phoneInputs.forEach(input => {
+                input.addEventListener('blur', function() {
+                    if (this.value && !validatePhone(this.value)) {
+                        this.style.borderColor = '#dc3545';
+                        // You could add a tooltip or message here
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
