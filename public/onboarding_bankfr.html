@@ -346,8 +346,8 @@
 
                     <div class="form-row full-width">
                         <div class="form-group">
-                     <label for="paysResidence">Pays de Résidence <span class="required">*</span></label>
-                            <select id="paysResidence" name="paysResidence" required>
+                     <label for="paysDeResidence">Pays de Résidence <span class="required">*</span></label>
+                            <select id="paysDeResidence" name="paysDeResidence" required>
                                 <!-- Options will be populated by JavaScript -->
                             </select>
                         </div>
@@ -553,7 +553,7 @@
         function initializeCountryDropdowns() {
             // For French forms (bankfr)
             populateCountriesSelect('nationalite', countriesFrench);
-            populateCountriesSelect('paysResidence', countriesFrench);
+            populateCountriesSelect('paysDeResidence', countriesFrench);
             
             // For English forms (banque_en)
             populateCountriesSelect('nationality', countriesFrench);
