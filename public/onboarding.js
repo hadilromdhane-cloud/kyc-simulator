@@ -346,263 +346,67 @@ const OnboardingHandler = (function() {
                 };
             }
         }
-    
-    mapPMDataToPayload: function(formData) {
-        const customerId = parseInt(customerData.customerId) || Utils.generateCustomerId();
-        const currentDateTime = new Date().toISOString();
-        
-        // Convert birth_date from dateConstitution
-        const birthDate = formData.dateConstitution ? new Date(formData.dateConstitution).toISOString() : currentDateTime;
-        
-        return {
-            customerId: customerId,
-            customerRelationName: "",
-            formId: "2", // PM uses formId "2"
-            items: {
-                isSanctionnedWorkflow: "Non",
-                isPepWorkflow: "",
-                agence: "headquarters",
-                rm_username: "admin",
-                rm_fn: "System",
-                rm_ln: "User",
-                process_type: "",
-                createdOn: currentDateTime,
-                dpr: "",
-                last_update: currentDateTime,
-                
-                // PM-specific fields from form
-                segment: formData.segment || "",
-                birth_date: birthDate,
-                nationality: formData.paysConstitution || "",
-                age: formData.dateConstitution ? 
-                    Math.floor((new Date() - new Date(formData.dateConstitution)) / (365.25 * 24 * 60 * 60 * 1000)) : 0,
-                adresseDeResidence: formData.siegeSocial || "",
-                PaysDeResidence: formData.paysResidenceFiscale || "",
-                nid: formData.numeroIdentite || "",
-                tel: formData.telephone || "",
-                email: formData.email || "",
-                website: formData.siteWeb || "",
-                canal_de_distribution: formData.canalDistribution || "",
-                legal_form: formData.formeJuridique || "",
-                industry: parseInt(formData.secteurActivite) || 360030,
-                activity: parseInt(formData.activiteExercee) || 7300,
-                
-                // Activity countries data grid
-                dataGrid1: [{
-                    "country-1": "",
-                    "is_msc": "n",
-                    "country": "",
-                    "PaysDeResidence": formData.paysActivite || ""
-                }],
-                
-                is_stock: "",
-                is_negoc: "",
-                textField: "",
-                textField1: "",
-                textField2: "",
-                textField3: "",
-                textField4: "",
-                textField5: "",
-                textField6: "",
-                textField7: "",
-                textField8: "",
-                id_doc: [],
-                doc_pm_type: "",
-                receptionDate: "",
-                type: "",
-                address_doc: [],
-                tiin_doc: [],
-                source_of_funds_doc: [],
-                dataGrid: [{"source_of_funds_doc1": []}],
-                invokeElm: false,
-                containerelm: {
-                    "LegalName": "",
-                    "Industry": "",
-                    "Revenueelm": "",
-                    "Revenueelm1": "",
-                    "Revenueelm2": "",
-                    "Assets": "",
-                    "NetIncome": "",
-                    "Liabilities": ""
-                },
-                invokeElm1: false,
-                containerelm1: {
-                    "Name1": "",
-                    "Name2": "",
-                    "contact1": "",
-                    "contact2": "",
-                    "OwnershipPercentage1": "",
-                    "OwnershipPercentage2": ""
-                },
-                businessName: formData.businessName || "",
-                entityType: "PM",
-                id: customerId,
-                customer_type: "manual-entry",
-                createdBy: "admin",
-                creatorId: 2,
-                creatorFirstName: "System",
-                creatorLastName: "User",
-                modificationDate: currentDateTime,
-                extendedProperties: {},
-                listsNames: [],
-                agencyId: 3,
-                agencyName: "headquarters",
-                eaiIds: {},
-                searchId: Math.floor(Math.random() * 100000),
-                outboundSystems: null,
-                AddressDataGrid: [],
-                current_date: currentDateTime,
-                isPEP: false,
-                isSanctionned: false,
-                isSanctioned: false,
-                hasRiskedCountry: false,
-                form_entity_type: "PM",
-                first_name: "",
-                last_name: "",
-                citizenship: "",
-                url: "https://greataml.com/",
-                is_hq_user: false,
-                current_user_name: "System User",
-                current_user_id: 2,
-                agency_location: null,
-                distribution_channel: null,
-                obnl_name: "",
-                customerUrl: "https://greataml.com/",
-                sumMscPercentage: 0,
-                revenuAnnuelNet: parseInt(formData.revenuAnnuelNet) || 0,
-                business_name: formData.businessName || "",
-                address: []
-            }
-        };
-    },
-
-    // Updated main mapping function to handle both PP and PM
-    mapFormDataToPayload: function(formData) {
-        // Check if this is PM or PP entity
-        const entityType = window.currentEntityType || 'PP';
-        
-        if (entityType === 'PM') {
-            return this.mapPMDataToPayload(formData);
-        } else {
-            // Use existing PP mapping logic
-            const customerId = parseInt(customerData.customerId) || Utils.generateCustomerId();
-            const currentDateTime = new Date().toISOString();
-
-            // Check tenant and create appropriate payload
-            const isBanqueEN = tenantName === 'banque_en';
-            
-            if (isBanqueEN) {
-                // Your existing Banque EN payload structure
-                return {
-                    customerId: customerId,
-                    customerRelationName: "",
-                    formId: "1",
-                    items: {
-                        // ... existing PP Banque EN structure
-                    }
-                };
-            } else {
-                // Your existing BankFR payload structure
-                return {
-                    customerId: customerId,
-                    customerRelationName: "",
-                    formId: "1",
-                    items: {
-                        // ... existing PP BankFR structure
-                    }
-                };
-            }
-        }
-    }
-
-    
     };
 
     // Form validation functions
-   const Validator = {
-    validateForm: function() {
-        const entityType = window.currentEntityType || 'PP';
-        let formSelector = '';
-        
-        if (entityType === 'PM') {
-            // Validate PM form fields
-            formSelector = '#pm-form ';
-        } else {
-            // Validate PP form fields (existing logic)
-            formSelector = '';
-        }
-        
-        const requiredFields = currentForm.querySelectorAll(formSelector + 'input[required], ' + formSelector + 'select[required], ' + formSelector + 'textarea[required]');
-        let isValid = true;
-        let firstInvalid = null;
+    const Validator = {
+        validateForm: function() {
+            const requiredFields = currentForm.querySelectorAll('input[required], select[required], textarea[required]');
+            let isValid = true;
+            let firstInvalid = null;
 
-        requiredFields.forEach(field => {
-            // Skip validation for disabled fields (pre-populated from screening)
-            if (field.disabled) return;
-            
-            // Skip fields that are not visible (for entity type switching)
-            if (entityType === 'PM' && !field.closest('#pm-form')) return;
-            if (entityType === 'PP' && field.closest('#pm-form')) return;
-            
-            if (!field.value.trim()) {
-                field.style.borderColor = '#dc3545';
-                if (!firstInvalid) {
-                    firstInvalid = field;
+            requiredFields.forEach(field => {
+                // Skip validation for disabled fields (pre-populated from screening)
+                if (field.disabled) return;
+                
+                if (!field.value.trim()) {
+                    field.style.borderColor = '#dc3545';
+                    if (!firstInvalid) {
+                        firstInvalid = field;
+                    }
+                    isValid = false;
+                } else {
+                    field.style.borderColor = '#e9ecef';
                 }
-                isValid = false;
-            } else {
-                field.style.borderColor = '#e9ecef';
+            });
+
+            if (!isValid) {
+                alert('Please fill in all required fields marked with *');
+                if (firstInvalid) {
+                    firstInvalid.focus();
+                }
             }
-        });
 
-        if (!isValid) {
-            alert('Please fill in all required fields marked with *');
-            if (firstInvalid) {
-                firstInvalid.focus();
-            }
-        }
+            return isValid;
+        },
 
-        return isValid;
-    },
-
-    collectFormData: function() {
-        const formData = {};
-        const entityType = window.currentEntityType || 'PP';
-        let formSelector = '';
-        
-        if (entityType === 'PM') {
-            formSelector = '#pm-form ';
-        }
-        
-        const allInputs = currentForm.querySelectorAll(formSelector + 'input, ' + formSelector + 'select, ' + formSelector + 'textarea');
-        
-        allInputs.forEach(input => {
-            // Skip fields that are not visible for current entity type
-            if (entityType === 'PM' && !input.closest('#pm-form')) return;
-            if (entityType === 'PP' && input.closest('#pm-form')) return;
+        collectFormData: function() {
+            const formData = {};
+            const allInputs = currentForm.querySelectorAll('input, select, textarea');
             
-            if (input.type === 'radio') {
-                if (input.checked) {
-                    formData[input.name] = input.value;
+            allInputs.forEach(input => {
+                if (input.type === 'radio') {
+                    if (input.checked) {
+                        formData[input.name] = input.value;
+                    }
+                } else if (input.type === 'checkbox') {
+                    if (input.checked) {
+                        formData[input.name] = input.value;
+                    }
+                } else {
+                    // Clean the input value to avoid regex issues
+                    let value = input.value;
+                    if (typeof value === 'string') {
+                        // Remove any problematic characters that might be interpreted as regex
+                        value = value.replace(/[*+?^${}()|\\[\]]/g, '');
+                    }
+                    formData[input.name] = value;
                 }
-            } else if (input.type === 'checkbox') {
-                if (input.checked) {
-                    formData[input.name] = input.value;
-                }
-            } else {
-                // Clean the input value to avoid regex issues
-                let value = input.value;
-                if (typeof value === 'string') {
-                    // Remove any problematic characters that might be interpreted as regex
-                    value = value.replace(/[*+?^${}()|\\[\]]/g, '');
-                }
-                formData[input.name] = value;
-            }
-        });
+            });
 
-        return formData;
-    }
-};
+            return formData;
+        }
+    };
 
     // UI functions
     const UI = {
