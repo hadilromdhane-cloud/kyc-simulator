@@ -421,86 +421,107 @@ const OnboardingHandler = (function() {
             button.textContent = originalText;
             button.disabled = false;
         },
-
         showSuccessMessage: function(onboardingResult = null) {
-            let statusMessage = '';
-            let statusColor = '#28a745';
-            let additionalInfo = '';
+    let statusMessage = '';
+    let statusColor = '#28a745';
+    let additionalInfo = '';
 
-            if (onboardingResult) {
-                if (onboardingResult.errorMessage) {
-                    statusMessage = 'Application submitted with remarks';
-                    statusColor = '#ffc107';
-                    additionalInfo = `
-                        <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 8px; margin: 20px auto; max-width: 500px;">
-                            <h4 style="color: #856404; margin-bottom: 10px;">Remark:</h4>
-                            <p style="color: #856404; margin: 0;">${onboardingResult.errorMessage}</p>
-                        </div>
-                    `;
-                } else if (onboardingResult.instruction) {
-                    if (onboardingResult.instruction.blocking) {
-                        statusMessage = 'Application rejected';
-                        statusColor = '#dc3545';
-                        additionalInfo = `
-                            <div style="background: #f8d7da; border: 1px solid #f5c6cb; padding: 15px; border-radius: 8px; margin: 20px auto; max-width: 500px;">
-                                <h4 style="color: #721c24; margin-bottom: 10px;">Blocking instruction:</h4>
-                                <p style="color: #721c24; margin: 0;"><strong>${onboardingResult.instruction.label}</strong></p>
-                                <p style="color: #721c24; margin: 5px 0 0 0;">${onboardingResult.instruction.description}</p>
-                            </div>
-                        `;
-                    } else {
-                        statusMessage = 'Application submitted - Action required';
-                        statusColor = '#ffc107';
-                        additionalInfo = `
-                            <div style="background: #d1ecf1; border: 1px solid #bee5eb; padding: 15px; border-radius: 8px; margin: 20px auto; max-width: 500px;">
-                                <h4 style="color: #0c5460; margin-bottom: 10px;">Information instruction:</h4>
-                                <p style="color: #0c5460; margin: 0;"><strong>${onboardingResult.instruction.label}</strong></p>
-                                <p style="color: #0c5460; margin: 5px 0 0 0;">${onboardingResult.instruction.description}</p>
-                            </div>
-                        `;
-                    }
-                } else {
-                    statusMessage = 'Application approved successfully';
-                    additionalInfo = `
-                        <div style="background: #d4edda; border: 1px solid #c3e6cb; padding: 15px; border-radius: 8px; margin: 20px auto; max-width: 500px;">
-                            <h4 style="color: #155724; margin-bottom: 10px;">✓ Validation successful</h4>
-                            <p style="color: #155724; margin: 0;">The customer has been approved and can be integrated into the system.</p>
-                        </div>
-                    `;
-                }
-            } else {
-                statusMessage = 'Application submitted successfully';
-            }
-
-            const container = document.querySelector('.container');
-            container.innerHTML = `
-                <div style="text-align: center; padding: 50px;">
-                    <div style="font-size: 4em; color: ${statusColor}; margin-bottom: 20px;">
-                        ${onboardingResult && onboardingResult.instruction && onboardingResult.instruction.blocking ? '⚠' : '✓'}
-                    </div>
-                    <h2 style="color: ${statusColor}; margin-bottom: 20px;">${statusMessage}</h2>
-                    <p style="font-size: 1.2em; color: #6c757d; margin-bottom: 30px;">
-                        KYC application for customer <strong>${customerData.customerId}</strong> has been processed by the Reis system.
-                    </p>
-                    
-                    ${additionalInfo}
-                    
-                    <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px auto; max-width: 400px;">
-                        <h4 style="margin-bottom: 15px;">Application Information:</h4>
-                        <p><strong>Customer:</strong> ${customerData.customerId}</p>
-                        <p><strong>Type:</strong> Individual</p>
-                        <p><strong>Tenant:</strong> ${tenantName.toUpperCase()}</p>
-                        <p><strong>Submission Date:</strong> ${new Date().toLocaleDateString('en-US')}</p>
-                        ${onboardingResult && onboardingResult.riskCalculationId ? 
-                            `<p><strong>Risk Calculation ID:</strong> ${onboardingResult.riskCalculationId}</p>` : ''}
-                    </div>
-                    
-                    <button class="btn btn-primary" onclick="window.location.href='index.html'" style="margin-top: 20px; padding: 15px 30px; background: linear-gradient(45deg, #007bff, #0056b3); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
-                        Back to Home
-                    </button>
+    if (onboardingResult) {
+        if (onboardingResult.errorMessage) {
+            statusMessage = 'Application submitted with remarks';
+            statusColor = '#ffc107';
+            additionalInfo = `
+                <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 8px; margin: 20px auto; max-width: 500px;">
+                    <h4 style="color: #856404; margin-bottom: 10px;">Remark:</h4>
+                    <p style="color: #856404; margin: 0;">${onboardingResult.errorMessage}</p>
                 </div>
             `;
-        },
+        } else if (onboardingResult.instruction) {
+            if (onboardingResult.instruction.blocking) {
+                statusMessage = 'Application rejected';
+                statusColor = '#dc3545';
+                additionalInfo = `
+                    <div style="background: #f8d7da; border: 1px solid #f5c6cb; padding: 15px; border-radius: 8px; margin: 20px auto; max-width: 500px;">
+                        <h4 style="color: #721c24; margin-bottom: 10px;">Blocking instruction:</h4>
+                        <p style="color: #721c24; margin: 0;"><strong>${onboardingResult.instruction.label}</strong></p>
+                        <p style="color: #721c24; margin: 5px 0 0 0;">${onboardingResult.instruction.description}</p>
+                    </div>
+                `;
+            } else {
+                statusMessage = 'Application submitted - Action required';
+                statusColor = '#ffc107';
+                additionalInfo = `
+                    <div style="background: #d1ecf1; border: 1px solid #bee5eb; padding: 15px; border-radius: 8px; margin: 20px auto; max-width: 500px;">
+                        <h4 style="color: #0c5460; margin-bottom: 10px;">Information instruction:</h4>
+                        <p style="color: #0c5460; margin: 0;"><strong>${onboardingResult.instruction.label}</strong></p>
+                        <p style="color: #0c5460; margin: 5px 0 0 0;">${onboardingResult.instruction.description}</p>
+                    </div>
+                `;
+            }
+        } else {
+            statusMessage = 'Onboarding done successfully';
+            additionalInfo = `
+                <div style="background: #d4edda; border: 1px solid #c3e6cb; padding: 15px; border-radius: 8px; margin: 20px auto; max-width: 500px;">
+                    <h4 style="color: #155724; margin-bottom: 10px;">✓ Validation successful</h4>
+                    <p style="color: #155724; margin: 0;">The customer has been approved and can be integrated into the system.</p>
+                </div>
+            `;
+        }
+    } else {
+        statusMessage = 'Onboarding done successfully';
+    }
+
+    const container = document.querySelector('.container');
+    const customerCardUrl = `https://greataml.com/profiles/customer-card/${customerData.customerId}`;
+    
+    container.innerHTML = `
+        <div style="text-align: center; padding: 50px;">
+            <div style="font-size: 4em; color: ${statusColor}; margin-bottom: 20px;">
+                ${onboardingResult && onboardingResult.instruction && onboardingResult.instruction.blocking ? '⚠' : '✓'}
+            </div>
+            <h2 style="color: ${statusColor}; margin-bottom: 20px;">${statusMessage}</h2>
+            <p style="font-size: 1.2em; color: #6c757d; margin-bottom: 30px;">
+                KYC application for customer <strong>${customerData.customerId}</strong> has been processed by the Reis system.
+            </p>
+            
+            ${additionalInfo}
+            
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px auto; max-width: 400px;">
+                <h4 style="margin-bottom: 15px;">Application Information:</h4>
+                <p><strong>Customer:</strong> ${customerData.customerId}</p>
+                <p><strong>Type:</strong> Individual</p>
+                <p><strong>Tenant:</strong> ${tenantName.toUpperCase()}</p>
+                <p><strong>Submission Date:</strong> ${new Date().toLocaleDateString('en-US')}</p>
+                ${onboardingResult && onboardingResult.riskCalculationId ? 
+                    `<p><strong>Risk Calculation ID:</strong> ${onboardingResult.riskCalculationId}</p>` : ''}
+            </div>
+            
+            <div style="margin: 30px auto; max-width: 500px;">
+                <p style="font-size: 1.1em; color: #495057; margin-bottom: 15px;">
+                    You can see the customer information and its risk calculation details via:
+                </p>
+                <a href="${customerCardUrl}" target="_blank" style="
+                    display: inline-block;
+                    background: linear-gradient(45deg, #007bff, #0056b3);
+                    color: white;
+                    padding: 12px 25px;
+                    text-decoration: none;
+                    border-radius: 8px;
+                    font-weight: 600;
+                    font-size: 1rem;
+                    transition: transform 0.2s ease;
+                    box-shadow: 0 3px 8px rgba(0,123,255,0.3);
+                " onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                    View Customer Card
+                </a>
+            </div>
+            
+            <button class="btn btn-primary" onclick="window.location.href='index.html'" style="margin-top: 20px; padding: 15px 30px; background: linear-gradient(45deg, #28a745, #20c997); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                Back to Home
+            </button>
+        </div>
+    `;
+},
 
         showErrorMessage: function(errorMessage) {
             const container = document.querySelector('.container');
