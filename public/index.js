@@ -188,32 +188,99 @@ class TokenManager {
 // Global token manager instance
 const tokenManager = new TokenManager();
 
-// Visible fields per process
-const countries = [
-  "Afghanistan","Albania","Algeria","Andorra","Angola","Antigua and Barbuda","Argentina",
-  "Armenia","Australia","Austria","Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados",
-  "Belarus","Belgium","Belize","Benin","Bhutan","Bolivia","Bosnia and Herzegovina","Botswana",
-  "Brazil","Brunei","Bulgaria","Burkina Faso","Burundi","Cabo Verde","Cambodia","Cameroon",
-  "Canada","Central African Republic","Chad","Chile","China","Colombia","Comoros","Congo",
-  "Costa Rica","Croatia","Cuba","Cyprus","Czech Republic","Denmark","Djibouti","Dominica",
-  "Dominican Republic","Ecuador","Egypt","El Salvador","Equatorial Guinea","Eritrea","Estonia",
-  "Eswatini","Ethiopia","Fiji","Finland","France","Gabon","Gambia","Georgia","Germany","Ghana",
-  "Greece","Grenada","Guatemala","Guinea","Guinea-Bissau","Guyana","Haiti","Honduras","Hungary",
-  "Iceland","India","Indonesia","Iran","Iraq","Ireland","Israel","Italy","Jamaica","Japan","Jordan",
-  "Kazakhstan","Kenya","Kiribati","Kuwait","Kyrgyzstan","Laos","Latvia","Lebanon","Lesotho","Liberia",
-  "Libya","Liechtenstein","Lithuania","Luxembourg","Madagascar","Malawi","Malaysia","Maldives","Mali",
-  "Malta","Marshall Islands","Mauritania","Mauritius","Mexico","Micronesia","Moldova","Monaco",
-  "Mongolia","Montenegro","Morocco","Mozambique","Myanmar","Namibia","Nauru","Nepal","Netherlands",
-  "New Zealand","Nicaragua","Niger","Nigeria","North Korea","North Macedonia","Norway","Oman","Pakistan",
-  "Palau","Palestine","Panama","Papua New Guinea","Paraguay","Peru","Philippines","Poland","Portugal",
-  "Qatar","Romania","Russia","Rwanda","Saint Kitts and Nevis","Saint Lucia","Saint Vincent and the Grenadines",
-  "Samoa","San Marino","Sao Tome and Principe","Saudi Arabia","Senegal","Serbia","Seychelles","Sierra Leone",
-  "Singapore","Slovakia","Slovenia","Solomon Islands","Somalia","South Africa","South Korea","South Sudan",
-  "Spain","Sri Lanka","Sudan","Suriname","Sweden","Switzerland","Syria","Taiwan","Tajikistan","Tanzania",
-  "Thailand","Timor-Leste","Togo","Tonga","Trinidad and Tobago","Tunisia","Turkey","Turkmenistan","Tuvalu",
-  "Uganda","Ukraine","United Arab Emirates","United Kingdom","United States","Uruguay","Uzbekistan","Vanuatu",
-  "Vatican City","Venezuela","Vietnam","Yemen","Zambia","Zimbabwe"
+// English countries array (for banque_en and default)
+const countriesEnglish = [
+    "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda",
+    "Argentina", "Armenia", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain",
+    "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bhutan",
+    "Bolivia", "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria",
+    "Burkina Faso", "Burundi", "Cabo Verde", "Cambodia", "Cameroon", "Canada",
+    "Central African Republic", "Chad", "Chile", "China", "Colombia", "Comoros", "Congo",
+    "Costa Rica", "Croatia", "Cuba", "Cyprus", "Czech Republic", "Denmark", "Djibouti",
+    "Dominica", "Dominican Republic", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea",
+    "Eritrea", "Estonia", "Eswatini", "Ethiopia", "Fiji", "Finland", "France", "Gabon",
+    "Gambia", "Georgia", "Germany", "Ghana", "Greece", "Grenada", "Guatemala", "Guinea",
+    "Guinea-Bissau", "Guyana", "Haiti", "Honduras", "Hungary", "Iceland", "India",
+    "Indonesia", "Iran", "Iraq", "Ireland", "Israel", "Italy", "Jamaica", "Japan",
+    "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Kuwait", "Kyrgyzstan", "Laos",
+    "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania",
+    "Luxembourg", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta",
+    "Marshall Islands", "Mauritania", "Mauritius", "Mexico", "Micronesia", "Moldova",
+    "Monaco", "Mongolia", "Montenegro", "Morocco", "Mozambique", "Myanmar", "Namibia",
+    "Nauru", "Nepal", "Netherlands", "New Zealand", "Nicaragua", "Niger", "Nigeria",
+    "North Korea", "North Macedonia", "Norway", "Oman", "Pakistan", "Palau", "Palestine",
+    "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland", "Portugal",
+    "Qatar", "Romania", "Russia", "Rwanda", "Saint Kitts and Nevis", "Saint Lucia",
+    "Saint Vincent and the Grenadines", "Samoa", "San Marino", "Sao Tome and Principe",
+    "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore",
+    "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Korea",
+    "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden", "Switzerland",
+    "Syria", "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Timor-Leste", "Togo",
+    "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Tuvalu",
+    "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States",
+    "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City", "Venezuela", "Vietnam", "Yemen",
+    "Zambia", "Zimbabwe"
 ];
+
+// French countries array (for bankfr)
+const countriesFrench = [
+    "Afghanistan", "Albanie", "Algérie", "Andorre", "Angola", "Antigua-et-Barbuda",
+    "Argentine", "Arménie", "Australie", "Autriche", "Azerbaïdjan", "Bahamas",
+    "Bahreïn", "Bangladesh", "Barbade", "Bélarus", "Belgique", "Belize", "Bénin",
+    "Bhoutan", "Bolivie", "Bosnie-Herzégovine", "Botswana", "Brésil",
+    "Brunei Darussalam", "Bulgarie", "Burkina Faso", "Burundi", "Cabo Verde",
+    "Cambodge", "Cameroun", "Canada", "République centrafricaine", "Tchad",
+    "Chili", "Chine", "Colombie", "Comores", "Congo", "Costa Rica",
+    "Côte d'Ivoire", "Croatie", "Cuba", "Chypre", "Tchéquie",
+    "République démocratique du Congo", "Danemark", "Djibouti", "Dominique",
+    "République dominicaine", "Équateur", "Égypte", "El Salvador",
+    "Guinée équatoriale", "Érythrée", "Estonie", "Éthiopie", "Fidji",
+    "Finlande", "France", "Gabon", "Gambie", "Géorgie", "Allemagne",
+    "Ghana", "Grèce", "Grenade", "Guatemala", "Guinée", "Guinée-Bissau",
+    "Guyana", "Haïti", "Honduras", "Hongrie", "Islande", "Inde",
+    "Indonésie", "Iran", "Iraq", "Irlande", "Israël", "Italie",
+    "Jamaïque", "Japon", "Jordanie", "Kazakhstan", "Kenya", "Kiribati",
+    "Koweït", "Kirghizistan", "République démocratique populaire lao",
+    "Lettonie", "Liban", "Lesotho", "Libéria", "Libye", "Liechtenstein",
+    "Lituanie", "Luxembourg", "Madagascar", "Malawi", "Malaisie", "Maldives",
+    "Mali", "Malte", "Îles Marshall", "Mauritanie", "Maurice", "Mexique",
+    "États fédérés de Micronésie", "République de Moldova", "Monaco",
+    "Mongolie", "Monténégro", "Maroc", "Mozambique", "Myanmar", "Namibie",
+    "Nauru", "Népal", "Pays-Bas", "Nouvelle-Zélande", "Nicaragua", "Niger",
+    "Nigéria", "République populaire démocratique de Corée", "Macédoine du Nord",
+    "Norvège", "Oman", "Pakistan", "Palaos", "Palestine", "Panama",
+    "Papouasie-Nouvelle-Guinée", "Paraguay", "Pérou", "Philippines", "Pologne",
+    "Portugal", "Qatar", "Roumanie", "Fédération de Russie", "Rwanda",
+    "Saint-Kitts-et-Nevis", "Sainte-Lucie", "Saint-Vincent-et-les Grenadines",
+    "Samoa", "Saint-Marin", "Sao Tomé-et-Principe", "Arabie saoudite", "Sénégal",
+    "Serbie", "Seychelles", "Sierra Leone", "Singapour", "Slovaquie", "Slovénie",
+    "Îles Salomon", "Somalie", "Afrique du Sud", "République de Corée",
+    "Soudan du Sud", "Espagne", "Sri Lanka", "Soudan", "Suriname", "Suède",
+    "Suisse", "République arabe syrienne", "Tadjikistan",
+    "République-Unie de Tanzanie", "Thaïlande", "Timor-Leste", "Togo",
+    "Tonga", "Trinité-et-Tobago", "Tunisie", "Turquie", "Turkménistan",
+    "Tuvalu", "Ouganda", "Ukraine", "Émirats arabes unis", "Royaume-Uni",
+    "États-Unis", "Uruguay", "Ouzbékistan", "Vanuatu", "Saint-Siège",
+    "Venezuela", "Viet Nam", "Yémen", "Zambie", "Zimbabwe"
+];
+
+// Function to get the appropriate countries array based on tenant
+function getCountriesForTenant(tenant) {
+    switch(tenant) {
+        case 'bankfr':
+            return countriesFrench;
+        case 'banque_en':
+            return countriesEnglish;
+        default:
+            return countriesEnglish; // Fallback to English
+    }
+}
+
+// Dynamic countries getter that uses current tenant
+function getCurrentCountries() {
+    const currentTenant = tokenManager.getTenant() || localStorage.getItem('tenantName') || 'banque_en';
+    return getCountriesForTenant(currentTenant);
+}
 
 const visibleTemplates = {
   PP: {
@@ -939,21 +1006,24 @@ function renderFields(containerId, entityType, processType) {
 
     let input;
     if (field.key === 'citizenship' || field.key === 'nationality') {
-      input = document.createElement('select');
-      input.id = containerId + '_' + field.key;
+  input = document.createElement('select');
+  input.id = containerId + '_' + field.key;
 
-      const defaultOption = document.createElement('option');
-      defaultOption.value = '';
-      defaultOption.textContent = 'Select Country';
-      input.appendChild(defaultOption);
+  const defaultOption = document.createElement('option');
+  defaultOption.value = '';
+  defaultOption.textContent = 'Select Country';
+  input.appendChild(defaultOption);
 
-      countries.forEach(country => {
-        const option = document.createElement('option');
-        option.value = country;
-        option.textContent = country;
-        input.appendChild(option);
-      });
-    } else if (field.key === 'queueName') {
+  // Use dynamic countries based on current tenant
+  const currentCountries = getCurrentCountries();
+  currentCountries.forEach(country => {
+    const option = document.createElement('option');
+    option.value = country;
+    option.textContent = country;
+    input.appendChild(option);
+  });
+}
+ else if (field.key === 'queueName') {
       input = document.createElement('select');
       input.id = containerId + '_' + field.key;
 
@@ -1584,3 +1654,5 @@ window.addEventListener('beforeunload', function() {
 
 window.closeNotificationHistory = closeNotificationHistory;
 window.continueOnboardingFromHistory = continueOnboardingFromHistory;
+window.getCountriesForTenant = getCountriesForTenant;
+ 
