@@ -150,7 +150,7 @@ const OnboardingHandler = (function() {
                         adresseDeResidence: formData.residentialAddress || formData.adresse || "",
                         postal_code: formData.postalCode || formData.codePostal || "",
                         fiscale_ville: formData.city || formData.ville || "",
-                        Country_of_residence: formData.countryOfResidence || formData.paysResidence || "",
+                        Country_of_residence: formData.countryOfResidence || formData.PaysDeResidence || "",
                         tin_: {
                             id: this.getDocumentTypeIdEN(formData.idType || formData.typePiece),
                             name: this.getDocumentTypeNameEN(formData.idType || formData.typePiece),
@@ -243,7 +243,7 @@ const OnboardingHandler = (function() {
                     items: {
                         isSanctionnedWorkflow: "Non",
                         AddressDataGrid: [],
-                        PaysDeResidence: formData.paysResidence || "",
+                        PaysDeResidence: formData.paysDeResidence || "",
                         address: [],
                         address_doc: [],
                         address_proof_type: {},
@@ -679,7 +679,7 @@ const OnboardingHandler = (function() {
         { screeningField: 'lastName', onboardingFields: ['nom', 'lastName'], readonly: true, label: 'Nom/Last Name' },
         { screeningField: 'birthDate', onboardingFields: ['dateNaissance', 'dateOfBirth'], readonly: true, label: 'Date de naissance/Birth Date' },
         { screeningField: 'nationality', onboardingFields: ['nationalite', 'nationality'], readonly: true, label: 'Nationalité/Nationality', fieldType: 'select' },
-        { screeningField: 'citizenship', onboardingFields: ['paysResidence', 'countryOfResidence'], readonly: true, label: 'Pays de Résidence/Country of Residence', fieldType: 'select' }
+        { screeningField: 'citizenship', onboardingFields: ['paysDeResidence', 'countryOfResidence'], readonly: true, label: 'Pays de Résidence/Country of Residence', fieldType: 'select' }
     ];
         let fieldsLocked = 0;
 
