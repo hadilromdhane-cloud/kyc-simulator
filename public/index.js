@@ -1368,13 +1368,14 @@ document.getElementById('closePopup').addEventListener('click', () => {
 function navigateToOnboarding(customerId) {
   const currentTenant = localStorage.getItem('tenantName') || 'bankfr';
   
-  // Determine entity type by checking if we have businessName in stored data
+  // Determine entity type by checking screening data
   let entityType = 'PP'; // default
   try {
     const screeningData = localStorage.getItem(`screeningData_${customerId}`);
     if (screeningData) {
       const data = JSON.parse(screeningData);
-      if (data.businessName) {
+      // Check for PM-specific fields
+      if (data.businessName || data.entityType === 'PM') {
         entityType = 'PM';
       }
     }
@@ -1389,7 +1390,7 @@ function navigateToOnboarding(customerId) {
     },
     'banque_en': {
       'PP': 'onboarding_banque_en.html', 
-      'PM': 'onboarding_banque_en_PM.html'  // If you create this later
+      'PM': 'onboarding_banque_en_PM.html'
     }
   };
   
@@ -1514,15 +1515,27 @@ function storeCustomerDataForOnboarding(customerData, apiResponse) {
       return false;
     }
 
+    // Determine entity type
+    const entityType = customerData.businessName ? 'PM' : 'PP';
+
     // Create comprehensive customer data object with security flag
     const completeCustomerData = {
       // Core identification data (will be read-only in onboarding)
       customerId: customerId,
+      entityType: entityType,
+      
+      // PP-specific fields
       firstName: customerData.firstName,
       lastName: customerData.lastName,
       birthDate: customerData.birthDate,
       nationality: customerData.nationality,
       citizenship: customerData.citizenship,
+      
+      // PM-specific fields
+      businessName: customerData.businessName,
+      legalForm: customerData.legalForm,
+      countryOfIncorporation: customerData.countryOfIncorporation,
+      registrationNumber: customerData.registrationNumber,
       
       // System data
       systemId: customerData.systemId,
@@ -1552,6 +1565,8 @@ function storeCustomerDataForOnboarding(customerData, apiResponse) {
     // Also store a mapping for easy lookup
     const customerMappings = JSON.parse(localStorage.getItem('customerDataMappings') || '{}');
     customerMappings[customerId] = {
+      entityType: entityType,
+      businessName: customerData.businessName,
       firstName: customerData.firstName,
       lastName: customerData.lastName,
       storedAt: new Date().toISOString(),
@@ -1559,8 +1574,10 @@ function storeCustomerDataForOnboarding(customerData, apiResponse) {
     };
     localStorage.setItem('customerDataMappings', JSON.stringify(customerMappings));
     
-    console.log('Customer data stored for secure onboarding transfer:', {
+    console.log(`${entityType} customer data stored for secure onboarding transfer:`, {
       customerId: customerId,
+      entityType: entityType,
+      businessName: customerData.businessName,
       firstName: customerData.firstName,
       lastName: customerData.lastName,
       isLocked: true,
@@ -1573,7 +1590,6 @@ function storeCustomerDataForOnboarding(customerData, apiResponse) {
     return false;
   }
 }
-
 // --- Button Events ---
 const closeBtn = document.getElementById('closePopup');
 closeBtn.addEventListener('click', () => {
