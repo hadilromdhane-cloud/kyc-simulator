@@ -675,11 +675,11 @@ function continueOnboardingFromHistory(customerId, historyIndex) {
   
   const currentTenant = localStorage.getItem('tenantName') || 'bankfr';
   const tenantPageMap = {
-    'bankfr': 'onboarding_bankfr.html',
+    'bankfr': 'onboarding_bankfr_PP.html',
     'banque_en': 'onboarding_banque_en.html',
   };
   
-  const onboardingPage = tenantPageMap[currentTenant] || 'onboarding_bankfr.html';
+  const onboardingPage = tenantPageMap[currentTenant] || 'onboarding_bankfr_PP.html';
   
   console.log(`Continuing onboarding for ${customerId} on ${onboardingPage} (tenant: ${currentTenant})`);
   
@@ -1369,11 +1369,11 @@ function navigateToOnboarding(customerId) {
   const currentTenant = localStorage.getItem('tenantName') || 'bankfr';
   
   const tenantPageMap = {
-    'bankfr': 'onboarding_bankfr.html',
+    'bankfr': 'onboarding_bankfr_PP.html',
     'banque_en': 'onboarding_banque_en.html',
   };
   
-  const onboardingPage = tenantPageMap[currentTenant] || 'onboarding_bankfr.html';
+  const onboardingPage = tenantPageMap[currentTenant] || 'onboarding_bankfr_PP.html';
   
   console.log(`Navigating to tenant-specific onboarding: ${onboardingPage} for tenant: ${currentTenant}`);
   
