@@ -243,7 +243,7 @@ const OnboardingHandler = (function() {
                     items: {
                         isSanctionnedWorkflow: "Non",
                         AddressDataGrid: [],
-                        PaysDeResidence: formData.paysDeResidence || "",
+                        PaysDeResidence: formData.PaysDeResidence || "",
                         address: [],
                         address_doc: [],
                         address_proof_type: {},
@@ -679,7 +679,7 @@ const OnboardingHandler = (function() {
         { screeningField: 'lastName', onboardingFields: ['nom', 'lastName'], readonly: true, label: 'Nom/Last Name' },
         { screeningField: 'birthDate', onboardingFields: ['dateNaissance', 'dateOfBirth'], readonly: true, label: 'Date de naissance/Birth Date' },
         { screeningField: 'nationality', onboardingFields: ['nationalite', 'nationality'], readonly: true, label: 'Nationalité/Nationality', fieldType: 'select' },
-        { screeningField: 'citizenship', onboardingFields: ['paysDeResidence', 'countryOfResidence'], readonly: true, label: 'Pays de Résidence/Country of Residence', fieldType: 'select' }
+        { screeningField: 'citizenship', onboardingFields: ['PaysDeResidence', 'countryOfResidence'], readonly: true, label: 'Pays de Résidence/Country of Residence', fieldType: 'select' }
     ];
         let fieldsLocked = 0;
 
