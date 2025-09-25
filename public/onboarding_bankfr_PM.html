@@ -260,6 +260,62 @@
             margin-bottom: 10px;
             color: #1976d2;
         }
+
+        /* Table styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            border: 1px solid #ddd;
+        }
+
+        table th,
+        table td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        table input,
+        table select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .add-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .remove-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .add-btn:hover,
+        .remove-btn:hover {
+            opacity: 0.9;
+        }
     </style>
 </head>
 <body>
@@ -274,9 +330,8 @@
 
         <div class="tabs">
             <button class="tab-button active" onclick="showTab('identification')">Identification</button>
-            <button class="tab-button" onclick="showTab('dirigeants')">Dirigeants</button>
             <button class="tab-button" onclick="showTab('financial')">Informations Financières</button>
-            <button class="tab-button" onclick="showTab('beneficiaires')">Bénéficiaires Effectifs</button>
+            <button class="tab-button" onclick="showTab('relations')">Relations</button>
         </div>
 
         <form id="pmOnboardingForm">
@@ -284,7 +339,7 @@
             <div id="identification" class="tab-content active">
                 <div class="form-section">
                     <h2 class="section-title">
-                        🏢 Identification de l'Entité
+                        Identification de l'Entité
                     </h2>
                     
                     <div class="form-row">
@@ -372,7 +427,7 @@
 
                 <div class="form-section">
                     <h2 class="section-title">
-                        📍 Siège Social
+                        Siège Social
                     </h2>
                     
                     <div class="form-row full-width">
@@ -419,90 +474,11 @@
                 </div>
             </div>
 
-            <!-- Dirigeants Tab -->
-            <div id="dirigeants" class="tab-content">
-                <div class="form-section">
-                    <h2 class="section-title">
-                        👔 Représentant Légal / Dirigeant Principal
-                    </h2>
-                    
-                    <div class="info-box">
-                        <h4>Information importante</h4>
-                        <p>Veuillez renseigner les informations du représentant légal ou du dirigeant principal de l'entité.</p>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="civilite">Civilité <span class="required">*</span></label>
-                            <select id="civilite" name="civilite" required>
-                                <option value="">-- Sélectionner --</option>
-                                <option value="M">Monsieur</option>
-                                <option value="Mme">Madame</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="fonction">Fonction <span class="required">*</span></label>
-                            <select id="fonction" name="fonction" required>
-                                <option value="">-- Sélectionner --</option>
-                                <option value="PDG">Président Directeur Général</option>
-                                <option value="DG">Directeur Général</option>
-                                <option value="Président">Président</option>
-                                <option value="Gérant">Gérant</option>
-                                <option value="Administrateur">Administrateur</option>
-                                <option value="Autre">Autre</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="nomDirigeant">Nom <span class="required">*</span></label>
-                            <input type="text" id="nomDirigeant" name="nomDirigeant" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="prenomDirigeant">Prénom <span class="required">*</span></label>
-                            <input type="text" id="prenomDirigeant" name="prenomDirigeant" required>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="dateNaissanceDirigeant">Date de naissance <span class="required">*</span></label>
-                            <input type="date" id="dateNaissanceDirigeant" name="dateNaissanceDirigeant" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="nationaliteDirigeant">Nationalité <span class="required">*</span></label>
-                            <select id="nationaliteDirigeant" name="nationaliteDirigeant" required>
-                                <!-- Options will be populated by JavaScript -->
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="telephoneDirigeant">Téléphone</label>
-                            <input type="tel" id="telephoneDirigeant" name="telephoneDirigeant">
-                        </div>
-                        <div class="form-group">
-                            <label for="emailDirigeant">E-mail</label>
-                            <input type="email" id="emailDirigeant" name="emailDirigeant">
-                        </div>
-                    </div>
-
-                    <div class="form-row full-width">
-                        <div class="form-group">
-                            <label for="adresseDirigeant">Adresse personnelle</label>
-                            <textarea id="adresseDirigeant" name="adresseDirigeant" placeholder="Adresse complète"></textarea>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <!-- Financial Information Tab -->
             <div id="financial" class="tab-content">
                 <div class="form-section">
                     <h2 class="section-title">
-                        💰 Informations Financières
+                        Informations Financières
                     </h2>
                     
                     <div class="form-row">
@@ -568,69 +544,32 @@
                 </div>
             </div>
 
-            <!-- Bénéficiaires Effectifs Tab -->
-            <div id="beneficiaires" class="tab-content">
+            <!-- Relations Tab -->
+            <div id="relations" class="tab-content">
                 <div class="form-section">
                     <h2 class="section-title">
-                        👥 Bénéficiaires Effectifs
+                        Personnes Liées à l'Entité
                     </h2>
                     
-                    <div class="info-box">
-                        <h4>Définition</h4>
-                        <p>Les bénéficiaires effectifs sont les personnes physiques qui détiennent ou contrôlent, directement ou indirectement, plus de 25% du capital ou des droits de vote de l'entité.</p>
-                    </div>
+                    <button type="button" id="addPersonBtn" class="add-btn">Ajouter une personne</button>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="nomBeneficiaire">Nom du bénéficiaire effectif</label>
-                            <input type="text" id="nomBeneficiaire" name="nomBeneficiaire">
-                        </div>
-                        <div class="form-group">
-                            <label for="prenomBeneficiaire">Prénom du bénéficiaire effectif</label>
-                            <input type="text" id="prenomBeneficiaire" name="prenomBeneficiaire">
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="dateNaissanceBeneficiaire">Date de naissance</label>
-                            <input type="date" id="dateNaissanceBeneficiaire" name="dateNaissanceBeneficiaire">
-                        </div>
-                        <div class="form-group">
-                            <label for="nationaliteBeneficiaire">Nationalité</label>
-                            <select id="nationaliteBeneficiaire" name="nationaliteBeneficiaire">
-                                <!-- Options will be populated by JavaScript -->
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="pourcentageDetention">Pourcentage de détention (%)</label>
-                            <input type="number" id="pourcentageDetention" name="pourcentageDetention" min="0" max="100" step="0.1">
-                        </div>
-                        <div class="form-group">
-                            <label for="natureDroits">Nature des droits</label>
-                            <select id="natureDroits" name="natureDroits">
-                                <option value="">-- Sélectionner --</option>
-                                <option value="capital">Droits au capital</option>
-                                <option value="vote">Droits de vote</option>
-                                <option value="both">Droits au capital et de vote</option>
-                                <option value="control">Contrôle par d'autres moyens</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-row full-width">
-                        <div class="form-group">
-                            <label for="adresseBeneficiaire">Adresse du bénéficiaire effectif</label>
-                            <textarea id="adresseBeneficiaire" name="adresseBeneficiaire" placeholder="Adresse complète"></textarea>
-                        </div>
-                    </div>
-
-                    <div class="info-box">
-                        <h4>Information complémentaire</h4>
-                        <p>Si votre entité a plusieurs bénéficiaires effectifs, veuillez nous contacter pour compléter ces informations.</p>
+                    <div style="overflow-x: auto;">
+                        <table id="personsTable">
+                            <thead>
+                                <tr>
+                                    <th>Prénom</th>
+                                    <th>Nom</th>
+                                    <th>Date de Naissance</th>
+                                    <th>Citoyenneté</th>
+                                    <th>Nationalité</th>
+                                    <th>Relation</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Dynamic rows will be added here -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -709,8 +648,6 @@
         function initializeCountryDropdowns() {
             populateCountriesSelect('paysImmatriculation', countriesFrench);
             populateCountriesSelect('paysSiege', countriesFrench);
-            populateCountriesSelect('nationaliteDirigeant', countriesFrench);
-            populateCountriesSelect('nationaliteBeneficiaire', countriesFrench);
         }
 
         // Tab switching functionality
@@ -783,6 +720,22 @@
                 data.customerType = 'PM';
                 data.submissionDate = new Date().toISOString();
                 
+                // Collect persons table data
+                const personsData = [];
+                const tableRows = document.querySelectorAll('#personsTable tbody tr');
+                tableRows.forEach((row, index) => {
+                    const inputs = row.querySelectorAll('input, select');
+                    const personData = {};
+                    inputs.forEach(input => {
+                        const fieldName = input.name.split('_').slice(2).join('_'); // Remove person_X_ prefix
+                        personData[fieldName] = input.value;
+                    });
+                    if (personData.firstName || personData.lastName) { // Only include if has some data
+                        personsData.push(personData);
+                    }
+                });
+                data.relatedPersons = personsData;
+                
                 // Simulate form submission
                 const submitBtn = document.getElementById('submitBtn');
                 submitBtn.disabled = true;
@@ -804,6 +757,77 @@
             });
         }
 
+        // Table functionality
+        let personCounter = 0;
+
+        function initializePersonsTable() {
+            const addBtn = document.getElementById('addPersonBtn');
+            if (addBtn) {
+                addBtn.addEventListener('click', addPersonRow);
+            }
+        }
+
+        function addPersonRow() {
+            personCounter++;
+            const tbody = document.querySelector('#personsTable tbody');
+            const row = document.createElement('tr');
+            
+            row.innerHTML = `
+                <td><input type="text" name="person_${personCounter}_firstName" placeholder="Prénom"></td>
+                <td><input type="text" name="person_${personCounter}_lastName" placeholder="Nom"></td>
+                <td><input type="date" name="person_${personCounter}_birthDate"></td>
+                <td>
+                    <select name="person_${personCounter}_citizenship">
+                        <option value="">-- Sélectionner --</option>
+                    </select>
+                </td>
+                <td>
+                    <select name="person_${personCounter}_nationality">
+                        <option value="">-- Sélectionner --</option>
+                    </select>
+                </td>
+                <td>
+                    <select name="person_${personCounter}_relation">
+                        <option value="">-- Sélectionner --</option>
+                        <option value="dirigeant">Dirigeant</option>
+                        <option value="president">Président</option>
+                        <option value="gerant">Gérant</option>
+                        <option value="administrateur">Administrateur</option>
+                        <option value="beneficiaire">Bénéficiaire effectif</option>
+                        <option value="actionnaire">Actionnaire</option>
+                        <option value="representant">Représentant légal</option>
+                    </select>
+                </td>
+                <td>
+                    <button type="button" onclick="removePersonRow(this)" class="remove-btn">Supprimer</button>
+                </td>
+            `;
+            
+            tbody.appendChild(row);
+            
+            // Populate country dropdowns for this row
+            const citizenshipSelect = row.querySelector(`select[name="person_${personCounter}_citizenship"]`);
+            const nationalitySelect = row.querySelector(`select[name="person_${personCounter}_nationality"]`);
+            
+            countriesFrench.forEach(country => {
+                const option1 = document.createElement('option');
+                option1.value = country;
+                option1.textContent = country;
+                citizenshipSelect.appendChild(option1);
+                
+                const option2 = document.createElement('option');
+                option2.value = country;
+                option2.textContent = country;
+                nationalitySelect.appendChild(option2);
+            });
+        }
+
+        function removePersonRow(button) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer cette personne?')) {
+                button.closest('tr').remove();
+            }
+        }
+
         // Initialize everything when the page loads
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize country dropdowns
@@ -815,6 +839,9 @@
             
             // Initialize form submission handler
             handleFormSubmission();
+            
+            // Initialize table functionality
+            initializePersonsTable();
             
             // Add input validation on blur
             const inputs = document.querySelectorAll('input, select, textarea');
@@ -847,7 +874,6 @@
                 input.addEventListener('blur', function() {
                     if (this.value && !validateEmail(this.value)) {
                         this.style.borderColor = '#dc3545';
-                        // You could add a tooltip or message here
                     }
                 });
             });
@@ -857,7 +883,6 @@
                 input.addEventListener('blur', function() {
                     if (this.value && !validatePhone(this.value)) {
                         this.style.borderColor = '#dc3545';
-                        // You could add a tooltip or message here
                     }
                 });
             });
