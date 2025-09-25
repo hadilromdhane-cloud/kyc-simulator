@@ -483,6 +483,285 @@
             </div>
         </form>
     </div>
+    <!-- Add this PM form section to your onboarding_bankfr.html -->
+<!-- You'll need to add a tab selector first to choose between PP and PM -->
+
+<div class="entity-type-selector" style="margin-bottom: 30px;">
+    <div style="text-align: center; background: #f8f9fa; padding: 20px; border-radius: 10px;">
+        <h3 style="margin-bottom: 15px; color: #2c3e50;">Type de Client</h3>
+        <div style="display: flex; justify-content: center; gap: 20px;">
+            <button type="button" class="entity-btn active" data-entity="PP" style="
+                padding: 15px 30px;
+                border: 2px solid #3498db;
+                background: #3498db;
+                color: white;
+                border-radius: 8px;
+                cursor: pointer;
+                font-weight: 600;
+            ">Personne Physique (PP)</button>
+            <button type="button" class="entity-btn" data-entity="PM" style="
+                padding: 15px 30px;
+                border: 2px solid #3498db;
+                background: white;
+                color: #3498db;
+                border-radius: 8px;
+                cursor: pointer;
+                font-weight: 600;
+            ">Personne Morale (PM)</button>
+        </div>
+    </div>
+</div>
+
+<!-- PM Form (initially hidden) -->
+<div id="pm-form" style="display: none;">
+    <div class="tabs">
+        <button class="tab-button active" onclick="showPMTab('pm-identification')">Identification du Client</button>
+        <button class="tab-button" onclick="showPMTab('pm-financial')">Données Financières</button>
+    </div>
+
+    <!-- PM Identification Tab -->
+    <div id="pm-identification" class="tab-content active">
+        <div class="form-section">
+            <h2 class="section-title">
+                🏢 Identification de l'Entité
+            </h2>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="businessName">Nom de l'entreprise <span class="required">*</span></label>
+                    <input type="text" id="businessName" name="businessName" required>
+                </div>
+                <div class="form-group">
+                    <label for="segment">Segment <span class="required">*</span></label>
+                    <select id="segment" name="segment" required>
+                        <option value="">-- Sélectionner --</option>
+                        <option value="npo">NPO (Organisation à but non lucratif)</option>
+                        <option value="sme">PME (Petites et moyennes entreprises)</option>
+                        <option value="corporate">Corporate</option>
+                        <option value="financial">Institution financière</option>
+                        <option value="government">Gouvernemental</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="dateConstitution">Date de constitution <span class="required">*</span></label>
+                    <input type="date" id="dateConstitution" name="dateConstitution" required>
+                </div>
+                <div class="form-group">
+                    <label for="paysConstitution">Pays de constitution <span class="required">*</span></label>
+                    <select id="paysConstitution" name="paysConstitution" required>
+                        <!-- Options will be populated by JavaScript -->
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row full-width">
+                <div class="form-group">
+                    <label for="siegeSocial">Siège social <span class="required">*</span></label>
+                    <textarea id="siegeSocial" name="siegeSocial" required placeholder="Adresse complète du siège social"></textarea>
+                </div>
+            </div>
+
+            <div class="form-row full-width">
+                <div class="form-group">
+                    <label for="paysResidenceFiscale">Pays de résidence fiscale <span class="required">*</span></label>
+                    <select id="paysResidenceFiscale" name="paysResidenceFiscale" required>
+                        <!-- Options will be populated by JavaScript -->
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h2 class="section-title">
+                📞 Contact et Identification
+            </h2>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="numeroIdentite">Numéro de la pièce d'identité <span class="required">*</span></label>
+                    <input type="text" id="numeroIdentite" name="numeroIdentite" required>
+                </div>
+                <div class="form-group">
+                    <label for="telephone">N. de téléphone</label>
+                    <input type="tel" id="telephone" name="telephone">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email">
+                </div>
+                <div class="form-group">
+                    <label for="siteWeb">Site web</label>
+                    <input type="url" id="siteWeb" name="siteWeb" placeholder="https://">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PM Financial Tab -->
+    <div id="pm-financial" class="tab-content">
+        <div class="form-section">
+            <h2 class="section-title">
+                💰 Données Financières
+            </h2>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="canalDistribution">Canal de distribution <span class="required">*</span></label>
+                    <select id="canalDistribution" name="canalDistribution" required>
+                        <option value="">-- Sélectionner --</option>
+                        <option value="online">En ligne</option>
+                        <option value="inagency">En personne (vente directe)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="revenuAnnuelNet">Revenu annuel net (EUR) <span class="required">*</span></label>
+                    <div class="currency-input">
+                        <span class="currency-symbol">€</span>
+                        <input type="number" id="revenuAnnuelNet" name="revenuAnnuelNet" required min="0" step="1000" placeholder="0">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="formeJuridique">Forme juridique <span class="required">*</span></label>
+                    <select id="formeJuridique" name="formeJuridique" required>
+                        <option value="">-- Sélectionner --</option>
+                        <option value="SARL">SARL (Société à responsabilité limitée)</option>
+                        <option value="SA">SA (Société anonyme)</option>
+                        <option value="SAS">SAS (Société par actions simplifiée)</option>
+                        <option value="SASU">SASU (Société par actions simplifiée unipersonnelle)</option>
+                        <option value="EURL">EURL (Entreprise unipersonnelle à responsabilité limitée)</option>
+                        <option value="SNC">SNC (Société en nom collectif)</option>
+                        <option value="SCS">SCS (Société en commandite simple)</option>
+                        <option value="SCA">SCA (Société en commandite par actions)</option>
+                        <option value="Public Limited Company (PLC)">Public Limited Company (PLC)</option>
+                        <option value="Private Limited Company">Private Limited Company</option>
+                        <option value="Association">Association</option>
+                        <option value="Fondation">Fondation</option>
+                        <option value="Autre">Autre</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="secteurActivite">Secteur d'activité <span class="required">*</span></label>
+                    <select id="secteurActivite" name="secteurActivite" required>
+                        <option value="">-- Sélectionner --</option>
+                        <option value="360030">Construction et BTP</option>
+                        <option value="360010">Agriculture et agroalimentaire</option>
+                        <option value="360020">Commerce et distribution</option>
+                        <option value="360040">Services financiers</option>
+                        <option value="360050">Technologie et informatique</option>
+                        <option value="360060">Santé et pharmaceutique</option>
+                        <option value="360070">Éducation</option>
+                        <option value="360080">Transport et logistique</option>
+                        <option value="360090">Énergie et environnement</option>
+                        <option value="360100">Immobilier</option>
+                        <option value="360110">Tourisme et hôtellerie</option>
+                        <option value="360120">Industrie manufacturière</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="activiteExercee">Activité exercée <span class="required">*</span></label>
+                    <select id="activiteExercee" name="activiteExercee" required>
+                        <option value="">-- Sélectionner --</option>
+                        <option value="7300">Services de conseil en gestion</option>
+                        <option value="7100">Services juridiques</option>
+                        <option value="7200">Services comptables</option>
+                        <option value="7400">Services d'architecture</option>
+                        <option value="7500">Services d'ingénierie</option>
+                        <option value="7600">Services de publicité</option>
+                        <option value="7700">Location et leasing</option>
+                        <option value="7800">Services de recrutement</option>
+                        <option value="7900">Services de voyage</option>
+                        <option value="8000">Services de sécurité</option>
+                        <option value="8100">Services de nettoyage</option>
+                        <option value="8200">Services administratifs</option>
+                        <option value="4100">Construction de bâtiments</option>
+                        <option value="4200">Génie civil</option>
+                        <option value="4300">Travaux de construction spécialisés</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="paysActivite">Pays d'activité <span class="required">*</span></label>
+                    <select id="paysActivite" name="paysActivite" required>
+                        <!-- Options will be populated by JavaScript -->
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add this JavaScript for PM form functionality -->
+<script>
+// Entity type selector functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const entityButtons = document.querySelectorAll('.entity-btn');
+    const ppForm = document.getElementById('identification'); // Your existing PP form
+    const pmForm = document.getElementById('pm-form');
+    
+    entityButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const entityType = this.getAttribute('data-entity');
+            
+            // Update button states
+            entityButtons.forEach(btn => {
+                btn.classList.remove('active');
+                btn.style.background = 'white';
+                btn.style.color = '#3498db';
+            });
+            this.classList.add('active');
+            this.style.background = '#3498db';
+            this.style.color = 'white';
+            
+            // Show/hide appropriate form
+            if (entityType === 'PP') {
+                if (ppForm) ppForm.parentElement.style.display = 'block';
+                if (pmForm) pmForm.style.display = 'none';
+                // Update tabs to show PP tabs
+                showTab('identification');
+            } else if (entityType === 'PM') {
+                if (ppForm) ppForm.parentElement.style.display = 'none';
+                if (pmForm) pmForm.style.display = 'block';
+                // Show PM tabs
+                showPMTab('pm-identification');
+            }
+            
+            // Update the entity type for form submission
+            window.currentEntityType = entityType;
+        });
+    });
+    
+    // Initialize with PP by default
+    window.currentEntityType = 'PP';
+});
+
+// PM Tab switching functionality
+function showPMTab(tabName) {
+    // Hide all PM tab contents
+    const pmTabContents = document.querySelectorAll('#pm-form .tab-content');
+    pmTabContents.forEach(content => content.classList.remove('active'));
+
+    // Remove active class from all PM tab buttons
+    const pmTabButtons = document.querySelectorAll('#pm-form .tab-button');
+    pmTabButtons.forEach(button => button.classList.remove('active'));
+
+    // Show selected PM tab content
+    document.getElementById(tabName).classList.add('active');
+
+    // Add active class to clicked button
+    event.target.classList.add('active');
+}
+</script>
 
     <!-- Include the shared JavaScript module -->
     <script src="onboarding.js"></script>
