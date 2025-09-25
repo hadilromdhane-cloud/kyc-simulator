@@ -356,7 +356,7 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="formeJuridique">Forme juridique <span class="required">*</span></label>
-                            <select id="formeJuridique" name="formeJuridique" required>
+                            <select id="formeJuridique" name="legal_form" required>
                                 <option value="">-- Sélectionner --</option>
                                 <option value="SARL">SARL - Société à Responsabilité Limitée</option>
                                 <option value="SA">SA - Société Anonyme</option>
@@ -367,8 +367,14 @@
                                 <option value="SCS">SCS - Société en Commandite Simple</option>
                                 <option value="SCA">SCA - Société en Commandite par Actions</option>
                                 <option value="Association">Association</option>
-                                <option value="Coopérative">Coopérative</option>
-                                <option value="Autre">Autre</option>
+                                <option value="Partnership">Société en Participation</option>
+                                <option value="Cooperative">Société Coopérative</option>
+                                <option value="Sole Proprietorship">Entreprise Individuelle</option>
+                                <option value="Civil Company">Société Civile</option>
+                                <option value="Economic Interest Group (EIG)">GIE (Groupement d'Intérêt Économique)</option>
+                                <option value="Financial Participation Company (SPF)">Société de Participation Financière (SPF)</option>
+                                <option value="Publicly Traded Company">Entreprise à Capital Public</option>
+                                <option value="Non-Profit Organization (NPO)">OBNL (Organisme à But Non Lucratif)</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -384,7 +390,7 @@
                         </div>
                         <div class="form-group">
                             <label for="paysImmatriculation">Pays d'immatriculation <span class="required">*</span></label>
-                            <select id="paysImmatriculation" name="paysImmatriculation" required>
+                            <select id="paysImmatriculation" name="country" required>
                                 <!-- Options will be populated by JavaScript -->
                             </select>
                         </div>
@@ -400,7 +406,7 @@
                         </div>
                         <div class="form-group">
                             <label for="secteurActivite">Secteur d'activité <span class="required">*</span></label>
-                            <select id="secteurActivite" name="secteurActivite" required>
+                            <select id="secteurActivite" name="activity" required>
                                 <option value="">-- Sélectionner --</option>
                                 <option value="Agriculture">Agriculture, sylviculture et pêche</option>
                                 <option value="Industries">Industries extractives</option>
@@ -451,7 +457,7 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="paysSiege">Pays du siège social <span class="required">*</span></label>
-                            <select id="paysSiege" name="paysSiege" required>
+                            <select id="paysSiege" name="PaysDeResidence" required>
                                 <!-- Options will be populated by JavaScript -->
                             </select>
                         </div>
@@ -498,7 +504,7 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="canalDistribution">Canal de distribution <span class="required">*</span></label>
-                            <select id="canalDistribution" name="canalDistribution" required>
+                            <select id="canalDistribution" name="canal_de_distribution" required>
                                 <option value="">-- Sélectionner --</option>
                                 <option value="online">En ligne</option>
                                 <option value="inagency">En personne (vente directe)</option>
@@ -506,7 +512,7 @@
                         </div>
                         <div class="form-group">
                             <label for="produitsCibles">Produits/Services cibles <span class="required">*</span></label>
-                            <select id="produitsCibles" name="produitsCibles" required>
+                            <select id="produitsCibles" name="produit" required>
                                 <option value="">-- Sélectionner --</option>
                                 <option value="currentAccount">Compte Courant Professionnel</option>
                                 <option value="businessLoan">Crédit Professionnel</option>
@@ -523,7 +529,7 @@
                     <div class="form-row full-width">
                         <div class="form-group">
                             <label for="origineFondsPM">Origine des fonds <span class="required">*</span></label>
-                            <select id="origineFondsPM" name="origineFondsPM" required>
+                            <select id="origineFondsPM" name="origine_des_fonds" required>
                                 <option value="">-- Sélectionner --</option>
                                 <option value="businessRevenue">Revenus d'Activité</option>
                                 <option value="capitalContribution">Apport en Capital</option>
