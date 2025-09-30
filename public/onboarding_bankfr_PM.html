@@ -840,8 +840,8 @@
             initializeCountryDropdowns();
             
             // Generate and display customer ID
-            const customerId = generateCustomerId();
-            document.getElementById('customerId').textContent = customerId;
+            //const customerId = generateCustomerId();
+            //document.getElementById('customerId').textContent = customerId;
             
             // Initialize form submission handler
             handleFormSubmission();
@@ -894,5 +894,13 @@
             });
         });
     </script>
+    <!-- Include the PM JavaScript module -->
+<script src="onboarding_bankfr_PM.js"></script>
+<script>
+    // Initialize the PM onboarding handler when the page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        PMOnboardingHandler.init('pmOnboardingForm', 'bankfr');
+    });
+</script>
 </body>
 </html>
