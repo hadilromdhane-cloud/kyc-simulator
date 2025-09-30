@@ -599,44 +599,24 @@ const PMOnboardingHandler = (function() {
             Utils.log('Customer ID from URL:', customerId);
             
             if (customerId) {
+                // Try to load the screening data with this exact customer ID
                 const screeningData = localStorage.getItem(`screeningData_${customerId}`);
+                
                 if (screeningData) {
                     try {
                         customerData = JSON.parse(screeningData);
-                        // Ensure customerId is preserved from URL
-                        if (!customerData.customerId) {
-                            customerData.customerId = customerId;
-                        }
-                        Utils.log('Loaded PM screening data', customerData);
+                        Utils.log('Loaded screening data with customerId:', customerData.customerId);
                     } catch (error) {
-                        Utils.logError('Error parsing PM screening data', error);
-                        customerData = {
-                            customerId: customerId,
-                            source: 'Manual Entry',
-                            tenant: tenantName,
-                            entityType: 'PM'
-                        };
+                        Utils.logError('Error parsing screening data', error);
                     }
                 } else {
-                    Utils.log('No screening data found, using customerId from URL', customerId);
-                    customerData = {
-                        customerId: customerId,
-                        source: 'Manual Entry',
-                        tenant: tenantName,
-                        entityType: 'PM'
-                    };
+                    Utils.logError('No screening data found for customerId:', customerId);
                 }
-            } else {
-                customerData = {
-                    customerId: Utils.generateCustomerId(),
-                    source: 'Manual Entry',
-                    tenant: tenantName,
-                    entityType: 'PM'
-                };
             }
-
-            Utils.log('Final PM customer data', customerData);
-            Utils.log('Final customerId', customerData.customerId);
+            
+            if (!customerData || !customerData.customerId) {
+                Utils.logError('CRITICAL: No valid customer data found!');
+            }
         },
 
         updateCustomerInfo: function() {
