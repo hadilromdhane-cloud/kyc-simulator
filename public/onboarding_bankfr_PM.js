@@ -28,9 +28,11 @@ const PMOnboardingHandler = (function() {
             return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
         },
 
-        generateCustomerId: function() {
-            return 'PM-' + Math.floor(Math.random() * 10000);
-        },
+        ggenerateCustomerId: function() {
+    // This should never be called in production
+    Utils.logError('WARNING: generateCustomerId called - this should not happen');
+    return null;
+},
 
         formatDate: function(date) {
             return date ? date : new Date().toISOString();
@@ -595,62 +597,38 @@ const PMOnboardingHandler = (function() {
     // Main functions
     const Core = {
         loadCustomerData: function() {
-            const customerId = Utils.getUrlParameter('customerId');
-            Utils.log('Customer ID from URL:', customerId);
-            
-            if (customerId) {
-                // Try to load the screening data with this exact customer ID
-                const screeningData = localStorage.getItem(`screeningData_${customerId}`);
-                
-                if (screeningData) {
-                    try {
-                        customerData = JSON.parse(screeningData);
-                        Utils.log('Loaded screening data with customerId:', customerData.customerId);
-                    } catch (error) {
-                        Utils.logError('Error parsing screening data', error);
-                    }
-                } else {
-                    Utils.logError('No screening data found for customerId:', customerId);
-                }
-            }
-            
-            if (!customerData || !customerData.customerId) {
-                Utils.logError('CRITICAL: No valid customer data found!');
-            }
-        },
+    const customerId = Utils.getUrlParameter('customerId');
+    Utils.log('Customer ID from URL:', customerId);
+    
+    if (!customerId) {
+        Utils.logError('CRITICAL: No customerId found in URL');
+        alert('Error: No customer ID provided. Please start from the screening process.');
+        window.location.href = 'index.html';
+        return;
+    }
+    
+    const screeningData = localStorage.getItem(`screeningData_${customerId}`);
+    if (screeningData) {
+        try {
+            customerData = JSON.parse(screeningData);
+            customerData.customerId = customerId;
+            Utils.log('Loaded PM screening data', customerData);
+        } catch (error) {
+            Utils.logError('Error parsing PM screening data', error);
+            alert('Error: Could not load customer data. Please restart the screening process.');
+            window.location.href = 'index.html';
+            return;
+        }
+    } else {
+        Utils.logError('No screening data found for customerId:', customerId);
+        alert('Error: No screening data found. Please complete the screening process first.');
+        window.location.href = 'index.html';
+        return;
+    }
 
-        updateCustomerInfo: function() {
-            // Update multiple possible customer ID display locations
-            const customerIdElements = [
-                document.getElementById('customerId'),
-                document.getElementById('entityId'),
-                document.querySelector('[data-customer-id]'),
-                document.querySelector('.customer-id-display')
-            ];
-            
-            customerIdElements.forEach(element => {
-                if (element) {
-                    element.textContent = customerData.customerId;
-                    Utils.log('Updated customer ID display', element.id || element.className);
-                }
-            });
-
-            // Update hidden input fields
-            const hiddenIdInputs = document.querySelectorAll('input[name="customerId"], input[name="entityId"]');
-            hiddenIdInputs.forEach(input => {
-                input.value = customerData.customerId;
-            });
-
-            // Update page title
-            const pageTitle = document.querySelector('h1, .page-title, .header h2');
-            if (pageTitle && !pageTitle.dataset.idUpdated) {
-                const currentText = pageTitle.textContent;
-                if (!currentText.includes(customerData.customerId)) {
-                    pageTitle.textContent = `${currentText} - ID: ${customerData.customerId}`;
-                    pageTitle.dataset.idUpdated = 'true';
-                }
-            }
-        },
+    Utils.log('Final PM customer data', customerData);
+    Utils.log('Final customerId', customerData.customerId);
+},
 
         prePopulateForm: function() {
             console.log('PM prePopulateForm called with customerData:', customerData);
