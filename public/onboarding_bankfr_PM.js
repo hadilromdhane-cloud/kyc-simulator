@@ -596,35 +596,79 @@ const PMOnboardingHandler = (function() {
     const Core = {
         loadCustomerData: function() {
             const customerId = Utils.getUrlParameter('customerId');
+            Utils.log('Customer ID from URL:', customerId);
             
             if (customerId) {
                 const screeningData = localStorage.getItem(`screeningData_${customerId}`);
                 if (screeningData) {
                     try {
                         customerData = JSON.parse(screeningData);
+                        // Ensure customerId is preserved from URL
+                        if (!customerData.customerId) {
+                            customerData.customerId = customerId;
+                        }
                         Utils.log('Loaded PM screening data', customerData);
                     } catch (error) {
                         Utils.logError('Error parsing PM screening data', error);
+                        customerData = {
+                            customerId: customerId,
+                            source: 'Manual Entry',
+                            tenant: tenantName,
+                            entityType: 'PM'
+                        };
                     }
+                } else {
+                    Utils.log('No screening data found, using customerId from URL', customerId);
+                    customerData = {
+                        customerId: customerId,
+                        source: 'Manual Entry',
+                        tenant: tenantName,
+                        entityType: 'PM'
+                    };
                 }
-            }
-            
-            if (!customerData) {
+            } else {
                 customerData = {
-                    customerId: customerId || Utils.generateCustomerId(),
+                    customerId: Utils.generateCustomerId(),
                     source: 'Manual Entry',
                     tenant: tenantName,
                     entityType: 'PM'
                 };
             }
 
-            Utils.log('Loaded PM customer data', customerData);
+            Utils.log('Final PM customer data', customerData);
+            Utils.log('Final customerId', customerData.customerId);
         },
 
         updateCustomerInfo: function() {
-            const customerIdElement = document.getElementById('customerId');
-            if (customerIdElement) {
-                customerIdElement.textContent = customerData.customerId;
+            // Update multiple possible customer ID display locations
+            const customerIdElements = [
+                document.getElementById('customerId'),
+                document.getElementById('entityId'),
+                document.querySelector('[data-customer-id]'),
+                document.querySelector('.customer-id-display')
+            ];
+            
+            customerIdElements.forEach(element => {
+                if (element) {
+                    element.textContent = customerData.customerId;
+                    Utils.log('Updated customer ID display', element.id || element.className);
+                }
+            });
+
+            // Update hidden input fields
+            const hiddenIdInputs = document.querySelectorAll('input[name="customerId"], input[name="entityId"]');
+            hiddenIdInputs.forEach(input => {
+                input.value = customerData.customerId;
+            });
+
+            // Update page title
+            const pageTitle = document.querySelector('h1, .page-title, .header h2');
+            if (pageTitle && !pageTitle.dataset.idUpdated) {
+                const currentText = pageTitle.textContent;
+                if (!currentText.includes(customerData.customerId)) {
+                    pageTitle.textContent = `${currentText} - ID: ${customerData.customerId}`;
+                    pageTitle.dataset.idUpdated = 'true';
+                }
             }
         },
 
@@ -844,29 +888,42 @@ const PMOnboardingHandler = (function() {
 
     // Public API
     return {
-        init: function(formElementId, tenant) {
-            
-            formId = formElementId;
-            tenantName = tenant || CONFIG.DEFAULT_TENANT;
-            currentForm = document.getElementById(formId);
-            
-            if (!currentForm) {
-                Utils.logError('PM Form not found', formId);
-                return;
-            }
+            init: function(formElementId, tenant) {
+                Utils.log('=== PM Onboarding Handler Initialization ===');
+                
+                formId = formElementId;
+                tenantName = tenant || CONFIG.DEFAULT_TENANT;
+                currentForm = document.getElementById(formId);
+                
+                if (!currentForm) {
+                    Utils.logError('PM Form not found', formId);
+                    alert('Erreur: Le formulaire PM est introuvable. ID: ' + formId);
+                    return;
+                }
 
-            // Initialize the PM handler
-            Core.loadCustomerData();
-            Core.updateCustomerInfo();
-            Core.prePopulateForm();
-            Core.setupAutoSave();
+                Utils.log('Form element found', formId);
+                Utils.log('Step 1: Loading customer data...');
+                Core.loadCustomerData();
+                
+                Utils.log('Step 2: Updating customer info display...');
+                Core.updateCustomerInfo();
+                
+                Utils.log('Step 3: Pre-populating form fields...');
+                Core.prePopulateForm();
+                
+                Utils.log('Step 4: Setting up auto-save...');
+                Core.setupAutoSave();
 
-            // Attach form submission handler
-            currentForm.addEventListener('submit', Core.handleFormSubmission);
+                Utils.log('Step 5: Attaching form submission handler...');
+                currentForm.addEventListener('submit', Core.handleFormSubmission);
 
-            Utils.log('PMOnboardingHandler initialized successfully');
-        },
-
+                Utils.log('=== PMOnboardingHandler initialized successfully ===');
+                Utils.log('Customer ID:', customerData.customerId);
+                Utils.log('Tenant:', tenantName);
+                
+                console.info('%c✓ PM Onboarding Ready', 'color: green; font-weight: bold; font-size: 14px;');
+                console.info('Customer ID:', customerData.customerId);
+            },
         // Utility methods that can be used by external code
         getCustomerData: function() {
             return customerData;
