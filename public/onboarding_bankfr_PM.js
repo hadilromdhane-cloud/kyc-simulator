@@ -28,7 +28,7 @@ const PMOnboardingHandler = (function() {
             return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
         },
 
-        ggenerateCustomerId: function() {
+        generateCustomerId: function() {
     // This should never be called in production
     Utils.logError('WARNING: generateCustomerId called - this should not happen');
     return null;
@@ -76,9 +76,20 @@ const PMOnboardingHandler = (function() {
 
     // Data mapping functions for PM entities
     const DataMapper = {
-        mapFormDataToPayload: function(formData) {
-            const customerId = parseInt(customerData.customerId.replace('PM-', '')) || Utils.generateCustomerId();
-            const currentDateTime = new Date().toISOString();
+            mapFormDataToPayload: function(formData) {
+                    if (!customerData || !customerData.customerId) {
+                        throw new Error('No customer data available. Cannot proceed with onboarding.');
+                    }
+                    
+                    const customerId = parseInt(customerData.customerId || customerData.customer_id);
+                    
+                    if (!customerId) {
+                        throw new Error('Invalid customer ID. Cannot proceed with onboarding.');
+                    }
+                    
+                    Utils.log('Using customerId for payload', customerId);
+                    
+                    const currentDateTime = new Date().toISOString();
 
             // Using the exact structure from your real PM payload example
             return {
@@ -629,6 +640,39 @@ const PMOnboardingHandler = (function() {
     Utils.log('Final PM customer data', customerData);
     Utils.log('Final customerId', customerData.customerId);
 },
+updateCustomerInfo: function() {
+    const customerIdElements = [
+        document.getElementById('customerId'),
+        document.getElementById('entityId'),
+        document.querySelector('[data-customer-id]'),
+        document.querySelector('.customer-id-display')
+    ];
+    
+    customerIdElements.forEach(element => {
+        if (element) {
+            element.textContent = customerData.customerId;
+            Utils.log('Updated customer ID display', element.id || element.className);
+        }
+    });
+
+    const hiddenIdInputs = document.querySelectorAll('input[name="customerId"], input[name="entityId"]');
+    hiddenIdInputs.forEach(input => {
+        input.value = customerData.customerId;
+    });
+
+    const pageTitle = document.querySelector('h1, .page-title, .header h2');
+    if (pageTitle && !pageTitle.dataset.idUpdated) {
+        const currentText = pageTitle.textContent;
+        if (!currentText.includes(customerData.customerId)) {
+            pageTitle.textContent = `${currentText} - ID: ${customerData.customerId}`;
+            pageTitle.dataset.idUpdated = 'true';
+        }
+    }
+},
+
+
+
+
 
         prePopulateForm: function() {
             console.log('PM prePopulateForm called with customerData:', customerData);
