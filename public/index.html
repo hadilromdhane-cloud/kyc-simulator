@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Web Service Simulator</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
@@ -12,99 +13,114 @@
     <h1>Web Service Simulator</h1>
   </header>
 
-  <div class="container">
-    <!-- Authentication Column -->
-    <section id="authSimulator">
-      <h2>Authentication</h2>
-      <label for="tenantName">Tenant Name:</label>
-      <select id="tenantName">
-        <option value="">Select Tenant</option>
-        <option value="banque_en">banque_en</option>
-        <option value="bankfr">bankfr</option>
-        <option value="assurance_fr">assurance_fr</option>
-        <option value="insurance_fr">insurance_fr</option>
-        <option value="en_bank">en_bank</option>
-        <option value="fr_bank">fr_bank</option>
-        <option value="en_insurance">en_insurance</option>
-        <option value="fr_insurance">fr_insurance</option>
-        <option value="pssandbox">pssandbox</option>
-      </select>
-
-      <label for="username">Username:</label>
-      <input type="text" id="username" placeholder="Enter username" />
-
-      <label for="password">Password:</label>
-      <input type="password" id="password" placeholder="Enter password" />
-
-      <button id="authBtn">Authenticate</button>
-    </section>
-
-    <!-- Onboarding Simulation Column -->
-    <section id="onboardingSimulator">
-      <h2>Onboarding Simulation</h2>
-
-      <div class="tabs">
-        <button class="tabBtn active" data-tab="decentralized">Decentralized Process</button>
-        <button class="tabBtn" data-tab="centralized">Centralized Process</button>
-      </div>
-
-      <div class="tabContent" id="decentralized">
-        <h3>Decentralized Onboarding</h3>
-
-        <label for="entityTypeDecentralized"><b>Entity Type:</b></label>
-        <select id="entityTypeDecentralized">
-          <option value="">Select Entity Type</option>
-          <option value="PP">Physical Person (PP)</option>
-          <option value="PM">Legal Person (PM)</option>
+  <div class="main-layout">
+    <!-- Authentication Sidebar -->
+    <aside id="authSidebar" class="auth-sidebar">
+      <button class="toggle-sidebar-btn" id="toggleSidebar" aria-label="Toggle Sidebar">
+        <span class="toggle-icon">☰</span>
+      </button>
+      
+      <div class="sidebar-content">
+        <h2>Authentication</h2>
+        
+        <label for="tenantName">Tenant Name:</label>
+        <select id="tenantName">
+          <option value="">Select Tenant</option>
+          <option value="banque_en">banque_en</option>
+          <option value="bankfr">bankfr</option>
+          <option value="assurance_fr">assurance_fr</option>
+          <option value="insurance_fr">insurance_fr</option>
+          <option value="en_bank">en_bank</option>
+          <option value="fr_bank">fr_bank</option>
+          <option value="en_insurance">en_insurance</option>
+          <option value="fr_insurance">fr_insurance</option>
+          <option value="pssandbox">pssandbox</option>
         </select>
 
-        <div id="decentralizedFields"></div>
-        <button id="submitDecentralized">Simulate</button>
-        <pre id="responseDecentralized"></pre>
-      </div>
+        <label for="username">Username:</label>
+        <input type="text" id="username" placeholder="Enter username" />
 
-      <div class="tabContent" id="centralized" style="display:none">
-        <h3>Centralized Onboarding</h3>
-        <div class="subTabs">
-          <button class="subTabBtn active" data-subtab="sync">Synchronous</button>
-          <button class="subTabBtn" data-subtab="async">Asynchronous</button>
+        <label for="password">Password:</label>
+        <input type="password" id="password" placeholder="Enter password" />
+
+        <button id="authBtn">Authenticate</button>
+        
+        <div class="auth-status" id="authStatus">
+          <span class="status-indicator"></span>
+          <span class="status-text">Not Connected</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <section id="onboardingSimulator">
+        <h2>Onboarding Simulation</h2>
+
+        <div class="tabs">
+          <button class="tabBtn active" data-tab="decentralized">Decentralized Process</button>
+          <button class="tabBtn" data-tab="centralized">Centralized Process</button>
         </div>
 
-        <div class="subTabContent" id="sync">
-          <label for="entityTypeSync"><b>Entity Type:</b></label>
-          <select id="entityTypeSync">
+        <div class="tabContent" id="decentralized">
+          <h3>Decentralized Onboarding</h3>
+
+          <label for="entityTypeDecentralized"><b>Entity Type:</b></label>
+          <select id="entityTypeDecentralized">
             <option value="">Select Entity Type</option>
             <option value="PP">Physical Person (PP)</option>
             <option value="PM">Legal Person (PM)</option>
           </select>
 
-          <div id="syncFields"></div>
-          <button id="submitSync">Simulate</button>
-          <pre id="responseSync"></pre>
+          <div id="decentralizedFields"></div>
+          <button id="submitDecentralized">Simulate</button>
+          <pre id="responseDecentralized"></pre>
         </div>
 
-        <div class="subTabContent" id="async" style="display:none">
-          <label for="entityTypeAsync"><b>Entity Type:</b></label>
-          <select id="entityTypeAsync">
-            <option value="">Select Entity Type</option>
-            <option value="PP">Physical Person (PP)</option>
-            <option value="PM">Legal Person (PM)</option>
-          </select>
+        <div class="tabContent" id="centralized" style="display:none">
+          <h3>Centralized Onboarding</h3>
+          <div class="subTabs">
+            <button class="subTabBtn active" data-subtab="sync">Synchronous</button>
+            <button class="subTabBtn" data-subtab="async">Asynchronous</button>
+          </div>
 
-          <div id="asyncFields"></div>
-          <button id="submitAsync">Simulate</button>
-          <pre id="responseAsync"></pre>
+          <div class="subTabContent" id="sync">
+            <label for="entityTypeSync"><b>Entity Type:</b></label>
+            <select id="entityTypeSync">
+              <option value="">Select Entity Type</option>
+              <option value="PP">Physical Person (PP)</option>
+              <option value="PM">Legal Person (PM)</option>
+            </select>
+
+            <div id="syncFields"></div>
+            <button id="submitSync">Simulate</button>
+            <pre id="responseSync"></pre>
+          </div>
+
+          <div class="subTabContent" id="async" style="display:none">
+            <label for="entityTypeAsync"><b>Entity Type:</b></label>
+            <select id="entityTypeAsync">
+              <option value="">Select Entity Type</option>
+              <option value="PP">Physical Person (PP)</option>
+              <option value="PM">Legal Person (PM)</option>
+            </select>
+
+            <div id="asyncFields"></div>
+            <button id="submitAsync">Simulate</button>
+            <pre id="responseAsync"></pre>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </main>
   </div>
-<div id="popup" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+
+  <div id="popup" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
     background:white; padding:30px; border-radius:10px; box-shadow:0 5px 25px rgba(0,0,0,0.4);
     z-index:1000; min-width:400px; max-width:600px;">
-  <p id="popupText" style="font-size:1.1rem; margin-bottom:15px;"></p>
-  <input type="text" id="popupLink" readonly style="width:100%; padding:8px; font-size:1rem; margin-bottom:15px; display:none;"/>
-  <button id="closePopup" style="padding:8px 15px; font-size:1rem;">Close</button>
-</div>
+    <p id="popupText" style="font-size:1.1rem; margin-bottom:15px;"></p>
+    <input type="text" id="popupLink" readonly style="width:100%; padding:8px; font-size:1rem; margin-bottom:15px; display:none;"/>
+    <button id="closePopup" style="padding:8px 15px; font-size:1rem;">Close</button>
+  </div>
 
   <script src="index.js"></script>
 </body>
