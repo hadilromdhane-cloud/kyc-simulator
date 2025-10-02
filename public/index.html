@@ -106,8 +106,13 @@
     </main>
   </div>
 
-<div id="popup" style="display:none;"></div>
-
+  <div id="popup" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+    background:white; padding:30px; border-radius:10px; box-shadow:0 5px 25px rgba(0,0,0,0.4);
+    z-index:1000; min-width:400px; max-width:600px;">
+    <p id="popupText" style="font-size:1.1rem; margin-bottom:15px;"></p>
+    <input type="text" id="popupLink" readonly style="width:100%; padding:8px; font-size:1rem; margin-bottom:15px; display:none;"/>
+    <button id="closePopup" style="padding:8px 15px; font-size:1rem;">Close</button>
+  </div>
 
   <script src="index.js"></script>
 </body>
