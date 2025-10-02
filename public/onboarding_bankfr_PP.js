@@ -15,7 +15,7 @@ const OnboardingHandler = (function() {
     // Configuration
     const CONFIG = {
         API_BASE_URL: 'https://greataml.com/kyc-web-restful',
-        ONBOARDING_ENDPOINT: '/onboarding/onboard',
+        ONBOARDING_ENDPOINT: '/onboarding/v1/onboardCustomer',
         DEFAULT_TENANT: 'bankfr'
     };
 
