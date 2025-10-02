@@ -527,7 +527,7 @@ const OnboardingHandler = (function() {
                 </div>
             ` : ''}
             
-            <p class="status-text">${isBlocking ? '✗' : '✓'} ${statusMessage}${isHighRisk ? ' - Not Approved' : ''}</p>
+            <p class="status-text">${isBlocking ? '✗' : '✓'} ${statusMessage}${isHighRisk ? '' : ''}</p>
             
             ${additionalInfo}
             
