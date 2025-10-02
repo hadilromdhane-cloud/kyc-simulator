@@ -1103,9 +1103,9 @@ function showScreeningResultsPopup(event) {
   const content = document.createElement('div');
   content.style.cssText = 'padding: 20px; color: #333; line-height: 1.6; font-size: 0.95rem;';
   
-  let contentHTML = `<div style="margin-bottom: 15px;"><strong>🏦 Tenant:</strong> ${currentTenant}</div>`;
+  let contentHTML = `<div style="margin-bottom: 15px;"><strong>Tenant:</strong> ${currentTenant}</div>`;
   contentHTML += `<div style="margin-bottom: 15px;"><strong>Customer:</strong> ${event.customerId}</div>`;
-  contentHTML += `<div style="margin-bottom: 15px;"><strong>🔍 Risk Assessment:</strong></div>`;
+  contentHTML += `<div style="margin-bottom: 15px;"><strong>Processing Results:</strong></div>`;
   contentHTML += `<div style="margin-left: 20px; margin-bottom: 10px;">`;
   contentHTML += `• <strong>PEP Status:</strong> ${event.isPEP ? '<span style="color: #ffc107;">⚠️ YES</span>' : '<span style="color: #28a745;">✅ NO</span>'} (${event.pepDecision || 'N/A'})<br>`;
   contentHTML += `• <strong>Sanctions:</strong> ${event.isSanctioned ? '<span style="color: #dc3545;">🚨 YES</span>' : '<span style="color: #28a745;">✅ NO</span>'} (${event.sanctionDecision || 'N/A'})<br>`;
