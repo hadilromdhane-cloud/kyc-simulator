@@ -1130,6 +1130,7 @@ function showPopup(message, link = '') {
 function showScreeningResponsePopup(message, link = null, showContinueButton = false, customerData = null, apiResponse = null) {
   const popup = document.getElementById('popup');
   popup.innerHTML = '';
+  popup.removeAttribute('style'); // Nettoyer tous les anciens styles
   
   popup.style.cssText = `
     display: block;
