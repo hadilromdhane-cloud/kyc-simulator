@@ -1126,76 +1126,6 @@ function showPopup(message, link = '') {
 }
 
 
-// NEW: Screening Response Popup - Option 1 Style
-function showScreeningResponsePopup(message, link = null, showContinueButton = false, customerData = null, apiResponse = null) {
-  const popup = document.getElementById('popup');
-  popup.innerHTML = '';
-  popup.removeAttribute('style'); // Nettoyer tous les anciens styles
-  
-  popup.style.cssText = `
-    display: block;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: white;
-    padding: 0;
-    border-radius: 10px;
-    box-shadow: 0 5px 25px rgba(0,0,0,0.4);
-    z-index: 1000;
-    min-width: 500px;
-    max-width: 600px;
-    border: 2px solid #007ACC;
-    border-left: 6px solid #007ACC;
-  `;
-  
-  const header = document.createElement('div');
-  header.style.cssText = 'display: flex; align-items: center; gap: 12px; padding: 20px; border-bottom: 1px solid #e0e0e0;';
-  header.innerHTML = '<span style="font-size: 2rem;">🔍</span><h3 style="color: #007ACC; font-size: 1.2rem; font-weight: 600; margin: 0;">Reis KYC Screening Response</h3>';
-  
-  const content = document.createElement('div');
-  content.style.cssText = 'padding: 20px; color: #333; line-height: 1.6; font-size: 0.95rem;';
-  content.textContent = message;
-  
-  if (link) {
-    const linkElement = document.createElement('a');
-    linkElement.href = link;
-    linkElement.target = '_blank';
-    linkElement.textContent = link;
-    linkElement.style.cssText = 'color: #007ACC; text-decoration: underline; display: block; margin-top: 10px; word-break: break-all;';
-    content.appendChild(linkElement);
-  }
-  
-  const buttonsContainer = document.createElement('div');
-  buttonsContainer.style.cssText = 'padding: 20px; display: flex; gap: 10px; justify-content: flex-end; border-top: 1px solid #e0e0e0;';
-  
-  if (showContinueButton && customerData && apiResponse) {
-    const continueBtn = document.createElement('button');
-    continueBtn.textContent = 'Continue Onboarding';
-    continueBtn.style.cssText = 'padding: 10px 20px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: 600;';
-    continueBtn.onclick = () => {
-      const customerId = apiResponse.customerId || apiResponse.customer_id || apiResponse.id;
-      if (!customerId) {
-        showNotification('Error: Customer ID not found', 'error');
-        return;
-      }
-      navigateToOnboarding(customerId);
-      popup.style.display = 'none';
-    };
-    buttonsContainer.appendChild(continueBtn);
-  }
-  
-  const closeBtn = document.createElement('button');
-  closeBtn.textContent = 'Close';
-  closeBtn.style.cssText = 'padding: 10px 20px; background-color: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: 600;';
-  closeBtn.onclick = () => popup.style.display = 'none';
-  buttonsContainer.appendChild(closeBtn);
-  
-  popup.appendChild(header);
-  popup.appendChild(content);
-  popup.appendChild(buttonsContainer);
-}
-
 function showNoHitsPopup(customerData, apiResponse) {
   const popup = document.getElementById('popup');
   const popupText = document.getElementById('popupText');
@@ -1401,6 +1331,99 @@ function showScreeningResultsPopup(event) {
   }
 
   popup.style.display = 'block';
+}
+
+
+// NEW: Screening Response Popup - Option 1 Style
+function showScreeningResponsePopup(message, link = null, showContinueButton = false, customerData = null, apiResponse = null) {
+  const popup = document.getElementById('popup');
+  popup.innerHTML = '';
+  
+  popup.style.cssText = `
+    display: block;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 0;
+    border-radius: 10px;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.4);
+    z-index: 1000;
+    min-width: 500px;
+    max-width: 600px;
+    border: 2px solid #007ACC;
+    border-left: 6px solid #007ACC;
+  `;
+  
+  const header = document.createElement('div');
+  header.style.cssText = 'display: flex; align-items: center; gap: 12px; padding: 20px; border-bottom: 1px solid #e0e0e0;';
+  header.innerHTML = '<span style="font-size: 2rem;">🔍</span><h3 style="color: #007ACC; font-size: 1.2rem; font-weight: 600; margin: 0;">Reis KYC Screening Response</h3>';
+  
+  const content = document.createElement('div');
+  content.style.cssText = 'padding: 20px; color: #333; line-height: 1.6; font-size: 0.95rem;';
+  content.textContent = message;
+  
+  if (link) {
+    const linkElement = document.createElement('a');
+    linkElement.href = link;
+    linkElement.target = '_blank';
+    linkElement.textContent = link;
+    linkElement.style.cssText = 'color: #007ACC; text-decoration: underline; display: block; margin-top: 10px; word-break: break-all;';
+    content.appendChild(linkElement);
+  }
+  
+  const buttonsContainer = document.createElement('div');
+  buttonsContainer.style.cssText = 'padding: 20px; display: flex; gap: 10px; justify-content: flex-end; border-top: 1px solid #e0e0e0;';
+  
+  if (showContinueButton && customerData && apiResponse) {
+    const continueBtn = document.createElement('button');
+    continueBtn.textContent = 'Continue Onboarding';
+    continueBtn.style.cssText = 'padding: 10px 20px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: 600;';
+    continueBtn.onclick = () => {
+  const customerId = apiResponse.customerId || apiResponse.customer_id || apiResponse.id;
+  if (!customerId) {
+    showNotification('Error: Customer ID not found', 'error');
+    return;
+  }
+  
+  // Store customer data before navigating
+  localStorage.setItem(`screeningData_${customerId}`, JSON.stringify({
+    customerId: customerId,
+    firstName: customerData.firstName,
+    lastName: customerData.lastName,
+    birthDate: customerData.birthDate,
+    nationality: customerData.nationality,
+    citizenship: customerData.citizenship,
+    systemId: customerData.systemId,
+    systemName: customerData.systemName,
+    searchQueryId: apiResponse.search_query_id,
+    screeningResult: apiResponse.maxScore > 0 ? 'HITS_FOUND' : 'NO_HITS',
+    maxScore: apiResponse.maxScore || 0,
+    timestamp: new Date().toISOString(),
+    tenant: 'bankfr',
+    isScreeningDataLocked: true
+  }));
+  
+  navigateToOnboarding(customerId);
+  popup.style.display = 'none';
+};
+
+
+
+
+    buttonsContainer.appendChild(continueBtn);
+  }
+  
+  const closeBtn = document.createElement('button');
+  closeBtn.textContent = 'Close';
+  closeBtn.style.cssText = 'padding: 10px 20px; background-color: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: 600;';
+  closeBtn.onclick = () => popup.style.display = 'none';
+  buttonsContainer.appendChild(closeBtn);
+  
+  popup.appendChild(header);
+  popup.appendChild(content);
+  popup.appendChild(buttonsContainer);
 }
 
 function resetPopup() {
