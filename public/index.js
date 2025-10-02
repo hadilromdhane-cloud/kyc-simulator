@@ -1688,4 +1688,33 @@ window.addEventListener('beforeunload', function() {
 window.closeNotificationHistory = closeNotificationHistory;
 window.continueOnboardingFromHistory = continueOnboardingFromHistory;
 window.getCountriesForTenant = getCountriesForTenant;
- 
+ // Resize functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const resizeHandle = document.getElementById('resizeHandle');
+  const authSidebar = document.getElementById('authSidebar');
+  let isResizing = false;
+
+  resizeHandle.addEventListener('mousedown', function(e) {
+    isResizing = true;
+    document.body.classList.add('resizing');
+    e.preventDefault();
+  });
+
+  document.addEventListener('mousemove', function(e) {
+    if (!isResizing) return;
+
+    const newWidth = e.clientX;
+    
+    // Limites min et max
+    if (newWidth >= 200 && newWidth <= 600) {
+      authSidebar.style.width = newWidth + 'px';
+    }
+  });
+
+  document.addEventListener('mouseup', function() {
+    if (isResizing) {
+      isResizing = false;
+      document.body.classList.remove('resizing');
+    }
+  });
+});

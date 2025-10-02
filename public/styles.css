@@ -314,3 +314,43 @@ button:hover {
     padding: 20px;
   }
 }
+
+
+/* Resize Handle */
+.resize-handle {
+  position: absolute;
+  top: 0;
+  right: -5px;
+  width: 10px;
+  height: 100%;
+  cursor: col-resize;
+  background: transparent;
+  z-index: 1000;
+  transition: background 0.2s;
+}
+
+.resize-handle:hover {
+  background: rgba(0, 122, 204, 0.3);
+}
+
+.resize-handle:active {
+  background: rgba(0, 122, 204, 0.5);
+}
+
+.auth-sidebar {
+  width: 280px;
+  min-width: 200px; /* Largeur minimale */
+  max-width: 600px; /* Largeur maximale */
+  background: white;
+  border-right: 2px solid #007ACC;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.08);
+  transition: none; /* Enlever la transition pour le resize manuel */
+  position: relative;
+  overflow: hidden;
+}
+
+/* Cursor pour toute la page pendant le drag */
+body.resizing {
+  cursor: col-resize;
+  user-select: none;
+}
