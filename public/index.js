@@ -1337,8 +1337,17 @@ function showScreeningResultsPopup(event) {
 // NEW: Screening Response Popup - Option 1 Style
 function showScreeningResponsePopup(message, link = null, showContinueButton = false, customerData = null, apiResponse = null) {
   const popup = document.getElementById('popup');
-  popup.innerHTML = '';
   
+  // Hide all original popup elements
+  const popupText = document.getElementById('popupText');
+  const popupLink = document.getElementById('popupLink');
+  const closePopupBtn = document.getElementById('closePopup');
+  if (popupText) popupText.style.display = 'none';
+  if (popupLink) popupLink.style.display = 'none';
+  if (closePopupBtn) closePopupBtn.style.display = 'none';
+  
+  // Clear and reset popup
+  popup.innerHTML = '';
   popup.style.cssText = `
     display: block;
     position: fixed;
@@ -1381,37 +1390,33 @@ function showScreeningResponsePopup(message, link = null, showContinueButton = f
     continueBtn.textContent = 'Continue Onboarding';
     continueBtn.style.cssText = 'padding: 10px 20px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: 600;';
     continueBtn.onclick = () => {
-  const customerId = apiResponse.customerId || apiResponse.customer_id || apiResponse.id;
-  if (!customerId) {
-    showNotification('Error: Customer ID not found', 'error');
-    return;
-  }
-  
-  // Store customer data before navigating
-  localStorage.setItem(`screeningData_${customerId}`, JSON.stringify({
-    customerId: customerId,
-    firstName: customerData.firstName,
-    lastName: customerData.lastName,
-    birthDate: customerData.birthDate,
-    nationality: customerData.nationality,
-    citizenship: customerData.citizenship,
-    systemId: customerData.systemId,
-    systemName: customerData.systemName,
-    searchQueryId: apiResponse.search_query_id,
-    screeningResult: apiResponse.maxScore > 0 ? 'HITS_FOUND' : 'NO_HITS',
-    maxScore: apiResponse.maxScore || 0,
-    timestamp: new Date().toISOString(),
-    tenant: 'bankfr',
-    isScreeningDataLocked: true
-  }));
-  
-  navigateToOnboarding(customerId);
-  popup.style.display = 'none';
-};
-
-
-
-
+      const customerId = apiResponse.customerId || apiResponse.customer_id || apiResponse.id;
+      if (!customerId) {
+        showNotification('Error: Customer ID not found', 'error');
+        return;
+      }
+      
+      // Store customer data before navigating
+      localStorage.setItem(`screeningData_${customerId}`, JSON.stringify({
+        customerId: customerId,
+        firstName: customerData.firstName,
+        lastName: customerData.lastName,
+        birthDate: customerData.birthDate,
+        nationality: customerData.nationality,
+        citizenship: customerData.citizenship,
+        systemId: customerData.systemId,
+        systemName: customerData.systemName,
+        searchQueryId: apiResponse.search_query_id,
+        screeningResult: apiResponse.maxScore > 0 ? 'HITS_FOUND' : 'NO_HITS',
+        maxScore: apiResponse.maxScore || 0,
+        timestamp: new Date().toISOString(),
+        tenant: 'bankfr',
+        isScreeningDataLocked: true
+      }));
+      
+      navigateToOnboarding(customerId);
+      popup.style.display = 'none';
+    };
     buttonsContainer.appendChild(continueBtn);
   }
   
