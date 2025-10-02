@@ -15,7 +15,7 @@ const PMOnboardingHandler = (function() {
     // Configuration
     const CONFIG = {
         API_BASE_URL: 'https://greataml.com/kyc-web-restful',
-        ONBOARDING_ENDPOINT: '/onboarding/onboard',
+        ONBOARDING_ENDPOINT: '/onboarding/v1/onboardCustomer',
         DEFAULT_TENANT: 'bankfr'
     };
 
@@ -95,7 +95,9 @@ const PMOnboardingHandler = (function() {
             return {
                 customerId: customerId,
                 customerRelationName: formData.raisonSociale || "",
-                formId: "2", // PM uses formId "2"
+                formId: "2", 
+                systemName: customerData.systemName || "",
+                systemId: customerData.systemId || "",
                 items: {
                     isSanctionnedWorkflow: "Non",
                     isPepWorkflow: "",

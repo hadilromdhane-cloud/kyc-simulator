@@ -122,121 +122,7 @@ const OnboardingHandler = (function() {
 
             // Check tenant and create appropriate payload
             const isBanqueEN = tenantName === 'banque_en';
-            
-            if (isBanqueEN) {
-                // Banque EN payload structure (based on successful example)
-                return {
-                    customerId: customerId,
-                    customerRelationName: "",
-                    formId: "1",
-                    items: {
-                        isSanctionnedWorkflow: "No",
-                        isPepWorkflow: "<li>PEP : <b> <span id=\"m_-6565793956881070177m_5147999647471681674is_pep\"> No </span></b></li>",
-                        agence: "headquarters",
-                        rm_username: "admin",
-                        rm_fn: "System",
-                        rm_ln: "User",
-                        process_type: "",
-                        createdOn: currentDateTime,
-                        dpr: "",
-                        last_update: currentDateTime,
-                        first_name: formData.firstName || formData.prenom || "",
-                        last_name: formData.lastName || formData.nom || "",
-                        birth_date: formData.dateOfBirth || formData.dateNaissance || "",
-                        nationality: formData.nationality || formData.nationalite || "",
-                        marital_status: formData.civilStatus || formData.etatCivil || "",
-                        tel1: "", // Keep empty like successful example
-                        email: formData.email || "",
-                        adresseDeResidence: formData.residentialAddress || formData.adresse || "",
-                        postal_code: formData.postalCode || formData.codePostal || "",
-                        fiscale_ville: formData.city || formData.ville || "",
-                        Country_of_residence: formData.countryOfResidence || formData.PaysDeResidence || "",
-                        tin_: {
-                            id: this.getDocumentTypeIdEN(formData.idType || formData.typePiece),
-                            name: this.getDocumentTypeNameEN(formData.idType || formData.typePiece),
-                            value: formData.idType || formData.typePiece || "",
-                            translate: this.getDocumentTypeNameEN(formData.idType || formData.typePiece),
-                            parentId: null,
-                            parentName: null,
-                            uniqueCode: `${this.getDocumentTypeNameEN(formData.idType || formData.typePiece)}:${formData.idType || formData.typePiece}:tin`,
-                            tags: ["tin"]
-                        },
-                        nid: formData.idNumber || formData.numeroPiece || "",
-                        delivery_date: formData.dateOfIssue || formData.dateDelivrance || "",
-                        expiry_date: formData.expiryDate || formData.dateExpiration || "",
-                        profession: formData.profession || "",
-                        product: [formData.productsServices || formData.produits || ""],
-                        onboarding_channel: formData.onboardingChannel || formData.canal || "",
-                        source_of_funds: [formData.sourceOfFunds || formData.origineFonds || ""],
-                        dataGrid: [{"select": "", "nature": "", "tx_nature": {}}],
-                        mscq: "",
-                        pep: "",
-                        pliberal: "",
-                        id_doc: [],
-                        address_proof_type: {},
-                        address_doc: [],
-                        tiin_doc: [],
-                        dataGrid1: [{"source_of_funds_doctype": {}, "source_of_funds_doc": []}],
-                        invokeElm: false,
-                        containerelm: {
-                            "profession-2": "",
-                            retrieved_dob: "",
-                            retrieved_last_name: "",
-                            retrieved_first_name: "",
-                            "citizenship-2": "",
-                            retrieved_address: ""
-                        },
-                        name: "",
-                        select: "",
-                        businessName: "",
-                        entityType: "PP",
-                        id: customerId,
-                        customer_type: "manual-entry",
-                        createdBy: "admin",
-                        creatorId: 2,
-                        creatorFirstName: "System",
-                        creatorLastName: "User",
-                        modificationDate: currentDateTime,
-                        extendedProperties: {},
-                        citizenship: formData.nationality || formData.nationalite || "",
-                        listsNames: [],
-                        agencyId: 3,
-                        agencyName: "headquarters",
-                        eaiIds: {},
-                        searchId: Math.floor(Math.random() * 100000),
-                        outboundSystems: null,
-                        AddressDataGrid: [],
-                        current_date: currentDateTime,
-                        isPEP: false,
-                        isSanctionned: false,
-                        isSanctioned: false,
-                        hasRiskedCountry: false,
-                        form_entity_type: "PP",
-                        cus_birth_date: formData.dateOfBirth || formData.dateNaissance || "",
-                        url: "https://greataml.com/",
-                        is_hq_user: false,
-                        current_user_name: "System User",
-                        current_user_id: 2,
-                        agency_location: null,
-                        distribution_channel: null,
-                        obnl_name: formData.lastName || formData.nom || "",
-                        customerUrl: "https://greataml.com/",
-                        revenuAnnuelNet: parseInt(formData.netAnnualIncome || formData.revenu) || 0,
-                        address: []
-                    },
-                    fatcaIdentification: {
-                        americanCitizen: "false",
-                        greenCard: "false",
-                        americanResident: "false",
-                        americanVisit: "false",
-                        address: null,
-                        beneficialOwners: null,
-                        hasBeneficialOwners: null
-                    }
-                };
-            } else {
-                // BankFR payload structure (keep the exact working structure)
-                return {
+            return {
                     
                     customerId: customerId,
                     customerRelationName: "",
@@ -348,7 +234,7 @@ const OnboardingHandler = (function() {
                     }
                 };
             }
-        }
+        
     };
 
     // Form validation functions
