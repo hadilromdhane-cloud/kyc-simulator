@@ -1274,65 +1274,106 @@ function showCentralizedPopup(message, showContinueButton = false, customerData 
 
 function showScreeningResultsPopup(event) {
   const popup = document.getElementById('popup');
+  
+  // Hide all original popup elements
   const popupText = document.getElementById('popupText');
   const popupLink = document.getElementById('popupLink');
-
-  const extraButtons = popup.querySelectorAll('button:not(#closePopup)');
-  extraButtons.forEach(btn => btn.remove());
-  const extraDivs = popup.querySelectorAll('div');
-  extraDivs.forEach(div => div.remove());
-
-  // Get tenant name for display
-  const currentTenant = tokenManager.getTenant() || localStorage.getItem('tenantName') || 'Unknown Tenant';
-
-  let message = `🏦 Tenant: ${currentTenant}\n`;
-  message += `Customer ${event.customerId} Screening Results:\n`;
-  message += `🔍 Risk Assessment:\n`;
-  message += `• PEP Status: ${event.isPEP ? '⚠️ YES' : '✅ NO'} (${event.pepDecision || 'N/A'})\n`;
-  message += `• Sanctions: ${event.isSanctioned ? '🚨 YES' : '✅ NO'} (${event.sanctionDecision || 'N/A'})\n`;
-  message += `• Adverse Media: ${event.isAdverseMedia ? '⚠️ YES' : '✅ NO'}\n\n`;
-  message += `Onboarding decision:\n`;
+  const closePopupBtn = document.getElementById('closePopup');
+  if (popupText) popupText.style.display = 'none';
+  if (popupLink) popupLink.style.display = 'none';
+  if (closePopupBtn) closePopupBtn.style.display = 'none';
   
-  if (event.isSanctioned) {
-    message += `Your customer is confirmed as sanctioned. You cannot proceed with the onboarding.`;
-  } else {
-    message += `Customer cleared for onboarding. You can proceed with the onboarding process.`;
-  }
-
-  popupText.style.whiteSpace = 'pre-line';
-  popupText.style.fontSize = '14px';
-  popupText.style.lineHeight = '1.4';
-  popupText.textContent = message;
-
-  popupLink.style.display = 'none';
-
-  if (!event.isSanctioned) {
-    const continueButton = document.createElement('button');
-    continueButton.textContent = 'Continue Onboarding';
-    continueButton.id = 'continueOnboardingBtn';
-    continueButton.style.cssText = `
-      padding: 10px 20px;
-      background-color: #28a745;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 14px;
-      margin: 20px 10px 0 0;
+  // Clear and reset popup with Option 1 style (ORANGE with pulse animation)
+  popup.innerHTML = '';
+  popup.style.cssText = `
+    display: block;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 0;
+    border-radius: 10px;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.4);
+    z-index: 1000;
+    min-width: 500px;
+    max-width: 600px;
+    border: 2px solid #FF9800;
+    border-left: 6px solid #FF9800;
+    animation: pulse 2s ease-in-out infinite;
+  `;
+  
+  // Add pulse animation
+  if (!document.querySelector('style[data-pulse-animation]')) {
+    const style = document.createElement('style');
+    style.setAttribute('data-pulse-animation', 'true');
+    style.textContent = `
+      @keyframes pulse {
+        0%, 100% { box-shadow: 0 5px 25px rgba(0,0,0,0.4); }
+        50% { box-shadow: 0 5px 30px rgba(255, 152, 0, 0.6); }
+      }
     `;
-    continueButton.onclick = () => {
+    document.head.appendChild(style);
+  }
+  
+  const currentTenant = tokenManager.getTenant() || localStorage.getItem('tenantName') || 'BANKFR';
+  
+  // Create header with bell icon
+  const header = document.createElement('div');
+  header.style.cssText = 'display: flex; align-items: center; gap: 12px; padding: 20px; border-bottom: 1px solid #e0e0e0;';
+  header.innerHTML = '<span style="font-size: 2rem;">🔔</span><h3 style="color: #FF9800; font-size: 1.2rem; font-weight: 600; margin: 0;">Reis KYC Hits Processing Results</h3>';
+  
+  // Create content
+  const content = document.createElement('div');
+  content.style.cssText = 'padding: 20px; color: #333; line-height: 1.6; font-size: 0.95rem;';
+  
+  let contentHTML = `<div style="margin-bottom: 15px;"><strong>🏦 Tenant:</strong> ${currentTenant}</div>`;
+  contentHTML += `<div style="margin-bottom: 15px;"><strong>Customer:</strong> ${event.customerId}</div>`;
+  contentHTML += `<div style="margin-bottom: 15px;"><strong>🔍 Risk Assessment:</strong></div>`;
+  contentHTML += `<div style="margin-left: 20px; margin-bottom: 10px;">`;
+  contentHTML += `• <strong>PEP Status:</strong> ${event.isPEP ? '<span style="color: #ffc107;">⚠️ YES</span>' : '<span style="color: #28a745;">✅ NO</span>'} (${event.pepDecision || 'N/A'})<br>`;
+  contentHTML += `• <strong>Sanctions:</strong> ${event.isSanctioned ? '<span style="color: #dc3545;">🚨 YES</span>' : '<span style="color: #28a745;">✅ NO</span>'} (${event.sanctionDecision || 'N/A'})<br>`;
+  contentHTML += `• <strong>Adverse Media:</strong> ${event.isAdverseMedia ? '<span style="color: #ffc107;">⚠️ YES</span>' : '<span style="color: #28a745;">✅ NO</span>'}`;
+  contentHTML += `</div>`;
+  contentHTML += `<div style="margin-top: 15px; padding: 15px; background: ${event.isSanctioned ? '#f8d7da' : '#d4edda'}; border-radius: 5px;">`;
+  contentHTML += `<strong>Onboarding Decision:</strong><br>`;
+  if (event.isSanctioned) {
+    contentHTML += `<span style="color: #721c24;">Your customer is confirmed as sanctioned. You cannot proceed with the onboarding.</span>`;
+  } else {
+    contentHTML += `<span style="color: #155724;">Customer cleared for onboarding. You can proceed with the onboarding process.</span>`;
+  }
+  contentHTML += `</div>`;
+  
+  content.innerHTML = contentHTML;
+  
+  // Create buttons container
+  const buttonsContainer = document.createElement('div');
+  buttonsContainer.style.cssText = 'padding: 20px; display: flex; gap: 10px; justify-content: flex-end; border-top: 1px solid #e0e0e0;';
+  
+  // Add Continue button only if not sanctioned
+  if (!event.isSanctioned) {
+    const continueBtn = document.createElement('button');
+    continueBtn.textContent = 'Continue Onboarding';
+    continueBtn.style.cssText = 'padding: 10px 20px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: 600;';
+    continueBtn.onclick = () => {
       navigateToOnboarding(event.customerId);
       popup.style.display = 'none';
-      resetPopup();
     };
-    
-    const closeButton = document.getElementById('closePopup');
-    closeButton.parentNode.insertBefore(continueButton, closeButton);
+    buttonsContainer.appendChild(continueBtn);
   }
-
-  popup.style.display = 'block';
+  
+  // Add Close button
+  const closeBtn = document.createElement('button');
+  closeBtn.textContent = 'Close';
+  closeBtn.style.cssText = 'padding: 10px 20px; background-color: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: 600;';
+  closeBtn.onclick = () => popup.style.display = 'none';
+  buttonsContainer.appendChild(closeBtn);
+  
+  // Assemble popup
+  popup.appendChild(header);
+  popup.appendChild(content);
+  popup.appendChild(buttonsContainer);
 }
-
 
 // NEW: Screening Response Popup - Option 1 Style
 function showScreeningResponsePopup(message, link = null, showContinueButton = false, customerData = null, apiResponse = null) {
