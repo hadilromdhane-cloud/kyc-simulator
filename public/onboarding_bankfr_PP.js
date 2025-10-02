@@ -317,6 +317,7 @@ const OnboardingHandler = (function() {
     let riskColor = '';
     let riskBadgeClass = 'risk-low';
     let isBlocking = false;
+    let isHighRisk = false;
     let additionalInfo = '';
 
     // Fetch risk level if riskCalculationId exists
@@ -331,6 +332,8 @@ const OnboardingHandler = (function() {
                     riskText = 'High Risk';
                     riskColor = '#dc3545';
                     riskBadgeClass = 'risk-high';
+                    isHighRisk = true;
+                    statusMessage = 'Customer on Hold';
                 } else if (riskLevel === 'MR' || (riskValue >= 30 && riskValue < 80)) {
                     riskText = 'Medium Risk';
                     riskColor = '#ffc107';
@@ -457,7 +460,7 @@ const OnboardingHandler = (function() {
                 margin: 25px 0;
                 font-size: 1.1rem;
                 font-weight: 600;
-                color: ${isBlocking ? '#dc3545' : '#28a745'};
+                color: ${isBlocking ? '#dc3545' : (isHighRisk ? '#ff8c00' : '#28a745')};
             }
             
             .btn-primary-custom {
@@ -524,7 +527,7 @@ const OnboardingHandler = (function() {
                 </div>
             ` : ''}
             
-            <p class="status-text">${isBlocking ? '✗' : '✓'} ${statusMessage}</p>
+            <p class="status-text">${isBlocking ? '✗' : '✓'} ${statusMessage}${isHighRisk ? ' - Not Approved' : ''}</p>
             
             ${additionalInfo}
             
