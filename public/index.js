@@ -1125,6 +1125,76 @@ function showPopup(message, link = '') {
   }
 }
 
+
+// NEW: Screening Response Popup - Option 1 Style
+function showScreeningResponsePopup(message, link = null, showContinueButton = false, customerData = null, apiResponse = null) {
+  const popup = document.getElementById('popup');
+  popup.innerHTML = '';
+  
+  popup.style.cssText = `
+    display: block;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 0;
+    border-radius: 10px;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.4);
+    z-index: 1000;
+    min-width: 500px;
+    max-width: 600px;
+    border: 2px solid #007ACC;
+    border-left: 6px solid #007ACC;
+  `;
+  
+  const header = document.createElement('div');
+  header.style.cssText = 'display: flex; align-items: center; gap: 12px; padding: 20px; border-bottom: 1px solid #e0e0e0;';
+  header.innerHTML = '<span style="font-size: 2rem;">🔍</span><h3 style="color: #007ACC; font-size: 1.2rem; font-weight: 600; margin: 0;">Reis KYC Screening Response</h3>';
+  
+  const content = document.createElement('div');
+  content.style.cssText = 'padding: 20px; color: #333; line-height: 1.6; font-size: 0.95rem;';
+  content.textContent = message;
+  
+  if (link) {
+    const linkElement = document.createElement('a');
+    linkElement.href = link;
+    linkElement.target = '_blank';
+    linkElement.textContent = link;
+    linkElement.style.cssText = 'color: #007ACC; text-decoration: underline; display: block; margin-top: 10px; word-break: break-all;';
+    content.appendChild(linkElement);
+  }
+  
+  const buttonsContainer = document.createElement('div');
+  buttonsContainer.style.cssText = 'padding: 20px; display: flex; gap: 10px; justify-content: flex-end; border-top: 1px solid #e0e0e0;';
+  
+  if (showContinueButton && customerData && apiResponse) {
+    const continueBtn = document.createElement('button');
+    continueBtn.textContent = 'Continue Onboarding';
+    continueBtn.style.cssText = 'padding: 10px 20px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: 600;';
+    continueBtn.onclick = () => {
+      const customerId = apiResponse.customerId || apiResponse.customer_id || apiResponse.id;
+      if (!customerId) {
+        showNotification('Error: Customer ID not found', 'error');
+        return;
+      }
+      navigateToOnboarding(customerId);
+      popup.style.display = 'none';
+    };
+    buttonsContainer.appendChild(continueBtn);
+  }
+  
+  const closeBtn = document.createElement('button');
+  closeBtn.textContent = 'Close';
+  closeBtn.style.cssText = 'padding: 10px 20px; background-color: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: 600;';
+  closeBtn.onclick = () => popup.style.display = 'none';
+  buttonsContainer.appendChild(closeBtn);
+  
+  popup.appendChild(header);
+  popup.appendChild(content);
+  popup.appendChild(buttonsContainer);
+}
+
 function showNoHitsPopup(customerData, apiResponse) {
   const popup = document.getElementById('popup');
   const popupText = document.getElementById('popupText');
@@ -1469,35 +1539,30 @@ async function callSearch(entityType, containerId, responseId, isDecentralized =
 
     logMessage(`Search completed for ${entityType}`, 'success');
     showNotification('Search completed successfully', 'success');
-    
     if (isDecentralized) {
-      if (data.maxScore && data.maxScore > 0) {
-        const link = `https://greataml.com/search/searchdecision/${data.search_query_id}`;
-        logMessage(`Hits found for customer (Score: ${data.maxScore})`, 'warning');
-        showPopup('You can treat the hits via this link:', link);
-      } else {
-        logMessage('No hits found for customer', 'info');
-        showNoHitsPopup(payload, data);
-      }
-    } else {
-      // Determine if this is sync or async based on containerId
-      const isAsync = containerId === 'asyncFields';
-      
-      // Centralized process - different behavior for sync vs async
-      if (data.maxScore && data.maxScore > 0) {
-        logMessage(`Hits found for customer (Score: ${data.maxScore})`, 'warning');
-        if (isAsync) {
-          // Async: allow continuing onboarding even with hits
-          showCentralizedPopup("The alert is being treated by the compliance team. You can now continue the onboarding.", true, payload, data);
+        if (data.maxScore && data.maxScore > 0) {
+          const link = `https://greataml.com/search/searchdecision/${data.search_query_id}`;
+          logMessage(`Hits found for customer (Score: ${data.maxScore})`, 'warning');
+          showScreeningResponsePopup('Some hits are found. You can treat the hits via this link.', link, false, payload, data);
         } else {
-          // Sync: wait for compliance team
-          showCentralizedPopup("The alert is being treated by the compliance team. You will receive a notification once it is processed.", false);
+          logMessage('No hits found for customer', 'info');
+          showScreeningResponsePopup('No hits found. You can proceed with the next step.', null, true, payload, data);
         }
       } else {
-        logMessage('No hits found for customer', 'info');
-        showCentralizedPopup("Your customer doesn't have any matches. You can continue the onboarding.", true, payload, data);
+        const isAsync = containerId === 'asyncFields';
+        
+        if (data.maxScore && data.maxScore > 0) {
+          logMessage(`Hits found for customer (Score: ${data.maxScore})`, 'warning');
+          if (isAsync) {
+            showScreeningResponsePopup('Some hits are found. The alert is being treated by the compliance team. You can now continue the onboarding.', null, true, payload, data);
+          } else {
+            showScreeningResponsePopup('Some hits are found. The alert is assigned to the compliance team. You will receive a notification once the alert is treated.', null, false, payload, data);
+          }
+        } else {
+          logMessage('No hits found for customer', 'info');
+          showScreeningResponsePopup('No hits found. You can proceed with the next step.', null, true, payload, data);
+        }
       }
-    }
   } catch (err) {
     const errorMsg = `Search error: ${err.message}`;
     logMessage(errorMsg, 'error');
