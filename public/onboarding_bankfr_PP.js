@@ -237,6 +237,7 @@ const OnboardingHandler = (function() {
             } else {
                 // BankFR payload structure (keep the exact working structure)
                 return {
+                    
                     customerId: customerId,
                     customerRelationName: "",
                     formId: "1",
@@ -328,6 +329,8 @@ const OnboardingHandler = (function() {
                         rm_ln: "User",
                         rm_username: "admin",
                         searchId: Math.floor(Math.random() * 100000),
+                        systemName: customerData.systemName || "",
+                        systemId: customerData.systemId || "",
                         tel1: formData.telephone || "",
                         tel2: formData.portable || "",
                         tiin_doc: [],
