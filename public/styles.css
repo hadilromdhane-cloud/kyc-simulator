@@ -9,22 +9,24 @@ body {
 
 header {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
+  justify-content: center;
+  gap: 20px;
   padding: 20px 0 30px;
   border-bottom: 2px solid #007ACC;
   background: white;
 }
 
 header img { 
-  height: 120px; 
+  height: 80px;
 }
 
 header h1 {
   font-weight: 700;
   font-size: 2.2rem;
   color: #004080;
-  margin: 10px 0 0;
+  margin: 0;
 }
 
 /* Main Layout with Sidebar */
@@ -36,10 +38,12 @@ header h1 {
 /* Authentication Sidebar */
 .auth-sidebar {
   width: 280px;
+  min-width: 200px;
+  max-width: 600px;
   background: white;
   border-right: 2px solid #007ACC;
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.08);
-  transition: width 0.3s ease;
+  transition: none;
   position: relative;
   overflow: hidden;
 }
@@ -298,12 +302,16 @@ button:hover {
 }
 
 @media (max-width: 600px) {
+  header {
+    flex-wrap: wrap;
+  }
+  
   header h1 {
     font-size: 1.6rem;
   }
   
   header img {
-    height: 80px;
+    height: 60px;
   }
   
   .main-content {
@@ -335,18 +343,6 @@ button:hover {
 
 .resize-handle:active {
   background: rgba(0, 122, 204, 0.5);
-}
-
-.auth-sidebar {
-  width: 280px;
-  min-width: 200px; /* Largeur minimale */
-  max-width: 600px; /* Largeur maximale */
-  background: white;
-  border-right: 2px solid #007ACC;
-  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.08);
-  transition: none; /* Enlever la transition pour le resize manuel */
-  position: relative;
-  overflow: hidden;
 }
 
 /* Cursor pour toute la page pendant le drag */
