@@ -1677,27 +1677,6 @@ function renderFields(containerId, entityType, processType) {
   console.log('Rendered', fields.length, 'fields in container', containerId);
 }
 
-// FIXED: Update the event listener for entity type change (async)
-document.getElementById('entityTypeAsync').addEventListener('change', () => {
-  const entityType = document.getElementById('entityTypeAsync').value;
-  console.log('Async entity type changed to:', entityType);
-  if (entityType) {
-    renderFields('asyncFields', entityType, 'async');
-  }
-});
-
-// ALSO UPDATE: The async button listener
-document.getElementById('submitAsync').addEventListener('click', () => {
-  const entityType = document.getElementById('entityTypeAsync').value;
-  console.log('Submit async clicked for entity type:', entityType);
-  if (!entityType) {
-    showNotification('Please select an entity type', 'warning');
-    return;
-  }
-  callSearchAsync(entityType, 'asyncFields');
-});
-
-
 function showScreeningResultsPopup(event) {
   const popup = document.getElementById('popup');
   
@@ -2192,15 +2171,28 @@ document.getElementById('submitDecentralized')
     )
   );
 
+   document.getElementById('entityTypeAsync').addEventListener('change', () => {
+     const entityType = document.getElementById('entityTypeAsync').value;
+     console.log('Async entity type changed to:', entityType);
+     if (entityType) {
+       renderFields('asyncFields', entityType, 'async');
+     }
+   });
+
 document.getElementById('submitSync')
   .addEventListener('click', () => 
     callSearch(document.getElementById('entityTypeSync').value, 'syncFields', 'responseSync')
   );
 
-document.getElementById('submitAsync')
-  .addEventListener('click', () => 
-    callSearch(document.getElementById('entityTypeAsync').value, 'asyncFields', 'responseAsync')
-  );
+document.getElementById('submitAsync').addEventListener('click', () => {
+  const entityType = document.getElementById('entityTypeAsync').value;
+  console.log('Submit async clicked for entity type:', entityType);
+  if (!entityType) {
+    showNotification('Please select an entity type', 'warning');
+    return;
+  }
+  callSearchAsync(entityType, 'asyncFields');
+});
 
 document.getElementById('entityTypeDecentralized')
   .addEventListener('change', () => renderFields('decentralizedFields', document.getElementById('entityTypeDecentralized').value, 'decentralized'));
