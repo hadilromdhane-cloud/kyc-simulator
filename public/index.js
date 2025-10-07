@@ -955,24 +955,26 @@ async function callSearchAsync(entityType, containerId) {
     });
 
     const data = await res.json();
-    
     console.log('Async onboarding response:', data);
 
-    logMessage(`Async onboarding completed for ${entityType}`, 'success');
-    showNotification('Customer KYC data successfully submitted!', 'success');
-    
-    // Get the Reis ID from the response (try multiple possible field names)
-    const reisId = data.reisId || data.reis_id || data.id || data.customerId;
-    const customerWatchListUrl = `https://greataml.com/profiles/customer-watch-list/${reisId}`;
-    
-    // Show success popup with the correct message and watch list link
-    showScreeningResponsePopup(
-      `The customer KYC data is successfully submitted from your core system to Reis.\n\nThe customer will be screened and processed by the compliance team asynchronously.\n\nYou can view the customer card via this link:`,
-      customerWatchListUrl,
-      false,
-      formData,
-      data
-    );
+logMessage(`Async onboarding completed for ${entityType}`, 'success');
+showNotification(`${entityType} KYC data successfully submitted!`, 'success');
+
+// Get the Reis ID from the response (try multiple possible field names)
+const reisId = data.reisId || data.reis_id || data.id || data.customerId;
+const customerWatchListUrl = `https://greataml.com/profiles/customer-watch-list/${reisId}`;
+
+// Determine the entity label for the message
+const entityLabel = entityType === 'PM' ? 'entity' : 'customer';
+
+// Show success popup with the correct message and watch list link
+showScreeningResponsePopup(
+  `The ${entityLabel} KYC data is successfully submitted from your core system to Reis.\n\nThe ${entityLabel} will be screened and processed by the compliance team asynchronously.\n\nYou can view the ${entityLabel} card via this link:`,
+  customerWatchListUrl,
+  false,
+  formData,
+  data
+);
 
   } catch (err) {
     const errorMsg = `Async onboarding error: ${err.message}`;
