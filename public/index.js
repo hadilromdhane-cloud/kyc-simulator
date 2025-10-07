@@ -348,8 +348,6 @@ const defaultValues = {
   }
 };
 
-//-------------------------------------------------------------
-
 const asyncFieldOptions = {
   idType: [
     { value: 'cin', label: 'Carte d\'identité nationale' },
@@ -392,17 +390,29 @@ const asyncFieldOptions = {
   ]
 };
 
-// UPDATE the renderFields function to handle async templates
+// FIXED renderFields function
 function renderFields(containerId, entityType, processType) {
   const container = document.getElementById(containerId);
+  if (!container) {
+    console.error('Container not found:', containerId);
+    return;
+  }
+  
   container.innerHTML = '';
 
   // Determine which template to use
   let fields;
-  if (containerId === 'asyncFields') {
+  if (containerId === 'asyncFields' || processType === 'async') {
     fields = visibleTemplates[entityType]?.async || [];
+    console.log('Rendering async fields for', entityType, ':', fields);
   } else {
     fields = visibleTemplates[entityType]?.[processType] || [];
+    console.log('Rendering', processType, 'fields for', entityType, ':', fields);
+  }
+
+  if (fields.length === 0) {
+    console.warn('No fields found for', entityType, processType);
+    return;
   }
 
   fields.forEach(field => {
@@ -549,6 +559,29 @@ function renderFields(containerId, entityType, processType) {
     container.appendChild(label);
     container.appendChild(input);
   });
+  
+  console.log('Rendered', fields.length, 'fields in container', containerId);
+}
+
+// Helper functions for document types
+function getDocumentTypeId(docType) {
+  const typeMap = {
+    'cin': 1,
+    'passeport': 13,
+    'titre_sejour': 2,
+    'permis_conduire': 3
+  };
+  return typeMap[docType] || 1;
+}
+
+function getDocumentTypeName(docType) {
+  const nameMap = {
+    'cin': 'Carte d\'identité nationale',
+    'passeport': 'Passeport',
+    'titre_sejour': 'Titre de séjour',
+    'permis_conduire': 'Permis de conduire'
+  };
+  return nameMap[docType] || 'Carte d\'identité nationale';
 }
 
 // NEW: Create payload for async onboarding
@@ -693,28 +726,7 @@ function createAsyncOnboardingPayload(entityType, formData) {
   }
 }
 
-// Helper functions for document types (keep existing ones)
-function getDocumentTypeId(docType) {
-  const typeMap = {
-    'cin': 1,
-    'passeport': 13,
-    'titre_sejour': 2,
-    'permis_conduire': 3
-  };
-  return typeMap[docType] || 1;
-}
-
-function getDocumentTypeName(docType) {
-  const nameMap = {
-    'cin': 'Carte d\'identité nationale',
-    'passeport': 'Passeport',
-    'titre_sejour': 'Titre de séjour',
-    'permis_conduire': 'Permis de conduire'
-  };
-  return nameMap[docType] || 'Carte d\'identité nationale';
-}
-
-// UPDATE the callSearch function to handle async differently
+// Async onboarding function
 async function callSearchAsync(entityType, containerId) {
   if (!tenantName) { 
     showNotification('Please authenticate first!', 'warning');
@@ -793,48 +805,6 @@ async function callSearchAsync(entityType, containerId) {
   }
 }
 
-// UPDATE button event listener for async
-document.getElementById('submitAsync').addEventListener('click', () => {
-  const entityType = document.getElementById('entityTypeAsync').value;
-  if (!entityType) {
-    showNotification('Please select an entity type', 'warning');
-    return;
-  }
-  callSearchAsync(entityType, 'asyncFields');
-});
-
-// UPDATE entity type change listener for async
-document.getElementById('entityTypeAsync').addEventListener('change', () => {
-  const entityType = document.getElementById('entityTypeAsync').value;
-  if (entityType) {
-    renderFields('asyncFields', entityType, 'async');
-  }
-});
-//--------------------------------------------------------------
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 let sessionEvents = JSON.parse(sessionStorage.getItem('kycEvents')) || [];
 let sessionEventCounter = parseInt(sessionStorage.getItem('kycEventCounter')) || 0;
 
@@ -864,7 +834,7 @@ function handleRealWebhookEvent(webhookData) {
     timestamp: new Date().toISOString(),
     customerId: webhookData.customerId,
     source: 'Reis_KYC',
-    tenant: eventTenant, // Store the tenant active when this event was created
+    tenant: eventTenant,
     search_query_id: webhookData.searchQueryId,
     isPEP: webhookData.isPEP || false,
     isSanctioned: webhookData.isSanctioned || false,
@@ -876,7 +846,6 @@ function handleRealWebhookEvent(webhookData) {
     isReal: true
   };
   
-  // Store in session
   sessionEvents.unshift(realEvent);
   if (sessionEvents.length > 50) {
     sessionEvents = sessionEvents.slice(0, 50);
@@ -885,11 +854,9 @@ function handleRealWebhookEvent(webhookData) {
   sessionStorage.setItem('kycEvents', JSON.stringify(sessionEvents));
   sessionStorage.setItem('kycEventCounter', sessionEventCounter.toString());
   
-  // Show notifications with tenant name (use the event's stored tenant)
   showNotification(`[${eventTenant}] Real webhook received for customer ${realEvent.customerId}`, 'warning');
   showScreeningResultsPopup(realEvent);
   
-  // Update history
   notificationsHistory.unshift(realEvent);
   localStorage.setItem('notificationsHistory', JSON.stringify(notificationsHistory));
   updateNotificationBadge();
@@ -899,7 +866,6 @@ function handleRealWebhookEvent(webhookData) {
 
 // --- Notification System ---
 function createNotificationElements() {
-  // Create notification container
   const notificationContainer = document.createElement('div');
   notificationContainer.id = 'notificationContainer';
   notificationContainer.style.cssText = `
@@ -911,7 +877,6 @@ function createNotificationElements() {
   `;
   document.body.appendChild(notificationContainer);
 
-  // Create notifications history button
   const notificationButton = document.createElement('button');
   notificationButton.id = 'notificationHistoryBtn';
   notificationButton.innerHTML = 'Notifications';
@@ -936,7 +901,6 @@ function createNotificationElements() {
     min-width: 120px;
   `;
   
-  // Add hover effect that matches your button styles
   notificationButton.onmouseover = () => {
     notificationButton.style.backgroundColor = '#004080';
   };
@@ -950,7 +914,6 @@ function createNotificationElements() {
   notificationButton.onclick = showNotificationHistory;
   document.body.appendChild(notificationButton);
 
-  // Create token status button - NEW ADDITION
   const tokenStatusButton = document.createElement('button');
   tokenStatusButton.id = 'tokenStatusBtn';
   tokenStatusButton.innerHTML = 'Token Status';
@@ -977,12 +940,10 @@ function createNotificationElements() {
   tokenStatusButton.onclick = showTokenStatus;
   document.body.appendChild(tokenStatusButton);
 
-  // Update button badge
   updateNotificationBadge();
   updateTokenStatusButton();
 }
 
-// Token status functions
 function updateTokenStatusButton() {
   const button = document.getElementById('tokenStatusBtn');
   if (!button) return;
@@ -1009,7 +970,6 @@ function showTokenStatus() {
   showPopup(`Token Status: ${status}\nTenant: ${tenant}\nToken: ${token ? `${token.substring(0, 20)}...` : 'None'}`);
 }
 
-// Update token status button every 10 seconds
 setInterval(updateTokenStatusButton, 10000);
 
 function updateNotificationBadge() {
@@ -1073,8 +1033,6 @@ function showNotificationHistory() {
       const canContinueOnboarding = isReis && !notification.isSanctioned && !notification.onboardingCompleted;
       const statusColor = notification.isSanctioned ? '#dc3545' : '#28a745';
       const statusText = notification.isSanctioned ? 'SANCTIONED' : 'CLEARED';
-      
-      // Get tenant name for this notification (use the stored tenant from when it was created)
       const notificationTenant = notification.tenant || 'Unknown';
       
       historyHTML += `
@@ -1279,8 +1237,6 @@ let notificationsHistory = JSON.parse(localStorage.getItem('notificationsHistory
 let lastEventTimestamp = parseInt(localStorage.getItem('lastEventTimestamp')) || (Date.now() - 300000);
 
 function setupEventPolling() {
-  // Don't reset lastEventId to 0 - keep the existing value to avoid reprocessing old events
-  // Only reset if there's no stored value (first time)
   if (!localStorage.getItem('lastEventId')) {
     localStorage.setItem('lastEventId', '0');
     lastEventId = 0;
@@ -1305,17 +1261,14 @@ function setupEventPolling() {
         data.events.forEach(event => {
           console.log('Processing event:', event.customerId);
           
-          // Add tenant information to the event AT THE TIME OF PROCESSING (only if not already present)
           if (!event.tenant) {
             event.tenant = currentTenant;
           }
           
-          // Only show popups for events that are newer than what we had when the page loaded
           const wasEventProcessedBefore = notificationsHistory.some(n => 
             n.customerId === event.customerId && n.search_query_id === event.search_query_id
           );
           
-          // Update lastEventId
           lastEventId = event.id;
           localStorage.setItem('lastEventId', lastEventId.toString());
           
@@ -1324,7 +1277,6 @@ function setupEventPolling() {
             showScreeningResultsPopup(event);
             showNotification(`[${event.tenant}] Screening completed for ${event.customerId}`, 'warning');
             
-            // Add to notifications history
             notificationsHistory.unshift(event);
             if (notificationsHistory.length > 50) {
               notificationsHistory = notificationsHistory.slice(0, 50);
@@ -1480,7 +1432,7 @@ tabButtons.forEach(btn => btn.addEventListener('click', () => {
     const syncType = document.getElementById('entityTypeSync').value;
     const asyncType = document.getElementById('entityTypeAsync').value;
     if (syncType) renderFields('syncFields', syncType, 'centralized');
-    if (asyncType) renderFields('asyncFields', asyncType, 'centralized');
+    if (asyncType) renderFields('asyncFields', asyncType, 'async');
   }
 }));
 
@@ -1494,193 +1446,18 @@ subTabButtons.forEach(btn => btn.addEventListener('click', () => {
   const activeSubtab = document.getElementById(btn.dataset.subtab);
   activeSubtab.style.display = 'block';
 
-  // Re-render fields when switching tabs if entity type is already selected
   if (btn.dataset.subtab === 'sync') {
     const syncType = document.getElementById('entityTypeSync').value;
     if (syncType) renderFields('syncFields', syncType, 'centralized');
   } else if (btn.dataset.subtab === 'async') {
     const asyncType = document.getElementById('entityTypeAsync').value;
-    if (asyncType) renderFields('asyncFields', asyncType, 'async'); // ✅ CORRECT
+    if (asyncType) renderFields('asyncFields', asyncType, 'async');
   }
 }));
-// --- Render input fields ---
-// FIXED: Update the renderFields function to properly handle async
-function renderFields(containerId, entityType, processType) {
-  const container = document.getElementById(containerId);
-  if (!container) {
-    console.error('Container not found:', containerId);
-    return;
-  }
-  
-  container.innerHTML = '';
-
-  // Determine which template to use
-  let fields;
-  if (containerId === 'asyncFields' || processType === 'async') {
-    fields = visibleTemplates[entityType]?.async || [];
-    console.log('Rendering async fields for', entityType, ':', fields);
-  } else {
-    fields = visibleTemplates[entityType]?.[processType] || [];
-    console.log('Rendering', processType, 'fields for', entityType, ':', fields);
-  }
-
-  if (fields.length === 0) {
-    console.warn('No fields found for', entityType, processType);
-    return;
-  }
-
-  fields.forEach(field => {
-    const label = document.createElement('label');
-    label.textContent = field.label + (field.required ? ' *:' : ':');
-    if (field.required) {
-      label.style.fontWeight = 'bold';
-    }
-
-    let input;
-    
-    // Handle different field types
-    if (field.type === 'country' || field.key === 'citizenship' || field.key === 'nationality' || field.key === 'countryOfIncorporation') {
-      input = document.createElement('select');
-      input.id = containerId + '_' + field.key;
-      if (field.required) input.required = true;
-
-      const defaultOption = document.createElement('option');
-      defaultOption.value = '';
-      defaultOption.textContent = 'Select Country';
-      input.appendChild(defaultOption);
-
-      const currentCountries = getCurrentCountries();
-      currentCountries.forEach(country => {
-        const option = document.createElement('option');
-        option.value = country;
-        option.textContent = country;
-        input.appendChild(option);
-      });
-    } 
-    else if (field.type === 'idType') {
-      input = document.createElement('select');
-      input.id = containerId + '_' + field.key;
-      if (field.required) input.required = true;
-
-      const defaultOption = document.createElement('option');
-      defaultOption.value = '';
-      defaultOption.textContent = 'Sélectionner le type';
-      input.appendChild(defaultOption);
-
-      asyncFieldOptions.idType.forEach(type => {
-        const option = document.createElement('option');
-        option.value = type.value;
-        option.textContent = type.label;
-        input.appendChild(option);
-      });
-    }
-    else if (field.type === 'profession') {
-      input = document.createElement('select');
-      input.id = containerId + '_' + field.key;
-      if (field.required) input.required = true;
-
-      const defaultOption = document.createElement('option');
-      defaultOption.value = '';
-      defaultOption.textContent = 'Sélectionner la profession';
-      input.appendChild(defaultOption);
-
-      asyncFieldOptions.profession.forEach(prof => {
-        const option = document.createElement('option');
-        option.value = prof;
-        option.textContent = prof;
-        input.appendChild(option);
-      });
-    }
-    else if (field.type === 'products') {
-      input = document.createElement('select');
-      input.id = containerId + '_' + field.key;
-      if (field.required) input.required = true;
-
-      const defaultOption = document.createElement('option');
-      defaultOption.value = '';
-      defaultOption.textContent = 'Sélectionner le produit';
-      input.appendChild(defaultOption);
-
-      asyncFieldOptions.products.forEach(product => {
-        const option = document.createElement('option');
-        option.value = product.value;
-        option.textContent = product.label;
-        input.appendChild(option);
-      });
-    }
-    else if (field.type === 'channel') {
-      input = document.createElement('select');
-      input.id = containerId + '_' + field.key;
-      if (field.required) input.required = true;
-
-      const defaultOption = document.createElement('option');
-      defaultOption.value = '';
-      defaultOption.textContent = 'Sélectionner le canal';
-      input.appendChild(defaultOption);
-
-      asyncFieldOptions.channel.forEach(channel => {
-        const option = document.createElement('option');
-        option.value = channel.value;
-        option.textContent = channel.label;
-        input.appendChild(option);
-      });
-    }
-    else if (field.type === 'legalForm') {
-      input = document.createElement('select');
-      input.id = containerId + '_' + field.key;
-      if (field.required) input.required = true;
-
-      const defaultOption = document.createElement('option');
-      defaultOption.value = '';
-      defaultOption.textContent = 'Sélectionner la forme juridique';
-      input.appendChild(defaultOption);
-
-      asyncFieldOptions.legalForm.forEach(form => {
-        const option = document.createElement('option');
-        option.value = form;
-        option.textContent = form;
-        input.appendChild(option);
-      });
-    }
-    else if (field.key === 'queueName') {
-      input = document.createElement('select');
-      input.id = containerId + '_' + field.key;
-
-      const queueOptions = ['Default', 'Maker', 'Checker'];
-      queueOptions.forEach(queueOption => {
-        const option = document.createElement('option');
-        option.value = queueOption;
-        option.textContent = queueOption;
-        input.appendChild(option);
-      });
-      
-      input.value = 'Default';
-    } 
-    else {
-      input = document.createElement('input');
-      input.id = containerId + '_' + field.key;
-      input.type = field.type === 'date' ? 'date' : (field.type === 'number' ? 'number' : 'text');
-      if (field.placeholder) input.placeholder = field.placeholder;
-      if (field.required) input.required = true;
-      
-      // Special handling for revenue field
-      if (field.type === 'number') {
-        input.min = '0';
-        input.step = '1';
-      }
-    }
-
-    container.appendChild(label);
-    container.appendChild(input);
-  });
-  
-  console.log('Rendered', fields.length, 'fields in container', containerId);
-}
 
 function showScreeningResultsPopup(event) {
   const popup = document.getElementById('popup');
   
-  // Hide all original popup elements
   const popupText = document.getElementById('popupText');
   const popupLink = document.getElementById('popupLink');
   const closePopupBtn = document.getElementById('closePopup');
@@ -1688,7 +1465,6 @@ function showScreeningResultsPopup(event) {
   if (popupLink) popupLink.style.display = 'none';
   if (closePopupBtn) closePopupBtn.style.display = 'none';
   
-  // Clear and reset popup with Option 1 style (ORANGE with pulse animation)
   popup.innerHTML = '';
   popup.style.cssText = `
     display: block;
@@ -1708,7 +1484,6 @@ function showScreeningResultsPopup(event) {
     animation: pulse 2s ease-in-out infinite;
   `;
   
-  // Add pulse animation
   if (!document.querySelector('style[data-pulse-animation]')) {
     const style = document.createElement('style');
     style.setAttribute('data-pulse-animation', 'true');
@@ -1723,12 +1498,10 @@ function showScreeningResultsPopup(event) {
   
   const currentTenant = tokenManager.getTenant() || localStorage.getItem('tenantName') || 'BANKFR';
   
-  // Create header with bell icon
   const header = document.createElement('div');
   header.style.cssText = 'display: flex; align-items: center; gap: 12px; padding: 20px; border-bottom: 1px solid #e0e0e0;';
   header.innerHTML = '<span style="font-size: 2rem;">🔔</span><h3 style="color: #FF9800; font-size: 1.2rem; font-weight: 600; margin: 0;">Reis KYC Hits Processing Results</h3>';
   
-  // Create content
   const content = document.createElement('div');
   content.style.cssText = 'padding: 20px; color: #333; line-height: 1.6; font-size: 0.95rem;';
   
@@ -1751,11 +1524,9 @@ function showScreeningResultsPopup(event) {
   
   content.innerHTML = contentHTML;
   
-  // Create buttons container
   const buttonsContainer = document.createElement('div');
   buttonsContainer.style.cssText = 'padding: 20px; display: flex; gap: 10px; justify-content: flex-end; border-top: 1px solid #e0e0e0;';
   
-  // Add Continue button only if not sanctioned
   if (!event.isSanctioned) {
     const continueBtn = document.createElement('button');
     continueBtn.textContent = 'Continue Onboarding';
@@ -1767,24 +1538,20 @@ function showScreeningResultsPopup(event) {
     buttonsContainer.appendChild(continueBtn);
   }
   
-  // Add Close button
   const closeBtn = document.createElement('button');
   closeBtn.textContent = 'Close';
   closeBtn.style.cssText = 'padding: 10px 20px; background-color: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: 600;';
   closeBtn.onclick = () => popup.style.display = 'none';
   buttonsContainer.appendChild(closeBtn);
   
-  // Assemble popup
   popup.appendChild(header);
   popup.appendChild(content);
   popup.appendChild(buttonsContainer);
 }
 
-// NEW: Screening Response Popup - Option 1 Style
 function showScreeningResponsePopup(message, link = null, showContinueButton = false, customerData = null, apiResponse = null) {
   const popup = document.getElementById('popup');
   
-  // Hide all original popup elements
   const popupText = document.getElementById('popupText');
   const popupLink = document.getElementById('popupLink');
   const closePopupBtn = document.getElementById('closePopup');
@@ -1792,7 +1559,6 @@ function showScreeningResponsePopup(message, link = null, showContinueButton = f
   if (popupLink) popupLink.style.display = 'none';
   if (closePopupBtn) closePopupBtn.style.display = 'none';
   
-  // Clear and reset popup
   popup.innerHTML = '';
   popup.style.cssText = `
     display: block;
@@ -1842,7 +1608,6 @@ function showScreeningResponsePopup(message, link = null, showContinueButton = f
         return;
       }
       
-      // Store customer data before navigating
       localStorage.setItem(`screeningData_${customerId}`, JSON.stringify({
         customerId: customerId,
         firstName: customerData.firstName,
@@ -1875,6 +1640,18 @@ function showScreeningResponsePopup(message, link = null, showContinueButton = f
   popup.appendChild(header);
   popup.appendChild(content);
   popup.appendChild(buttonsContainer);
+}
+
+function showPopup(message) {
+  const popup = document.getElementById('popup');
+  const popupText = document.getElementById('popupText');
+  
+  if (popupText) {
+    popupText.style.display = 'block';
+    popupText.textContent = message;
+  }
+  
+  popup.style.display = 'block';
 }
 
 function resetPopup() {
@@ -1913,13 +1690,11 @@ document.getElementById('closePopup').addEventListener('click', () => {
 function navigateToOnboarding(customerId) {
   const currentTenant = localStorage.getItem('tenantName') || 'bankfr';
   
-  // Determine entity type by checking screening data
-  let entityType = 'PP'; // default
+  let entityType = 'PP';
   try {
     const screeningData = localStorage.getItem(`screeningData_${customerId}`);
     if (screeningData) {
       const data = JSON.parse(screeningData);
-      // Check for PM-specific fields
       if (data.businessName || data.entityType === 'PM') {
         entityType = 'PM';
       }
@@ -1945,6 +1720,7 @@ function navigateToOnboarding(customerId) {
   
   window.location.href = `${onboardingPage}?customerId=${customerId}`;
 }
+
 async function callSearch(entityType, containerId, responseId, isDecentralized = false) {
   if (!tenantName) { 
     showNotification('Please authenticate first!', 'warning');
@@ -2001,7 +1777,6 @@ async function callSearch(entityType, containerId, responseId, isDecentralized =
 
     const data = await res.json();
     
-    // CRITICAL: Store customer data for secure onboarding transfer immediately after successful API call
     const dataStored = storeCustomerDataForOnboarding(payload, data);
     if (!dataStored) {
       console.error('Failed to store customer data for onboarding');
@@ -2014,30 +1789,31 @@ async function callSearch(entityType, containerId, responseId, isDecentralized =
 
     logMessage(`Search completed for ${entityType}`, 'success');
     showNotification('Search completed successfully', 'success');
+    
     if (isDecentralized) {
-        if (data.maxScore && data.maxScore > 0) {
-          const link = `https://greataml.com/search/searchdecision/${data.search_query_id}`;
-          logMessage(`Hits found for customer (Score: ${data.maxScore})`, 'warning');
-          showScreeningResponsePopup('Some hits are found. You can treat the hits via this link.', link, false, payload, data);
+      if (data.maxScore && data.maxScore > 0) {
+        const link = `https://greataml.com/search/searchdecision/${data.search_query_id}`;
+        logMessage(`Hits found for customer (Score: ${data.maxScore})`, 'warning');
+        showScreeningResponsePopup('Some hits are found. You can treat the hits via this link.', link, false, payload, data);
+      } else {
+        logMessage('No hits found for customer', 'info');
+        showScreeningResponsePopup('No hits found. You can proceed with the next step.', null, true, payload, data);
+      }
+    } else {
+      const isAsync = containerId === 'asyncFields';
+      
+      if (data.maxScore && data.maxScore > 0) {
+        logMessage(`Hits found for customer (Score: ${data.maxScore})`, 'warning');
+        if (isAsync) {
+          showScreeningResponsePopup('Some hits are found. The alert is being treated by the compliance team. You can now continue the onboarding.', null, true, payload, data);
         } else {
-          logMessage('No hits found for customer', 'info');
-          showScreeningResponsePopup('No hits found. You can proceed with the next step.', null, true, payload, data);
+          showScreeningResponsePopup('Some hits are found. The alert is assigned to the compliance team. You will receive a notification once the alert is treated.', null, false, payload, data);
         }
       } else {
-        const isAsync = containerId === 'asyncFields';
-        
-        if (data.maxScore && data.maxScore > 0) {
-          logMessage(`Hits found for customer (Score: ${data.maxScore})`, 'warning');
-          if (isAsync) {
-            showScreeningResponsePopup('Some hits are found. The alert is being treated by the compliance team. You can now continue the onboarding.', null, true, payload, data);
-          } else {
-            showScreeningResponsePopup('Some hits are found. The alert is assigned to the compliance team. You will receive a notification once the alert is treated.', null, false, payload, data);
-          }
-        } else {
-          logMessage('No hits found for customer', 'info');
-          showScreeningResponsePopup('No hits found. You can proceed with the next step.', null, true, payload, data);
-        }
+        logMessage('No hits found for customer', 'info');
+        showScreeningResponsePopup('No hits found. You can proceed with the next step.', null, true, payload, data);
       }
+    }
   } catch (err) {
     const errorMsg = `Search error: ${err.message}`;
     logMessage(errorMsg, 'error');
@@ -2045,7 +1821,6 @@ async function callSearch(entityType, containerId, responseId, isDecentralized =
   }
 }
 
-// Enhanced customer data storage function for secure onboarding transfer
 function storeCustomerDataForOnboarding(customerData, apiResponse) {
   try {
     const customerId = apiResponse.customerId || apiResponse.customer_id || apiResponse.id;
@@ -2055,54 +1830,35 @@ function storeCustomerDataForOnboarding(customerData, apiResponse) {
       return false;
     }
 
-    // Determine entity type
     const entityType = customerData.businessName ? 'PM' : 'PP';
 
-    // Create comprehensive customer data object with security flag
     const completeCustomerData = {
-      // Core identification data (will be read-only in onboarding)
       customerId: customerId,
       entityType: entityType,
-      
-      // PP-specific fields
       firstName: customerData.firstName,
       lastName: customerData.lastName,
       birthDate: customerData.birthDate,
       nationality: customerData.nationality,
       citizenship: customerData.citizenship,
-      
-      // PM-specific fields
       businessName: customerData.businessName,
       legalForm: customerData.legalForm,
       countryOfIncorporation: customerData.countryOfIncorporation,
       registrationNumber: customerData.registrationNumber,
-      
-      // System data
       systemId: customerData.systemId,
       systemName: customerData.systemName,
       searchQuerySource: customerData.searchQuerySource,
-      
-      // Screening results
       searchQueryId: apiResponse.search_query_id,
       maxScore: apiResponse.maxScore || 0,
       screeningResult: apiResponse.maxScore > 0 ? 'HITS_FOUND' : 'NO_HITS',
-      
-      // Metadata
       tenant: tokenManager.getTenant() || localStorage.getItem('tenantName') || 'Unknown',
       timestamp: new Date().toISOString(),
-      
-      // SECURITY FLAG - marks this data as locked for onboarding
       isScreeningDataLocked: true,
-      
-      // Full API response for reference
       apiResponse: apiResponse
     };
 
-    // Store with multiple keys for reliability
     localStorage.setItem(`customerData_${customerId}`, JSON.stringify(completeCustomerData));
     localStorage.setItem(`screeningData_${customerId}`, JSON.stringify(completeCustomerData));
     
-    // Also store a mapping for easy lookup
     const customerMappings = JSON.parse(localStorage.getItem('customerDataMappings') || '{}');
     customerMappings[customerId] = {
       entityType: entityType,
@@ -2130,51 +1886,20 @@ function storeCustomerDataForOnboarding(customerData, apiResponse) {
     return false;
   }
 }
-// --- Button Events ---
-const closeBtn = document.getElementById('closePopup');
-closeBtn.addEventListener('click', () => {
-  const popup = document.getElementById('popup');
-  const popupText = document.getElementById('popupText');
-  const popupLink = document.getElementById('popupLink');
-  
-  popup.style.display = 'none';
-  
-  popupText.style.whiteSpace = 'normal';
-  popupText.style.fontSize = '';
-  popupText.style.lineHeight = '';
-  popupText.textContent = '';
-  
-  popupLink.onclick = null;
-  popupLink.style.cursor = 'default';
-  popupLink.style.display = 'none';
-  popupLink.readOnly = true;
-  popupLink.value = '';
-  popupLink.placeholder = '';
-  
-  const extraButtons = popup.querySelectorAll('button:not(#closePopup)');
-  extraButtons.forEach(btn => btn.remove());
-  
-  const extraDivs = popup.querySelectorAll('div');
-  extraDivs.forEach(div => div.remove());
-  
-  const sel = window.getSelection();
-  sel.removeAllRanges();
-});
 
-document.getElementById('submitDecentralized')
-  .addEventListener('click', () => 
-    callSearch(
-      document.getElementById('entityTypeDecentralized').value,
-      'decentralizedFields',
-      'responseDecentralized',
-      true
-    )
-  );
+// ===== BUTTON AND EVENT LISTENERS - ALL IN ONE PLACE =====
+document.getElementById('submitDecentralized').addEventListener('click', () => 
+  callSearch(
+    document.getElementById('entityTypeDecentralized').value,
+    'decentralizedFields',
+    'responseDecentralized',
+    true
+  )
+);
 
-document.getElementById('submitSync')
-  .addEventListener('click', () => 
-    callSearch(document.getElementById('entityTypeSync').value, 'syncFields', 'responseSync')
-  );
+document.getElementById('submitSync').addEventListener('click', () => 
+  callSearch(document.getElementById('entityTypeSync').value, 'syncFields', 'responseSync')
+);
 
 document.getElementById('submitAsync').addEventListener('click', () => {
   const entityType = document.getElementById('entityTypeAsync').value;
@@ -2186,11 +1911,28 @@ document.getElementById('submitAsync').addEventListener('click', () => {
   callSearchAsync(entityType, 'asyncFields');
 });
 
-document.getElementById('entityTypeDecentralized')
-  .addEventListener('change', () => renderFields('decentralizedFields', document.getElementById('entityTypeDecentralized').value, 'decentralized'));
+document.getElementById('entityTypeDecentralized').addEventListener('change', () => {
+  const entityType = document.getElementById('entityTypeDecentralized').value;
+  if (entityType) {
+    renderFields('decentralizedFields', entityType, 'decentralized');
+  }
+});
 
-document.getElementById('entityTypeSync')
-  .addEventListener('change', () => renderFields('syncFields', document.getElementById('entityTypeSync').value, 'centralized'));
+document.getElementById('entityTypeSync').addEventListener('change', () => {
+  const entityType = document.getElementById('entityTypeSync').value;
+  if (entityType) {
+    renderFields('syncFields', entityType, 'centralized');
+  }
+});
+
+// ONLY ONE listener for async entity type
+document.getElementById('entityTypeAsync').addEventListener('change', () => {
+  const entityType = document.getElementById('entityTypeAsync').value;
+  console.log('Async entity type changed to:', entityType);
+  if (entityType) {
+    renderFields('asyncFields', entityType, 'async');
+  }
+});
 
 async function receiveDirectWebhook(event) {
   try {
@@ -2230,41 +1972,35 @@ window.addEventListener('beforeunload', function() {
 window.closeNotificationHistory = closeNotificationHistory;
 window.continueOnboardingFromHistory = continueOnboardingFromHistory;
 window.getCountriesForTenant = getCountriesForTenant;
- // Resize functionality
+
+// Resize functionality
 document.addEventListener('DOMContentLoaded', function() {
   const resizeHandle = document.getElementById('resizeHandle');
   const authSidebar = document.getElementById('authSidebar');
   let isResizing = false;
 
-  resizeHandle.addEventListener('mousedown', function(e) {
-    isResizing = true;
-    document.body.classList.add('resizing');
-    e.preventDefault();
-  });
+  if (resizeHandle && authSidebar) {
+    resizeHandle.addEventListener('mousedown', function(e) {
+      isResizing = true;
+      document.body.classList.add('resizing');
+      e.preventDefault();
+    });
 
-  document.addEventListener('mousemove', function(e) {
-    if (!isResizing) return;
+    document.addEventListener('mousemove', function(e) {
+      if (!isResizing) return;
 
-    const newWidth = e.clientX;
-    
-    // Limites min et max
-    if (newWidth >= 200 && newWidth <= 600) {
-      authSidebar.style.width = newWidth + 'px';
-    }
-  });
-  // Entity type change listener for async - KEEP ONLY THIS ONE
-document.getElementById('entityTypeAsync').addEventListener('change', () => {
-  const entityType = document.getElementById('entityTypeAsync').value;
-  console.log('Async entity type changed to:', entityType);
-  if (entityType) {
-    renderFields('asyncFields', entityType, 'async');
+      const newWidth = e.clientX;
+      
+      if (newWidth >= 200 && newWidth <= 600) {
+        authSidebar.style.width = newWidth + 'px';
+      }
+    });
+
+    document.addEventListener('mouseup', function() {
+      if (isResizing) {
+        isResizing = false;
+        document.body.classList.remove('resizing');
+      }
+    });
   }
-});
-
-  document.addEventListener('mouseup', function() {
-    if (isResizing) {
-      isResizing = false;
-      document.body.classList.remove('resizing');
-    }
-  });
 });
