@@ -298,6 +298,20 @@ const visibleTemplates = {
       { label: 'Nationality', key: 'nationality' },
       { label: 'Citizenship', key: 'citizenship' },
       { label: 'Queue Name', key: 'queueName' }
+    ],
+    // NEW: Add async-specific template for PP
+    async: [
+      { label: 'First Name', key: 'firstName', required: true },
+      { label: 'Last Name', key: 'lastName', required: true },
+      { label: 'Birth Date', key: 'birthDate', type: 'date', required: true },
+      { label: 'Citizenship', key: 'citizenship', type: 'country', required: true },
+      { label: 'Nationality', key: 'nationality', type: 'country', required: true },
+      { label: 'Type de la pièce d\'identité', key: 'typePiece', type: 'idType', required: true },
+      { label: 'Numéro de la pièce d\'identité', key: 'numeroPiece', required: true },
+      { label: 'Profession', key: 'profession', type: 'profession', required: true },
+      { label: 'Produits/Services cibles', key: 'produits', type: 'products', required: true },
+      { label: 'Canal de distribution', key: 'canal', type: 'channel', required: true },
+      { label: 'Revenu annuel net', key: 'revenu', type: 'number', placeholder: 'Numeric only', required: true }
     ]
   },
   PM: {
@@ -305,6 +319,15 @@ const visibleTemplates = {
     centralized: [
       { label: 'Business Name', key: 'businessName' },
       { label: 'Queue Name', key: 'queueName' }
+    ],
+    // NEW: Add async-specific template for PM
+    async: [
+      { label: 'Business Name', key: 'businessName', required: true },
+      { label: 'Legal Form', key: 'legalForm', type: 'legalForm', required: true },
+      { label: 'Country of Incorporation', key: 'countryOfIncorporation', type: 'country', required: true },
+      { label: 'Registration Number', key: 'registrationNumber', required: true },
+      { label: 'Produits/Services cibles', key: 'produits', type: 'products', required: true },
+      { label: 'Canal de distribution', key: 'canal', type: 'channel', required: true }
     ]
   }
 };
@@ -324,6 +347,493 @@ const defaultValues = {
     queueName: 'Default'
   }
 };
+
+//-------------------------------------------------------------
+
+const asyncFieldOptions = {
+  idType: [
+    { value: 'cin', label: 'Carte d\'identité nationale' },
+    { value: 'passeport', label: 'Passeport' },
+    { value: 'titre_sejour', label: 'Titre de séjour' },
+    { value: 'permis_conduire', label: 'Permis de conduire' }
+  ],
+  profession: [
+    'CLERGE & RELIGIEUX',
+    'COMMERCE',
+    'ARTISAN',
+    'CADRE SUPERIEUR',
+    'EMPLOYE',
+    'PROFESSION LIBERALE',
+    'RETRAITE',
+    'ETUDIANT',
+    'SANS PROFESSION'
+  ],
+  products: [
+    { value: 'currentAccount', label: 'Compte courant' },
+    { value: 'savingsAccount', label: 'Compte épargne' },
+    { value: 'loan', label: 'Prêt' },
+    { value: 'creditCard', label: 'Carte de crédit' },
+    { value: 'mobileBanking', label: 'Banque mobile' }
+  ],
+  channel: [
+    { value: 'branch', label: 'Agence' },
+    { value: 'online', label: 'En ligne' },
+    { value: 'mobile', label: 'Mobile' },
+    { value: 'phone', label: 'Téléphone' }
+  ],
+  legalForm: [
+    'SARL',
+    'SA',
+    'SAS',
+    'EURL',
+    'SNC',
+    'Association',
+    'Autre'
+  ]
+};
+
+// UPDATE the renderFields function to handle async templates
+function renderFields(containerId, entityType, processType) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+
+  // Determine which template to use
+  let fields;
+  if (containerId === 'asyncFields') {
+    fields = visibleTemplates[entityType]?.async || [];
+  } else {
+    fields = visibleTemplates[entityType]?.[processType] || [];
+  }
+
+  fields.forEach(field => {
+    const label = document.createElement('label');
+    label.textContent = field.label + (field.required ? ' *:' : ':');
+    if (field.required) {
+      label.style.fontWeight = 'bold';
+    }
+
+    let input;
+    
+    // Handle different field types
+    if (field.type === 'country' || field.key === 'citizenship' || field.key === 'nationality' || field.key === 'countryOfIncorporation') {
+      input = document.createElement('select');
+      input.id = containerId + '_' + field.key;
+      if (field.required) input.required = true;
+
+      const defaultOption = document.createElement('option');
+      defaultOption.value = '';
+      defaultOption.textContent = 'Select Country';
+      input.appendChild(defaultOption);
+
+      const currentCountries = getCurrentCountries();
+      currentCountries.forEach(country => {
+        const option = document.createElement('option');
+        option.value = country;
+        option.textContent = country;
+        input.appendChild(option);
+      });
+    } 
+    else if (field.type === 'idType') {
+      input = document.createElement('select');
+      input.id = containerId + '_' + field.key;
+      if (field.required) input.required = true;
+
+      const defaultOption = document.createElement('option');
+      defaultOption.value = '';
+      defaultOption.textContent = 'Sélectionner le type';
+      input.appendChild(defaultOption);
+
+      asyncFieldOptions.idType.forEach(type => {
+        const option = document.createElement('option');
+        option.value = type.value;
+        option.textContent = type.label;
+        input.appendChild(option);
+      });
+    }
+    else if (field.type === 'profession') {
+      input = document.createElement('select');
+      input.id = containerId + '_' + field.key;
+      if (field.required) input.required = true;
+
+      const defaultOption = document.createElement('option');
+      defaultOption.value = '';
+      defaultOption.textContent = 'Sélectionner la profession';
+      input.appendChild(defaultOption);
+
+      asyncFieldOptions.profession.forEach(prof => {
+        const option = document.createElement('option');
+        option.value = prof;
+        option.textContent = prof;
+        input.appendChild(option);
+      });
+    }
+    else if (field.type === 'products') {
+      input = document.createElement('select');
+      input.id = containerId + '_' + field.key;
+      if (field.required) input.required = true;
+
+      const defaultOption = document.createElement('option');
+      defaultOption.value = '';
+      defaultOption.textContent = 'Sélectionner le produit';
+      input.appendChild(defaultOption);
+
+      asyncFieldOptions.products.forEach(product => {
+        const option = document.createElement('option');
+        option.value = product.value;
+        option.textContent = product.label;
+        input.appendChild(option);
+      });
+    }
+    else if (field.type === 'channel') {
+      input = document.createElement('select');
+      input.id = containerId + '_' + field.key;
+      if (field.required) input.required = true;
+
+      const defaultOption = document.createElement('option');
+      defaultOption.value = '';
+      defaultOption.textContent = 'Sélectionner le canal';
+      input.appendChild(defaultOption);
+
+      asyncFieldOptions.channel.forEach(channel => {
+        const option = document.createElement('option');
+        option.value = channel.value;
+        option.textContent = channel.label;
+        input.appendChild(option);
+      });
+    }
+    else if (field.type === 'legalForm') {
+      input = document.createElement('select');
+      input.id = containerId + '_' + field.key;
+      if (field.required) input.required = true;
+
+      const defaultOption = document.createElement('option');
+      defaultOption.value = '';
+      defaultOption.textContent = 'Sélectionner la forme juridique';
+      input.appendChild(defaultOption);
+
+      asyncFieldOptions.legalForm.forEach(form => {
+        const option = document.createElement('option');
+        option.value = form;
+        option.textContent = form;
+        input.appendChild(option);
+      });
+    }
+    else if (field.key === 'queueName') {
+      input = document.createElement('select');
+      input.id = containerId + '_' + field.key;
+
+      const queueOptions = ['Default', 'Maker', 'Checker'];
+      queueOptions.forEach(queueOption => {
+        const option = document.createElement('option');
+        option.value = queueOption;
+        option.textContent = queueOption;
+        input.appendChild(option);
+      });
+      
+      input.value = 'Default';
+    } 
+    else {
+      input = document.createElement('input');
+      input.id = containerId + '_' + field.key;
+      input.type = field.type === 'date' ? 'date' : (field.type === 'number' ? 'number' : 'text');
+      if (field.placeholder) input.placeholder = field.placeholder;
+      if (field.required) input.required = true;
+      
+      // Special handling for revenue field
+      if (field.type === 'number') {
+        input.min = '0';
+        input.step = '1';
+      }
+    }
+
+    container.appendChild(label);
+    container.appendChild(input);
+  });
+}
+
+// NEW: Create payload for async onboarding
+function createAsyncOnboardingPayload(entityType, formData) {
+  const customerId = parseInt(formData.customerId) || Math.floor(Math.random() * 10000);
+  const currentDateTime = new Date().toISOString();
+  
+  if (entityType === 'PP') {
+    return {
+      systemName: "T24",
+      systemId: formData.systemId || `system_${Date.now()}`,
+      formId: "1",
+      onBehalfOfUser: "admin",
+      items: {
+        isSanctionnedWorkflow: "Non",
+        AddressDataGrid: [],
+        PaysDeResidence: formData.citizenship || "",
+        address: [],
+        address_doc: [],
+        address_proof_type: {},
+        adresseDeResidence: "",
+        agence: "headquarters",
+        agencyId: 3,
+        agencyName: "headquarters",
+        agency_location: null,
+        birth_date: formData.birthDate || "",
+        businessName: "",
+        canal_de_distribution: formData.canal || "",
+        citizenship: formData.citizenship || "",
+        containerelm: {
+          "profession-2": "",
+          retrieved_dob: "",
+          retrieved_last_name: "",
+          retrieved_first_name: "",
+          "citizenship-2": "",
+          retrieved_address: ""
+        },
+        createdBy: "admin",
+        createdOn: currentDateTime,
+        creatorFirstName: "System",
+        creatorId: 1,
+        creatorLastName: "User",
+        current_date: currentDateTime,
+        current_user_id: 1,
+        current_user_name: "System User",
+        cus_birth_date: formData.birthDate || "",
+        customerUrl: "https://greataml.com/",
+        customer_type: "manual-entry",
+        dataGrid: [{
+          select: "",
+          nature: "",
+          tx_nature: {}
+        }],
+        dataGrid1: [{
+          source_of_funds_doctype: {},
+          source_of_funds_doc: []
+        }],
+        delivery_date: "",
+        distribution_channel: null,
+        dpr: "",
+        eaiIds: {},
+        email: "",
+        entityType: "PP",
+        expiry_date: "",
+        extendedProperties: {},
+        first_name: formData.firstName || "",
+        fiscale_ville: "",
+        form_entity_type: "PP",
+        hasRiskedCountry: false,
+        id: customerId,
+        id_doc: [],
+        invokeElm: false,
+        isPEP: false,
+        isPepWorkflow: "<li>Personne politiquement exposée : <b> <span> Non</span></b></li>",
+        isSanctioned: false,
+        isSanctionned: false,
+        is_hq_user: false,
+        last_name: formData.lastName || "",
+        last_update: currentDateTime,
+        listsNames: [],
+        luneDeVosRelationsPresenteTElleLunDesIndicesDamericaniteDefinisParLaLoiFatca: "",
+        marital_status: "",
+        modificationDate: currentDateTime,
+        mscq: "",
+        nationality: formData.nationality || "",
+        nid: formData.numeroPiece || "",
+        obnl_name: formData.lastName || "",
+        origine_des_fonds: ["investmentReturns"],
+        outboundSystems: null,
+        pays: formData.nationality || "",
+        pep: "",
+        pliberal: "",
+        postal_code: "",
+        process_type: "",
+        produit: [formData.produits || ""],
+        profession: formData.profession || "",
+        revenuAnnuelNet: parseInt(formData.revenu) || 0,
+        rm_fn: "System",
+        rm_ln: "User",
+        rm_username: "admin",
+        searchId: Math.floor(Math.random() * 100000),
+        tel1: "",
+        tel2: "",
+        tiin_doc: [],
+        tin_: {
+          id: getDocumentTypeId(formData.typePiece),
+          name: getDocumentTypeName(formData.typePiece),
+          value: formData.typePiece || "",
+          translate: getDocumentTypeName(formData.typePiece),
+          parentId: null,
+          parentName: null,
+          uniqueCode: `${getDocumentTypeName(formData.typePiece)}:${formData.typePiece}:tin`,
+          tags: ["tin"]
+        },
+        url: "https://greataml.com/"
+      }
+    };
+  } else if (entityType === 'PM') {
+    return {
+      systemName: "T24",
+      systemId: formData.systemId || `system_${Date.now()}`,
+      formId: "2",
+      onBehalfOfUser: "admin",
+      items: {
+        businessName: formData.businessName || "",
+        legalForm: formData.legalForm || "",
+        countryOfIncorporation: formData.countryOfIncorporation || "",
+        registrationNumber: formData.registrationNumber || "",
+        produit: [formData.produits || ""],
+        canal_de_distribution: formData.canal || "",
+        entityType: "PM",
+        form_entity_type: "PM",
+        createdBy: "admin",
+        createdOn: currentDateTime,
+        current_date: currentDateTime,
+        id: customerId,
+        agence: "headquarters",
+        agencyId: 3,
+        agencyName: "headquarters"
+      }
+    };
+  }
+}
+
+// Helper functions for document types (keep existing ones)
+function getDocumentTypeId(docType) {
+  const typeMap = {
+    'cin': 1,
+    'passeport': 13,
+    'titre_sejour': 2,
+    'permis_conduire': 3
+  };
+  return typeMap[docType] || 1;
+}
+
+function getDocumentTypeName(docType) {
+  const nameMap = {
+    'cin': 'Carte d\'identité nationale',
+    'passeport': 'Passeport',
+    'titre_sejour': 'Titre de séjour',
+    'permis_conduire': 'Permis de conduire'
+  };
+  return nameMap[docType] || 'Carte d\'identité nationale';
+}
+
+// UPDATE the callSearch function to handle async differently
+async function callSearchAsync(entityType, containerId) {
+  if (!tenantName) { 
+    showNotification('Please authenticate first!', 'warning');
+    return; 
+  }
+
+  logMessage(`Starting async onboarding for ${entityType}...`, 'info');
+
+  try {
+    let currentAuthToken;
+    try {
+      currentAuthToken = await tokenManager.getValidToken();
+      if (!currentAuthToken) {
+        throw new Error('No valid token available');
+      }
+      logMessage('Using valid token for async onboarding', 'info');
+    } catch (tokenError) {
+      logMessage('Token validation failed: ' + tokenError.message, 'error');
+      showNotification('Authentication expired. Please login again.', 'error');
+      return;
+    }
+
+    // Collect form data
+    let formData = {};
+    document.querySelectorAll(`#${containerId} input, #${containerId} select`).forEach(input => {
+      formData[input.id.replace(containerId + '_', '')] = input.value;
+    });
+
+    // Generate system ID
+    const generatedSystemId = `system_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+    formData.systemId = generatedSystemId;
+    formData.customerId = Math.floor(Math.random() * 10000);
+
+    // Create the async onboarding payload
+    const payload = createAsyncOnboardingPayload(entityType, formData);
+
+    console.log('Async onboarding payload:', payload);
+
+    // Call the onboarding API directly
+    const endpoint = 'https://greataml.com/kyc-web-restful/onboarding/v1/onboardCustomer';
+    
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'x-auth-tenant': tenantName,
+        'x-auth-token': currentAuthToken
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+    
+    console.log('Async onboarding response:', data);
+
+    logMessage(`Async onboarding completed for ${entityType}`, 'success');
+    showNotification('Onboarding submitted successfully! Customer will be processed asynchronously.', 'success');
+    
+    // Show success popup with customer card link
+    const customerId = data.id || formData.customerId;
+    const customerCardUrl = `https://greataml.com/profiles/customer-card/${customerId}`;
+    
+    showScreeningResponsePopup(
+      `Onboarding successfully submitted!\n\nCustomer ID: ${customerId}\n\nThe customer will be screened and processed by the compliance team asynchronously.`,
+      customerCardUrl,
+      false,
+      formData,
+      data
+    );
+
+  } catch (err) {
+    const errorMsg = `Async onboarding error: ${err.message}`;
+    logMessage(errorMsg, 'error');
+    showNotification('Async onboarding failed: ' + err.message, 'error');
+    console.error('Full error:', err);
+  }
+}
+
+// UPDATE button event listener for async
+document.getElementById('submitAsync').addEventListener('click', () => {
+  const entityType = document.getElementById('entityTypeAsync').value;
+  if (!entityType) {
+    showNotification('Please select an entity type', 'warning');
+    return;
+  }
+  callSearchAsync(entityType, 'asyncFields');
+});
+
+// UPDATE entity type change listener for async
+document.getElementById('entityTypeAsync').addEventListener('change', () => {
+  const entityType = document.getElementById('entityTypeAsync').value;
+  if (entityType) {
+    renderFields('asyncFields', entityType, 'async');
+  }
+});
+//--------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 let sessionEvents = JSON.parse(sessionStorage.getItem('kycEvents')) || [];
 let sessionEventCounter = parseInt(sessionStorage.getItem('kycEventCounter')) || 0;
