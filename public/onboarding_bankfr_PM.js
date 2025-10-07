@@ -385,148 +385,300 @@ const PMOnboardingHandler = (function() {
     };
 
     // UI functions
-    const UI = {
-        showLoading: function(button) {
-            const originalText = button.textContent;
-            button.textContent = 'Envoi en cours...';
-            button.disabled = true;
-            return originalText;
-        },
+  // EXACT REPLACEMENT for the UI object in your PM handler
+// Find this section in document 6 and replace it entirely
 
-        hideLoading: function(button, originalText) {
-            button.textContent = originalText;
-            button.disabled = false;
-        },
+const UI = {
+    showLoading: function(button) {
+        const originalText = button.textContent;
+        button.textContent = 'Envoi en cours...';
+        button.disabled = true;
+        return originalText;
+    },
 
-        showSuccessMessage: function(onboardingResult = null) {
-            let statusMessage = '';
-            let statusColor = '#28a745';
-            let additionalInfo = '';
+    hideLoading: function(button, originalText) {
+        button.textContent = originalText;
+        button.disabled = false;
+    },
 
-            if (onboardingResult) {
-                if (onboardingResult.errorMessage) {
-                    statusMessage = 'Demande soumise avec remarques';
-                    statusColor = '#ffc107';
-                    additionalInfo = `
-                        <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 8px; margin: 20px auto; max-width: 500px;">
-                            <h4 style="color: #856404; margin-bottom: 10px;">Remarque:</h4>
-                            <p style="color: #856404; margin: 0;">${onboardingResult.errorMessage}</p>
-                        </div>
-                    `;
-                } else if (onboardingResult.instruction) {
-                    if (onboardingResult.instruction.blocking) {
-                        statusMessage = 'Demande rejetée';
-                        statusColor = '#dc3545';
-                        additionalInfo = `
-                            <div style="background: #f8d7da; border: 1px solid #f5c6cb; padding: 15px; border-radius: 8px; margin: 20px auto; max-width: 500px;">
-                                <h4 style="color: #721c24; margin-bottom: 10px;">Instruction bloquante:</h4>
-                                <p style="color: #721c24; margin: 0;"><strong>${onboardingResult.instruction.label}</strong></p>
-                                <p style="color: #721c24; margin: 5px 0 0 0;">${onboardingResult.instruction.description}</p>
-                            </div>
-                        `;
+    showSuccessMessage: async function(onboardingResult = null) {
+        let statusMessage = 'Customer Approved';
+        let riskText = '';
+        let riskBadgeClass = 'risk-low';
+        let isBlocking = false;
+        let isHighRisk = false;
+        let additionalInfo = '';
+
+        // Fetch risk level if riskCalculationId exists
+        if (onboardingResult && onboardingResult.riskCalculationId) {
+            try {
+                const riskData = await this.fetchRiskLevel(onboardingResult.riskCalculationId);
+                if (riskData && riskData.riskLevel) {
+                    const riskLevel = riskData.riskLevel.label;
+                    const riskValue = riskData.riskLevel.riskLevelValue;
+                    
+                    if (riskLevel === 'HR' || riskValue >= 80) {
+                        riskText = 'High Risk';
+                        riskBadgeClass = 'risk-high';
+                        isHighRisk = true;
+                        statusMessage = 'Entity on Hold';
+                    } else if (riskLevel === 'MR' || (riskValue >= 30 && riskValue < 80)) {
+                        riskText = 'Medium Risk';
+                        riskBadgeClass = 'risk-medium';
                     } else {
-                        statusMessage = 'Demande soumise - Action requise';
-                        statusColor = '#ffc107';
-                        additionalInfo = `
-                            <div style="background: #d1ecf1; border: 1px solid #bee5eb; padding: 15px; border-radius: 8px; margin: 20px auto; max-width: 500px;">
-                                <h4 style="color: #0c5460; margin-bottom: 10px;">Instruction d'information:</h4>
-                                <p style="color: #0c5460; margin: 0;"><strong>${onboardingResult.instruction.label}</strong></p>
-                                <p style="color: #0c5460; margin: 5px 0 0 0;">${onboardingResult.instruction.description}</p>
-                            </div>
-                        `;
+                        riskText = 'Low Risk';
+                        riskBadgeClass = 'risk-low';
                     }
-                } else {
-                    statusMessage = 'Onboarding PM terminé avec succès';
-                    additionalInfo = `
-                        <div style="background: #d4edda; border: 1px solid #c3e6cb; padding: 15px; border-radius: 8px; margin: 20px auto; max-width: 500px;">
-                            <h4 style="color: #155724; margin-bottom: 10px;">✓ Validation réussie</h4>
-                            <p style="color: #155724; margin: 0;">L'entité a été approuvée et peut être intégrée dans le système.</p>
-                        </div>
-                    `;
                 }
-            } else {
-                statusMessage = 'Onboarding PM terminé avec succès';
+            } catch (error) {
+                Utils.logError('Failed to fetch risk level', error);
             }
+        }
 
-            const container = document.querySelector('.container');
-            const customerCardUrl = `https://greataml.com/profiles/customer-card/${customerData.customerId}`;
+        // Handle different status scenarios
+        if (onboardingResult) {
+            if (onboardingResult.instruction && onboardingResult.instruction.blocking) {
+                statusMessage = 'Entity Rejected';
+                isBlocking = true;
+                additionalInfo = `
+                    <div style="background: #f8d7da; border: 2px solid #dc3545; padding: 20px; border-radius: 10px; margin: 25px auto; max-width: 500px; text-align: left;">
+                        <h4 style="color: #721c24; margin-bottom: 10px; font-size: 1.1rem;">⚠ Blocking Instruction</h4>
+                        <p style="color: #721c24; margin: 0; font-weight: 600;">${onboardingResult.instruction.label}</p>
+                        <p style="color: #721c24; margin: 10px 0 0 0; font-size: 0.95rem;">${onboardingResult.instruction.description}</p>
+                    </div>
+                `;
+            } else if (onboardingResult.instruction) {
+                statusMessage = 'Entity Approved - Action Required';
+                additionalInfo = `
+                    <div style="background: #d1ecf1; border: 2px solid #17a2b8; padding: 20px; border-radius: 10px; margin: 25px auto; max-width: 500px; text-align: left;">
+                        <h4 style="color: #0c5460; margin-bottom: 10px; font-size: 1.1rem;">ℹ Information Instruction</h4>
+                        <p style="color: #0c5460; margin: 0; font-weight: 600;">${onboardingResult.instruction.label}</p>
+                        <p style="color: #0c5460; margin: 10px 0 0 0; font-size: 0.95rem;">${onboardingResult.instruction.description}</p>
+                    </div>
+                `;
+            } else if (onboardingResult.errorMessage) {
+                statusMessage = 'Entity Approved - With Remarks';
+                additionalInfo = `
+                    <div style="background: #fff3cd; border: 2px solid #ffc107; padding: 20px; border-radius: 10px; margin: 25px auto; max-width: 500px; text-align: left;">
+                        <h4 style="color: #856404; margin-bottom: 10px; font-size: 1.1rem;">📝 Remark</h4>
+                        <p style="color: #856404; margin: 0;">${onboardingResult.errorMessage}</p>
+                    </div>
+                `;
+            }
+        }
+
+        const container = document.querySelector('.container');
+        const customerCardUrl = `https://greataml.com/profiles/customer-card/${customerData.customerId}`;
+        
+        container.innerHTML = `
+            <style>
+                .success-page-design1 {
+                    text-align: center;
+                    padding: 50px 20px;
+                    background: white;
+                    min-height: 100vh;
+                }
+                .success-icon {
+                    width: 80px;
+                    height: 80px;
+                    background: linear-gradient(135deg, ${isBlocking ? '#dc3545, #c82333' : '#28a745, #20c997'});
+                    border-radius: 50%;
+                    margin: 0 auto 25px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 3rem;
+                    color: white;
+                    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                }
+                .success-title {
+                    color: #004080;
+                    font-size: 1.8rem;
+                    margin-bottom: 15px;
+                    font-weight: 700;
+                }
+                .success-subtitle {
+                    color: #666;
+                    line-height: 1.6;
+                    margin-bottom: 30px;
+                    font-size: 1.1rem;
+                    max-width: 600px;
+                    margin-left: auto;
+                    margin-right: auto;
+                }
+                .risk-badge {
+                    display: inline-block;
+                    padding: 12px 30px;
+                    border-radius: 50px;
+                    font-weight: 600;
+                    font-size: 1.1rem;
+                    margin: 20px 0;
+                    transition: transform 0.2s ease;
+                }
+                .risk-badge:hover { transform: scale(1.05); }
+                .risk-medium { background: #fff3cd; color: #856404; border: 2px solid #ffc107; }
+                .risk-high { background: #f8d7da; color: #721c24; border: 2px solid #dc3545; }
+                .risk-low { background: #d4edda; color: #155724; border: 2px solid #28a745; }
+                .status-text {
+                    margin: 25px 0;
+                    font-size: 1.1rem;
+                    font-weight: 600;
+                    color: ${isBlocking ? '#dc3545' : (isHighRisk ? '#ff8c00' : '#28a745')};
+                }
+                .btn-primary-custom {
+                    display: inline-block;
+                    padding: 14px 35px;
+                    background: linear-gradient(135deg, #007ACC, #0056b3);
+                    color: white;
+                    text-decoration: none;
+                    border-radius: 8px;
+                    font-weight: 600;
+                    margin: 10px;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 4px 12px rgba(0, 122, 204, 0.3);
+                    border: none;
+                    cursor: pointer;
+                    font-size: 1rem;
+                }
+                .btn-primary-custom:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 6px 16px rgba(0, 122, 204, 0.4);
+                }
+                .btn-secondary-custom {
+                    display: inline-block;
+                    padding: 14px 35px;
+                    background: #6c757d;
+                    color: white;
+                    text-decoration: none;
+                    border-radius: 8px;
+                    font-weight: 600;
+                    margin: 10px;
+                    transition: all 0.3s ease;
+                    border: none;
+                    cursor: pointer;
+                    font-size: 1rem;
+                }
+                .btn-secondary-custom:hover {
+                    background: #5a6268;
+                    transform: translateY(-2px);
+                }
+                .entity-info-box {
+                    background: #f8f9fa;
+                    padding: 20px;
+                    border-radius: 10px;
+                    margin: 20px auto;
+                    max-width: 450px;
+                    text-align: left;
+                }
+                .entity-info-box h4 {
+                    margin-bottom: 15px;
+                    color: #004080;
+                }
+                .entity-info-box p {
+                    margin: 8px 0;
+                    color: #495057;
+                }
+            </style>
             
-            container.innerHTML = `
-                <div style="text-align: center; padding: 50px;">
-                    <div style="font-size: 4em; color: ${statusColor}; margin-bottom: 20px;">
-                        ${onboardingResult && onboardingResult.instruction && onboardingResult.instruction.blocking ? '⚠' : '✓'}
+            <div class="success-page-design1">
+                <div class="success-icon">${isBlocking ? '⚠' : '✓'}</div>
+                
+                <h2 class="success-title">Transfer Successful</h2>
+                
+                <p class="success-subtitle">
+                    Entity KYC DATA FORM has successfully transferred from your Core System to Reis KYC.
+                </p>
+                
+                ${riskText ? `
+                    <div style="margin: 35px 0;">
+                        <div style="font-size: 0.9rem; color: #666; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;">Risk Assessment</div>
+                        <div class="risk-badge ${riskBadgeClass}">${riskText}</div>
                     </div>
-                    <h2 style="color: ${statusColor}; margin-bottom: 20px;">${statusMessage}</h2>
-                    <p style="font-size: 1.2em; color: #6c757d; margin-bottom: 30px;">
-                        Demande KYC pour l'entité <strong>${customerData.customerId}</strong> traitée par le système Reis.
-                    </p>
-                    
-                    ${additionalInfo}
-                    
-                    <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px auto; max-width: 400px;">
-                        <h4 style="margin-bottom: 15px;">Informations de la demande:</h4>
-                        <p><strong>Entité:</strong> ${customerData.customerId}</p>
-                        <p><strong>Type:</strong> Personne Morale</p>
-                        <p><strong>Tenant:</strong> ${tenantName.toUpperCase()}</p>
-                        <p><strong>Date de soumission:</strong> ${new Date().toLocaleDateString('fr-FR')}</p>
-                        ${onboardingResult && onboardingResult.riskCalculationId ? 
-                            `<p><strong>ID de calcul de risque:</strong> ${onboardingResult.riskCalculationId}</p>` : ''}
-                    </div>
-                    
-                    <div style="margin: 30px auto; max-width: 500px;">
-                        <p style="font-size: 1.1em; color: #495057; margin-bottom: 15px;">
-                            Vous pouvez consulter les informations de l'entité et ses détails de calcul de risque via:
-                        </p>
-                        <a href="${customerCardUrl}" target="_blank" style="
-                            display: inline-block;
-                            background: linear-gradient(45deg, #007bff, #0056b3);
-                            color: white;
-                            padding: 12px 25px;
-                            text-decoration: none;
-                            border-radius: 8px;
-                            font-weight: 600;
-                            font-size: 1rem;
-                            transition: transform 0.2s ease;
-                            box-shadow: 0 3px 8px rgba(0,123,255,0.3);
-                        " onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
-                            Voir la Fiche Client
-                        </a>
-                    </div>
-                    
-                    <button class="btn btn-primary" onclick="window.location.href='index.html'" style="margin-top: 20px; padding: 15px 30px; background: linear-gradient(45deg, #28a745, #20c997); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                ` : ''}
+                
+                <p class="status-text">${isBlocking ? '✗' : '✓'} ${statusMessage}</p>
+                
+                ${additionalInfo}
+                
+                <div class="entity-info-box">
+                    <h4>Entity Information:</h4>
+                    <p><strong>Entity ID:</strong> ${customerData.customerId}</p>
+                    <p><strong>Business Name:</strong> ${customerData.businessName || 'N/A'}</p>
+                    <p><strong>Type:</strong> Personne Morale (PM)</p>
+                    <p><strong>Tenant:</strong> ${tenantName.toUpperCase()}</p>
+                    <p><strong>Submission Date:</strong> ${new Date().toLocaleDateString('fr-FR')}</p>
+                    ${onboardingResult && onboardingResult.riskCalculationId ? 
+                        `<p><strong>Risk Calculation ID:</strong> ${onboardingResult.riskCalculationId}</p>` : ''}
+                </div>
+                
+                <div style="margin: 35px auto; max-width: 550px;">
+                    <p style="color: #666; margin-bottom: 15px; font-size: 1.05rem;">View entity information and risk calculation details:</p>
+                    <a href="${customerCardUrl}" target="_blank" class="btn-primary-custom">
+                        View Customer Card
+                    </a>
+                    <br>
+                    <button class="btn-secondary-custom" onclick="window.location.href='index.html'">
+                        Back to Home
+                    </button>
+                </div>
+            </div>
+        `;
+    },
+
+    fetchRiskLevel: async function(riskCalculationId) {
+        try {
+            const token = Auth.getToken();
+            const tenant = Auth.getTenant();
+            
+            const response = await fetch(`${CONFIG.API_BASE_URL}/risk-calculation/risk-calculation-result/${riskCalculationId}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-auth-tenant': tenant,
+                    'x-auth-token': token
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error(`Failed to fetch risk level: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            Utils.log('Risk level data fetched for PM', data);
+            return data;
+        } catch (error) {
+            Utils.logError('Error fetching PM risk level', error);
+            return null;
+        }
+    },
+
+    showErrorMessage: function(errorMessage) {
+        const container = document.querySelector('.container');
+        container.innerHTML = `
+            <div style="text-align: center; padding: 50px;">
+                <div style="font-size: 4em; color: #dc3545; margin-bottom: 20px;">❌</div>
+                <h2 style="color: #dc3545; margin-bottom: 20px;">Erreur de soumission</h2>
+                <p style="font-size: 1.2em; color: #6c757d; margin-bottom: 30px;">
+                    Une erreur s'est produite lors de l'envoi de la demande KYC pour l'entité <strong>${customerData.customerId}</strong>.
+                </p>
+                
+                <div style="background: #f8d7da; border: 1px solid #f5c6cb; padding: 20px; border-radius: 10px; margin: 20px auto; max-width: 500px;">
+                    <h4 style="color: #721c24; margin-bottom: 10px;">Détails de l'erreur:</h4>
+                    <p style="color: #721c24; margin: 0; word-break: break-word;">${errorMessage}</p>
+                </div>
+                
+                <div style="margin-top: 30px;">
+                    <button class="btn btn-primary" onclick="location.reload()" style="margin-right: 10px; padding: 15px 30px; background: linear-gradient(45deg, #007bff, #0056b3); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                        Réessayer
+                    </button>
+                    <button class="btn btn-secondary" onclick="window.location.href='index.html'" style="padding: 15px 30px; background: #6c757d; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
                         Retour à l'accueil
                     </button>
                 </div>
-            `;
-        },
-
-        showErrorMessage: function(errorMessage) {
-            const container = document.querySelector('.container');
-            container.innerHTML = `
-                <div style="text-align: center; padding: 50px;">
-                    <div style="font-size: 4em; color: #dc3545; margin-bottom: 20px;">❌</div>
-                    <h2 style="color: #dc3545; margin-bottom: 20px;">Erreur de soumission</h2>
-                    <p style="font-size: 1.2em; color: #6c757d; margin-bottom: 30px;">
-                        Une erreur s'est produite lors de l'envoi de la demande KYC pour l'entité <strong>${customerData.customerId}</strong>.
-                    </p>
-                    
-                    <div style="background: #f8d7da; border: 1px solid #f5c6cb; padding: 20px; border-radius: 10px; margin: 20px auto; max-width: 500px;">
-                        <h4 style="color: #721c24; margin-bottom: 10px;">Détails de l'erreur:</h4>
-                        <p style="color: #721c24; margin: 0; word-break: break-word;">${errorMessage}</p>
-                    </div>
-                    
-                    <div style="margin-top: 30px;">
-                        <button class="btn btn-primary" onclick="location.reload()" style="margin-right: 10px; padding: 15px 30px; background: linear-gradient(45deg, #007bff, #0056b3); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
-                            Réessayer
-                        </button>
-                        <button class="btn btn-secondary" onclick="window.location.href='index.html'" style="padding: 15px 30px; background: #6c757d; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
-                            Retour à l'accueil
-                        </button>
-                    </div>
-                </div>
-            `;
-        }
-    };
+            </div>
+        `;
+    }
+};
 
     // Data persistence functions
     const Storage = {
