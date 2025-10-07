@@ -815,15 +815,16 @@ async function callSearchAsync(entityType, containerId) {
     console.log('Async onboarding response:', data);
 
     logMessage(`Async onboarding completed for ${entityType}`, 'success');
-    showNotification('Onboarding submitted successfully! Customer will be processed asynchronously.', 'success');
+    showNotification('Customer KYC data successfully submitted!', 'success');
     
-    // Show success popup with customer card link
-    const customerId = data.id || formData.customerId;
-    const customerCardUrl = `https://greataml.com/profiles/customer-card/${customerId}`;
+    // Get the Reis ID from the response (try multiple possible field names)
+    const reisId = data.reisId || data.reis_id || data.id || data.customerId;
+    const customerWatchListUrl = `https://greataml.com/profiles/customer-watch-list/${reisId}`;
     
+    // Show success popup with the correct message and watch list link
     showScreeningResponsePopup(
-      `Onboarding successfully submitted!\n\nCustomer ID: ${customerId}\nSystem ID: ${generatedSystemId}\n\nThe customer will be screened and processed by the compliance team asynchronously.`,
-      customerCardUrl,
+      `The customer KYC data is successfully submitted from your core system to Reis.\n\nThe customer will be screened and processed by the compliance team asynchronously.\n\nYou can view the customer card via this link:`,
+      customerWatchListUrl,
       false,
       formData,
       data

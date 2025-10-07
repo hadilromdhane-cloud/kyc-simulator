@@ -119,9 +119,6 @@ const OnboardingHandler = (function() {
         mapFormDataToPayload: function(formData) {
             const customerId = parseInt(customerData.customerId) || Utils.generateCustomerId();
             const currentDateTime = new Date().toISOString();
-
-            // Check tenant and create appropriate payload
-            const isBanqueEN = tenantName === 'banque_en';
             return {
                     
                     customerId: customerId,
