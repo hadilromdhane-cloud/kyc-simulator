@@ -1494,15 +1494,15 @@ subTabButtons.forEach(btn => btn.addEventListener('click', () => {
   const activeSubtab = document.getElementById(btn.dataset.subtab);
   activeSubtab.style.display = 'block';
 
+  // Re-render fields when switching tabs if entity type is already selected
   if (btn.dataset.subtab === 'sync') {
     const syncType = document.getElementById('entityTypeSync').value;
     if (syncType) renderFields('syncFields', syncType, 'centralized');
   } else if (btn.dataset.subtab === 'async') {
     const asyncType = document.getElementById('entityTypeAsync').value;
-    if (asyncType) renderFields('asyncFields', asyncType, 'centralized');
+    if (asyncType) renderFields('asyncFields', asyncType, 'async'); // ✅ CORRECT
   }
 }));
-
 // --- Render input fields ---
 // FIXED: Update the renderFields function to properly handle async
 function renderFields(containerId, entityType, processType) {
@@ -2171,14 +2171,6 @@ document.getElementById('submitDecentralized')
     )
   );
 
-   document.getElementById('entityTypeAsync').addEventListener('change', () => {
-     const entityType = document.getElementById('entityTypeAsync').value;
-     console.log('Async entity type changed to:', entityType);
-     if (entityType) {
-       renderFields('asyncFields', entityType, 'async');
-     }
-   });
-
 document.getElementById('submitSync')
   .addEventListener('click', () => 
     callSearch(document.getElementById('entityTypeSync').value, 'syncFields', 'responseSync')
@@ -2199,9 +2191,6 @@ document.getElementById('entityTypeDecentralized')
 
 document.getElementById('entityTypeSync')
   .addEventListener('change', () => renderFields('syncFields', document.getElementById('entityTypeSync').value, 'centralized'));
-
-document.getElementById('entityTypeAsync')
-  .addEventListener('change', () => renderFields('asyncFields', document.getElementById('entityTypeAsync').value, 'centralized'));
 
 async function receiveDirectWebhook(event) {
   try {
@@ -2263,6 +2252,14 @@ document.addEventListener('DOMContentLoaded', function() {
       authSidebar.style.width = newWidth + 'px';
     }
   });
+  // Entity type change listener for async - KEEP ONLY THIS ONE
+document.getElementById('entityTypeAsync').addEventListener('change', () => {
+  const entityType = document.getElementById('entityTypeAsync').value;
+  console.log('Async entity type changed to:', entityType);
+  if (entityType) {
+    renderFields('asyncFields', entityType, 'async');
+  }
+});
 
   document.addEventListener('mouseup', function() {
     if (isResizing) {
