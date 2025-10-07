@@ -287,16 +287,16 @@ const visibleTemplates = {
     decentralized: [
       { label: 'Name', key: 'firstName' },
       { label: 'Last Name', key: 'lastName' },
-      { label: 'Birth Date', key: 'birthDate' },
-      { label: 'Citizenship', key: 'citizenship' },
-      { label: 'Nationality', key: 'nationality' }
+      { label: 'Birth Date', key: 'birthDate', type: 'date' },
+      { label: 'Citizenship', key: 'citizenship', type: 'country' },
+      { label: 'Nationality', key: 'nationality', type: 'country' }
     ],
     centralized: [
       { label: 'Name', key: 'firstName' },
       { label: 'Last Name', key: 'lastName' },
-      { label: 'Birth Date', key: 'birthDate' },
-      { label: 'Nationality', key: 'nationality' },
-      { label: 'Citizenship', key: 'citizenship' },
+      { label: 'Birth Date', key: 'birthDate', type: 'date' },
+      { label: 'Nationality', key: 'nationality', type: 'country'},
+      { label: 'Citizenship', key: 'citizenship',type: 'country' },
       { label: 'Queue Name', key: 'queueName' }
     ],
     // NEW: Add async-specific template for PP
@@ -320,7 +320,6 @@ const visibleTemplates = {
       { label: 'Business Name', key: 'businessName' },
       { label: 'Queue Name', key: 'queueName' }
     ],
-    // NEW: Add async-specific template for PM
     async: [
       { label: 'Business Name', key: 'businessName', required: true },
       { label: 'Legal Form', key: 'legalForm', type: 'legalForm', required: true },
