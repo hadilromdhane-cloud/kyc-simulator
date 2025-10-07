@@ -398,20 +398,25 @@ function renderFields(containerId, entityType, processType) {
     return;
   }
   
+  console.log('=== renderFields called ===');
+  console.log('containerId:', containerId);
+  console.log('entityType:', entityType);
+  console.log('processType:', processType);
+  
   container.innerHTML = '';
 
   // Determine which template to use
   let fields;
   if (containerId === 'asyncFields' || processType === 'async') {
     fields = visibleTemplates[entityType]?.async || [];
-    console.log('Rendering async fields for', entityType, ':', fields);
+    console.log('✅ Using ASYNC template with', fields.length, 'fields');
   } else {
     fields = visibleTemplates[entityType]?.[processType] || [];
-    console.log('Rendering', processType, 'fields for', entityType, ':', fields);
+    console.log('Using', processType, 'template with', fields.length, 'fields');
   }
 
   if (fields.length === 0) {
-    console.warn('No fields found for', entityType, processType);
+    console.warn('⚠️ No fields found for', entityType, processType);
     return;
   }
 
@@ -560,7 +565,7 @@ function renderFields(containerId, entityType, processType) {
     container.appendChild(input);
   });
   
-  console.log('Rendered', fields.length, 'fields in container', containerId);
+  console.log('✅ Successfully rendered', fields.length, 'fields in', containerId);
 }
 
 // Helper functions for document types
@@ -1428,12 +1433,8 @@ tabButtons.forEach(btn => btn.addEventListener('click', () => {
   const activeTab = document.getElementById(btn.dataset.tab);
   activeTab.style.display = 'block';
 
-  if (btn.dataset.tab === 'centralized') {
-    const syncType = document.getElementById('entityTypeSync').value;
-    const asyncType = document.getElementById('entityTypeAsync').value;
-    if (syncType) renderFields('syncFields', syncType, 'centralized');
-    if (asyncType) renderFields('asyncFields', asyncType, 'async');
-  }
+  // Don't auto-render when switching to centralized tab
+  // Let the subtabs handle their own rendering
 }));
 
 // --- Subtabs ---
