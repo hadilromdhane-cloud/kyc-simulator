@@ -838,7 +838,8 @@ function createAsyncOnboardingPayload(entityType, formData) {
         url: "https://greataml.com/"
       }
     };
-  } else if (entityType === 'PM') {
+  } 
+  else if (entityType === 'PM') {
   return {
     systemName: "T24",
     systemId: formData.systemId || `system_${Date.now()}`,
@@ -870,6 +871,7 @@ function createAsyncOnboardingPayload(entityType, formData) {
       customer_type: "manual-entry"
     }
   };
+}
 }
 
 
