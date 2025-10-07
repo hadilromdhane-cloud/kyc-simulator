@@ -420,121 +420,72 @@ function renderFields(containerId, entityType, processType) {
   }
 
   fields.forEach(field => {
-    const label = document.createElement('label');
-    label.textContent = field.label + (field.required ? ' *:' : ':');
-    if (field.required) {
-      label.style.fontWeight = 'bold';
-    }
-
-    let input;
-    
-    // Handle different field types
-    if (field.type === 'country' || field.key === 'citizenship' || field.key === 'nationality' || field.key === 'countryOfIncorporation') {
-      input = document.createElement('select');
+    // Special handling for Queue Name field
+    if (field.key === 'queueName') {
+      // Create wrapper with blue corporate style
+      const queueWrapper = document.createElement('div');
+      queueWrapper.style.cssText = `
+        border: 2px solid #007ACC;
+        border-radius: 8px;
+        padding: 15px;
+        background: #f0f8ff;
+        position: relative;
+        margin-top: 20px;
+        margin-bottom: 10px;
+      `;
+      
+      // Create configuration header badge
+      const configHeader = document.createElement('div');
+      configHeader.textContent = 'CONFIGURATION';
+      configHeader.style.cssText = `
+        position: absolute;
+        top: -12px;
+        left: 15px;
+        background: #007ACC;
+        color: white;
+        padding: 3px 15px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: bold;
+        letter-spacing: 0.5px;
+      `;
+      queueWrapper.appendChild(configHeader);
+      
+      // Create label
+      const label = document.createElement('label');
+      label.textContent = field.label + ':';
+      label.style.cssText = `
+        color: #007ACC;
+        font-weight: bold;
+        display: block;
+        margin-bottom: 8px;
+      `;
+      
+      // Create select input
+      const input = document.createElement('select');
       input.id = containerId + '_' + field.key;
-      if (field.required) input.required = true;
-
-      const defaultOption = document.createElement('option');
-      defaultOption.value = '';
-      defaultOption.textContent = 'Select Country';
-      input.appendChild(defaultOption);
-
-      const currentCountries = getCurrentCountries();
-      currentCountries.forEach(country => {
-        const option = document.createElement('option');
-        option.value = country;
-        option.textContent = country;
-        input.appendChild(option);
-      });
-    } 
-    else if (field.type === 'idType') {
-      input = document.createElement('select');
-      input.id = containerId + '_' + field.key;
-      if (field.required) input.required = true;
-
-      const defaultOption = document.createElement('option');
-      defaultOption.value = '';
-      defaultOption.textContent = 'Sélectionner le type';
-      input.appendChild(defaultOption);
-
-      asyncFieldOptions.idType.forEach(type => {
-        const option = document.createElement('option');
-        option.value = type.value;
-        option.textContent = type.label;
-        input.appendChild(option);
-      });
-    }
-    else if (field.type === 'profession') {
-      input = document.createElement('select');
-      input.id = containerId + '_' + field.key;
-      if (field.required) input.required = true;
-
-      const defaultOption = document.createElement('option');
-      defaultOption.value = '';
-      defaultOption.textContent = 'Sélectionner la profession';
-      input.appendChild(defaultOption);
-
-      asyncFieldOptions.profession.forEach(prof => {
-        const option = document.createElement('option');
-        option.value = prof;
-        option.textContent = prof;
-        input.appendChild(option);
-      });
-    }
-    else if (field.type === 'products') {
-      input = document.createElement('select');
-      input.id = containerId + '_' + field.key;
-      if (field.required) input.required = true;
-
-      const defaultOption = document.createElement('option');
-      defaultOption.value = '';
-      defaultOption.textContent = 'Sélectionner le produit';
-      input.appendChild(defaultOption);
-
-      asyncFieldOptions.products.forEach(product => {
-        const option = document.createElement('option');
-        option.value = product.value;
-        option.textContent = product.label;
-        input.appendChild(option);
-      });
-    }
-    else if (field.type === 'channel') {
-      input = document.createElement('select');
-      input.id = containerId + '_' + field.key;
-      if (field.required) input.required = true;
-
-      const defaultOption = document.createElement('option');
-      defaultOption.value = '';
-      defaultOption.textContent = 'Sélectionner le canal';
-      input.appendChild(defaultOption);
-
-      asyncFieldOptions.channel.forEach(channel => {
-        const option = document.createElement('option');
-        option.value = channel.value;
-        option.textContent = channel.label;
-        input.appendChild(option);
-      });
-    }
-    else if (field.type === 'legalForm') {
-      input = document.createElement('select');
-      input.id = containerId + '_' + field.key;
-      if (field.required) input.required = true;
-
-      const defaultOption = document.createElement('option');
-      defaultOption.value = '';
-      defaultOption.textContent = 'Sélectionner la forme juridique';
-      input.appendChild(defaultOption);
-
-      asyncFieldOptions.legalForm.forEach(form => {
-        const option = document.createElement('option');
-        option.value = form;
-        option.textContent = form;
-        input.appendChild(option);
-      });
-    }
-    else if (field.key === 'queueName') {
-      input = document.createElement('select');
-      input.id = containerId + '_' + field.key;
+      input.style.cssText = `
+        width: 100%;
+        background: white;
+        border: 2px solid #007ACC;
+        color: #004080;
+        font-weight: 600;
+        padding: 10px;
+        border-radius: 5px;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      `;
+      
+      // Add hover effect
+      input.onmouseover = () => {
+        input.style.boxShadow = '0 4px 12px rgba(0, 122, 204, 0.3)';
+        input.style.transform = 'translateY(-2px)';
+      };
+      input.onmouseout = () => {
+        input.style.boxShadow = 'none';
+        input.style.transform = 'translateY(0)';
+      };
 
       const queueOptions = ['Default', 'Maker', 'Checker'];
       queueOptions.forEach(queueOption => {
@@ -545,28 +496,151 @@ function renderFields(containerId, entityType, processType) {
       });
       
       input.value = 'Default';
-    } 
-    else {
-      input = document.createElement('input');
-      input.id = containerId + '_' + field.key;
-      input.type = field.type === 'date' ? 'date' : (field.type === 'number' ? 'number' : 'text');
-      if (field.placeholder) input.placeholder = field.placeholder;
-      if (field.required) input.required = true;
       
-      // Special handling for revenue field
-      if (field.type === 'number') {
-        input.min = '0';
-        input.step = '1';
+      queueWrapper.appendChild(label);
+      queueWrapper.appendChild(input);
+      container.appendChild(queueWrapper);
+      
+    } else {
+      // Regular field handling
+      const label = document.createElement('label');
+      label.textContent = field.label + (field.required ? ' *:' : ':');
+      if (field.required) {
+        label.style.fontWeight = 'bold';
       }
-    }
 
-    container.appendChild(label);
-    container.appendChild(input);
+      let input;
+      
+      // Handle different field types
+      if (field.type === 'country' || field.key === 'citizenship' || field.key === 'nationality' || field.key === 'countryOfIncorporation') {
+        input = document.createElement('select');
+        input.id = containerId + '_' + field.key;
+        if (field.required) input.required = true;
+
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = 'Select Country';
+        input.appendChild(defaultOption);
+
+        const currentCountries = getCurrentCountries();
+        currentCountries.forEach(country => {
+          const option = document.createElement('option');
+          option.value = country;
+          option.textContent = country;
+          input.appendChild(option);
+        });
+      } 
+      else if (field.type === 'idType') {
+        input = document.createElement('select');
+        input.id = containerId + '_' + field.key;
+        if (field.required) input.required = true;
+
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = 'Sélectionner le type';
+        input.appendChild(defaultOption);
+
+        asyncFieldOptions.idType.forEach(type => {
+          const option = document.createElement('option');
+          option.value = type.value;
+          option.textContent = type.label;
+          input.appendChild(option);
+        });
+      }
+      else if (field.type === 'profession') {
+        input = document.createElement('select');
+        input.id = containerId + '_' + field.key;
+        if (field.required) input.required = true;
+
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = 'Sélectionner la profession';
+        input.appendChild(defaultOption);
+
+        asyncFieldOptions.profession.forEach(prof => {
+          const option = document.createElement('option');
+          option.value = prof;
+          option.textContent = prof;
+          input.appendChild(option);
+        });
+      }
+      else if (field.type === 'products') {
+        input = document.createElement('select');
+        input.id = containerId + '_' + field.key;
+        if (field.required) input.required = true;
+
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = 'Sélectionner le produit';
+        input.appendChild(defaultOption);
+
+        asyncFieldOptions.products.forEach(product => {
+          const option = document.createElement('option');
+          option.value = product.value;
+          option.textContent = product.label;
+          input.appendChild(option);
+        });
+      }
+      else if (field.type === 'channel') {
+        input = document.createElement('select');
+        input.id = containerId + '_' + field.key;
+        if (field.required) input.required = true;
+
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = 'Sélectionner le canal';
+        input.appendChild(defaultOption);
+
+        asyncFieldOptions.channel.forEach(channel => {
+          const option = document.createElement('option');
+          option.value = channel.value;
+          option.textContent = channel.label;
+          input.appendChild(option);
+        });
+      }
+      else if (field.type === 'legalForm') {
+        input = document.createElement('select');
+        input.id = containerId + '_' + field.key;
+        if (field.required) input.required = true;
+
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = 'Sélectionner la forme juridique';
+        input.appendChild(defaultOption);
+
+        asyncFieldOptions.legalForm.forEach(form => {
+          const option = document.createElement('option');
+          option.value = form;
+          option.textContent = form;
+          input.appendChild(option);
+        });
+      }
+      else {
+        input = document.createElement('input');
+        input.id = containerId + '_' + field.key;
+        
+        // Check both field.type and field.key for date fields
+        if (field.type === 'date' || field.key === 'birthDate') {
+          input.type = 'date';
+        } else if (field.type === 'number') {
+          input.type = 'number';
+          input.min = '0';
+          input.step = '1';
+        } else {
+          input.type = 'text';
+        }
+        
+        if (field.placeholder) input.placeholder = field.placeholder;
+        if (field.required) input.required = true;
+      }
+
+      container.appendChild(label);
+      container.appendChild(input);
+    }
   });
   
   console.log('✅ Successfully rendered', fields.length, 'fields in', containerId);
 }
-
 // Helper functions for document types
 function getDocumentTypeId(docType) {
   const typeMap = {
