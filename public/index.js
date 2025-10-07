@@ -760,10 +760,37 @@ async function callSearchAsync(entityType, containerId) {
       formData[input.id.replace(containerId + '_', '')] = input.value;
     });
 
-    // Generate system ID
+    // Generate system ID similar to screening flow (not random)
+    // Use a combination of timestamp and customer info for traceability
+    const customerIdentifier = `${formData.firstName || 'ASYNC'}_${formData.lastName || 'CUSTOMER'}_${Date.now()}`;
     const generatedSystemId = `system_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+    
+    // Store the mapping for potential future use
+    localStorage.setItem(`systemId_${customerIdentifier}`, generatedSystemId);
+    console.log('Generated systemId for async customer:', customerIdentifier, '→', generatedSystemId);
+    
     formData.systemId = generatedSystemId;
     formData.customerId = Math.floor(Math.random() * 10000);
+
+    // Store customer data with system ID for potential onboarding page use
+    const customerData = {
+      customerId: formData.customerId,
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      birthDate: formData.birthDate,
+      nationality: formData.nationality,
+      citizenship: formData.citizenship,
+      systemId: generatedSystemId,
+      systemName: "T24",
+      entityType: entityType,
+      tenant: tenantName,
+      timestamp: new Date().toISOString(),
+      processType: 'async'
+    };
+    
+    // Store for potential onboarding continuation
+    localStorage.setItem(`customerData_${formData.customerId}`, JSON.stringify(customerData));
+    console.log('Stored customer data for async onboarding:', customerData);
 
     // Create the async onboarding payload
     const payload = createAsyncOnboardingPayload(entityType, formData);
@@ -795,7 +822,7 @@ async function callSearchAsync(entityType, containerId) {
     const customerCardUrl = `https://greataml.com/profiles/customer-card/${customerId}`;
     
     showScreeningResponsePopup(
-      `Onboarding successfully submitted!\n\nCustomer ID: ${customerId}\n\nThe customer will be screened and processed by the compliance team asynchronously.`,
+      `Onboarding successfully submitted!\n\nCustomer ID: ${customerId}\nSystem ID: ${generatedSystemId}\n\nThe customer will be screened and processed by the compliance team asynchronously.`,
       customerCardUrl,
       false,
       formData,
@@ -1441,18 +1468,43 @@ tabButtons.forEach(btn => btn.addEventListener('click', () => {
 const subTabButtons = document.querySelectorAll('.subTabBtn');
 const subTabContents = document.querySelectorAll('.subTabContent');
 subTabButtons.forEach(btn => btn.addEventListener('click', () => {
+  console.log('🔵 Subtab clicked:', btn.dataset.subtab);
+  
   subTabButtons.forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   subTabContents.forEach(tc => tc.style.display = 'none');
   const activeSubtab = document.getElementById(btn.dataset.subtab);
-  activeSubtab.style.display = 'block';
+  
+  if (activeSubtab) {
+    activeSubtab.style.display = 'block';
+    console.log('✅ Showing subtab:', btn.dataset.subtab);
+  } else {
+    console.error('❌ Subtab not found:', btn.dataset.subtab);
+  }
 
+  // Clear fields when switching tabs to prevent crossover
   if (btn.dataset.subtab === 'sync') {
+    const syncFields = document.getElementById('syncFields');
+    if (syncFields) {
+      syncFields.innerHTML = '';
+      console.log('🧹 Cleared syncFields');
+    }
     const syncType = document.getElementById('entityTypeSync').value;
-    if (syncType) renderFields('syncFields', syncType, 'centralized');
+    if (syncType) {
+      console.log('Re-rendering sync fields for:', syncType);
+      renderFields('syncFields', syncType, 'centralized');
+    }
   } else if (btn.dataset.subtab === 'async') {
+    const asyncFields = document.getElementById('asyncFields');
+    if (asyncFields) {
+      asyncFields.innerHTML = '';
+      console.log('🧹 Cleared asyncFields');
+    }
     const asyncType = document.getElementById('entityTypeAsync').value;
-    if (asyncType) renderFields('asyncFields', asyncType, 'async');
+    if (asyncType) {
+      console.log('Re-rendering async fields for:', asyncType);
+      renderFields('asyncFields', asyncType, 'async');
+    }
   }
 }));
 
@@ -1914,6 +1966,7 @@ document.getElementById('submitAsync').addEventListener('click', () => {
 
 document.getElementById('entityTypeDecentralized').addEventListener('change', () => {
   const entityType = document.getElementById('entityTypeDecentralized').value;
+  console.log('🟢 Decentralized entity type changed to:', entityType);
   if (entityType) {
     renderFields('decentralizedFields', entityType, 'decentralized');
   }
@@ -1921,16 +1974,31 @@ document.getElementById('entityTypeDecentralized').addEventListener('change', ()
 
 document.getElementById('entityTypeSync').addEventListener('change', () => {
   const entityType = document.getElementById('entityTypeSync').value;
+  console.log('🔵 Sync entity type changed to:', entityType);
   if (entityType) {
+    // Clear async fields to prevent crossover
+    const asyncFields = document.getElementById('asyncFields');
+    if (asyncFields) asyncFields.innerHTML = '';
+    
     renderFields('syncFields', entityType, 'centralized');
   }
 });
 
-// ONLY ONE listener for async entity type
+// ONLY ONE listener for async entity type - WITH DEFENSIVE CLEARING
 document.getElementById('entityTypeAsync').addEventListener('change', () => {
   const entityType = document.getElementById('entityTypeAsync').value;
-  console.log('Async entity type changed to:', entityType);
+  console.log('🟠 Async entity type changed to:', entityType);
+  
   if (entityType) {
+    // CRITICAL: Clear sync fields to prevent crossover
+    const syncFields = document.getElementById('syncFields');
+    if (syncFields) {
+      syncFields.innerHTML = '';
+      console.log('🧹 Cleared syncFields to prevent crossover');
+    }
+    
+    // Render in async container ONLY
+    console.log('🎯 Rendering in asyncFields container with async template');
     renderFields('asyncFields', entityType, 'async');
   }
 });
