@@ -1504,36 +1504,145 @@ subTabButtons.forEach(btn => btn.addEventListener('click', () => {
 }));
 
 // --- Render input fields ---
+// FIXED: Update the renderFields function to properly handle async
 function renderFields(containerId, entityType, processType) {
   const container = document.getElementById(containerId);
+  if (!container) {
+    console.error('Container not found:', containerId);
+    return;
+  }
+  
   container.innerHTML = '';
 
-  const fields = visibleTemplates[entityType]?.[processType] || [];
+  // Determine which template to use
+  let fields;
+  if (containerId === 'asyncFields' || processType === 'async') {
+    fields = visibleTemplates[entityType]?.async || [];
+    console.log('Rendering async fields for', entityType, ':', fields);
+  } else {
+    fields = visibleTemplates[entityType]?.[processType] || [];
+    console.log('Rendering', processType, 'fields for', entityType, ':', fields);
+  }
+
+  if (fields.length === 0) {
+    console.warn('No fields found for', entityType, processType);
+    return;
+  }
 
   fields.forEach(field => {
     const label = document.createElement('label');
-    label.textContent = field.label + ':';
+    label.textContent = field.label + (field.required ? ' *:' : ':');
+    if (field.required) {
+      label.style.fontWeight = 'bold';
+    }
 
     let input;
-    if (field.key === 'citizenship' || field.key === 'nationality') {
-  input = document.createElement('select');
-  input.id = containerId + '_' + field.key;
+    
+    // Handle different field types
+    if (field.type === 'country' || field.key === 'citizenship' || field.key === 'nationality' || field.key === 'countryOfIncorporation') {
+      input = document.createElement('select');
+      input.id = containerId + '_' + field.key;
+      if (field.required) input.required = true;
 
-  const defaultOption = document.createElement('option');
-  defaultOption.value = '';
-  defaultOption.textContent = 'Select Country';
-  input.appendChild(defaultOption);
+      const defaultOption = document.createElement('option');
+      defaultOption.value = '';
+      defaultOption.textContent = 'Select Country';
+      input.appendChild(defaultOption);
 
-  // Use dynamic countries based on current tenant
-  const currentCountries = getCurrentCountries();
-  currentCountries.forEach(country => {
-    const option = document.createElement('option');
-    option.value = country;
-    option.textContent = country;
-    input.appendChild(option);
-  });
-}
- else if (field.key === 'queueName') {
+      const currentCountries = getCurrentCountries();
+      currentCountries.forEach(country => {
+        const option = document.createElement('option');
+        option.value = country;
+        option.textContent = country;
+        input.appendChild(option);
+      });
+    } 
+    else if (field.type === 'idType') {
+      input = document.createElement('select');
+      input.id = containerId + '_' + field.key;
+      if (field.required) input.required = true;
+
+      const defaultOption = document.createElement('option');
+      defaultOption.value = '';
+      defaultOption.textContent = 'Sélectionner le type';
+      input.appendChild(defaultOption);
+
+      asyncFieldOptions.idType.forEach(type => {
+        const option = document.createElement('option');
+        option.value = type.value;
+        option.textContent = type.label;
+        input.appendChild(option);
+      });
+    }
+    else if (field.type === 'profession') {
+      input = document.createElement('select');
+      input.id = containerId + '_' + field.key;
+      if (field.required) input.required = true;
+
+      const defaultOption = document.createElement('option');
+      defaultOption.value = '';
+      defaultOption.textContent = 'Sélectionner la profession';
+      input.appendChild(defaultOption);
+
+      asyncFieldOptions.profession.forEach(prof => {
+        const option = document.createElement('option');
+        option.value = prof;
+        option.textContent = prof;
+        input.appendChild(option);
+      });
+    }
+    else if (field.type === 'products') {
+      input = document.createElement('select');
+      input.id = containerId + '_' + field.key;
+      if (field.required) input.required = true;
+
+      const defaultOption = document.createElement('option');
+      defaultOption.value = '';
+      defaultOption.textContent = 'Sélectionner le produit';
+      input.appendChild(defaultOption);
+
+      asyncFieldOptions.products.forEach(product => {
+        const option = document.createElement('option');
+        option.value = product.value;
+        option.textContent = product.label;
+        input.appendChild(option);
+      });
+    }
+    else if (field.type === 'channel') {
+      input = document.createElement('select');
+      input.id = containerId + '_' + field.key;
+      if (field.required) input.required = true;
+
+      const defaultOption = document.createElement('option');
+      defaultOption.value = '';
+      defaultOption.textContent = 'Sélectionner le canal';
+      input.appendChild(defaultOption);
+
+      asyncFieldOptions.channel.forEach(channel => {
+        const option = document.createElement('option');
+        option.value = channel.value;
+        option.textContent = channel.label;
+        input.appendChild(option);
+      });
+    }
+    else if (field.type === 'legalForm') {
+      input = document.createElement('select');
+      input.id = containerId + '_' + field.key;
+      if (field.required) input.required = true;
+
+      const defaultOption = document.createElement('option');
+      defaultOption.value = '';
+      defaultOption.textContent = 'Sélectionner la forme juridique';
+      input.appendChild(defaultOption);
+
+      asyncFieldOptions.legalForm.forEach(form => {
+        const option = document.createElement('option');
+        option.value = form;
+        option.textContent = form;
+        input.appendChild(option);
+      });
+    }
+    else if (field.key === 'queueName') {
       input = document.createElement('select');
       input.id = containerId + '_' + field.key;
 
@@ -1546,16 +1655,47 @@ function renderFields(containerId, entityType, processType) {
       });
       
       input.value = 'Default';
-    } else {
+    } 
+    else {
       input = document.createElement('input');
       input.id = containerId + '_' + field.key;
-      input.type = (field.key === 'birthDate') ? 'date' : 'text';
+      input.type = field.type === 'date' ? 'date' : (field.type === 'number' ? 'number' : 'text');
+      if (field.placeholder) input.placeholder = field.placeholder;
+      if (field.required) input.required = true;
+      
+      // Special handling for revenue field
+      if (field.type === 'number') {
+        input.min = '0';
+        input.step = '1';
+      }
     }
 
     container.appendChild(label);
     container.appendChild(input);
   });
+  
+  console.log('Rendered', fields.length, 'fields in container', containerId);
 }
+
+// FIXED: Update the event listener for entity type change (async)
+document.getElementById('entityTypeAsync').addEventListener('change', () => {
+  const entityType = document.getElementById('entityTypeAsync').value;
+  console.log('Async entity type changed to:', entityType);
+  if (entityType) {
+    renderFields('asyncFields', entityType, 'async');
+  }
+});
+
+// ALSO UPDATE: The async button listener
+document.getElementById('submitAsync').addEventListener('click', () => {
+  const entityType = document.getElementById('entityTypeAsync').value;
+  console.log('Submit async clicked for entity type:', entityType);
+  if (!entityType) {
+    showNotification('Please select an entity type', 'warning');
+    return;
+  }
+  callSearchAsync(entityType, 'asyncFields');
+});
 
 
 function showScreeningResultsPopup(event) {
