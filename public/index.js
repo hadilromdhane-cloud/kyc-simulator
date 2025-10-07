@@ -798,7 +798,7 @@ async function callSearchAsync(entityType, containerId) {
     console.log('Async onboarding payload:', payload);
 
     // Call the onboarding API directly
-    const endpoint = 'https://greataml.com/kyc-web-restful/onboarding/v2/onboardCustomer';
+    const endpoint = 'https://greataml.com/kyc-web-restful/onboarding/v2/searchOnboardCustomer';
     
     const res = await fetch(endpoint, {
       method: 'POST',
