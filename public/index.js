@@ -962,7 +962,7 @@ showNotification(`${entityType} KYC data successfully submitted!`, 'success');
 
 // Get the Reis ID from the response (try multiple possible field names)
 const reisId = data.reisId || data.reis_id || data.id || data.customerId;
-const customerWatchListUrl = `https://greataml.com/profiles/customer-watch-list/${reisId}`;
+const customerWatchListUrl = `https://greataml.com/profiles/customer-card/${reisId}`;
 
 // Determine the entity label for the message
 const entityLabel = entityType === 'PM' ? 'entity' : 'customer';
