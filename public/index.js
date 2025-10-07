@@ -321,13 +321,17 @@ const visibleTemplates = {
       { label: 'Queue Name', key: 'queueName' }
     ],
     async: [
-      { label: 'Business Name', key: 'businessName', required: true },
-      { label: 'Legal Form', key: 'legalForm', type: 'legalForm', required: true },
-      { label: 'Country of Incorporation', key: 'countryOfIncorporation', type: 'country', required: true },
-      { label: 'Registration Number', key: 'registrationNumber', required: true },
-      { label: 'Produits/Services cibles', key: 'produits', type: 'products', required: true },
-      { label: 'Canal de distribution', key: 'canal', type: 'channel', required: true }
-    ]
+    { label: 'Business Name', key: 'businessName', required: true },
+    { label: 'Legal Form', key: 'legalForm', type: 'legalForm', required: true },
+    { label: 'Date of Incorporation', key: 'dateOfIncorporation', type: 'date', required: true },
+    { label: 'Registration Number', key: 'registrationNumber', required: true },
+    { label: 'Country of Incorporation', key: 'countryOfIncorporation', type: 'country', required: true },
+    { label: 'Share Capital (EUR)', key: 'shareCapital', type: 'number', placeholder: 'Numeric only', required: true },
+    { label: 'Activity Sector', key: 'activitySector', type: 'activitySector', required: true },
+    { label: 'Distribution Channel', key: 'canal', type: 'channel', required: true },
+    { label: 'Target Products/Services', key: 'produits', type: 'products', required: true },
+    { label: 'Funds Origin', key: 'fundsOrigin', type: 'fundsOrigin', required: true }
+  ]
   }
 };
 
@@ -386,6 +390,29 @@ const asyncFieldOptions = {
     'SNC',
     'Association',
     'Autre'
+  ],
+   activitySector: [
+    'Agriculture',
+    'Industries',
+    'Manufacture',
+    'Energie',
+    'Construction',
+    'Commerce',
+    'Transport',
+    'Information',
+    'Finance',
+    'Immobilier',
+    'Scientifiques',
+    'Services',
+    'Education',
+    'Sante'
+  ],
+  fundsOrigin: [
+    { value: 'business_revenue', label: 'Business Revenue' },
+    { value: 'investments', label: 'Investments' },
+    { value: 'loans', label: 'Loans' },
+    { value: 'shareholders', label: 'Shareholders' },
+    { value: 'other', label: 'Other' }
   ]
 };
 
@@ -615,6 +642,40 @@ function renderFields(containerId, entityType, processType) {
           input.appendChild(option);
         });
       }
+      else if (field.type === 'activitySector') {
+  input = document.createElement('select');
+  input.id = containerId + '_' + field.key;
+  if (field.required) input.required = true;
+
+  const defaultOption = document.createElement('option');
+  defaultOption.value = '';
+  defaultOption.textContent = 'Select Activity Sector';
+  input.appendChild(defaultOption);
+
+  asyncFieldOptions.activitySector.forEach(sector => {
+    const option = document.createElement('option');
+    option.value = sector;
+    option.textContent = sector;
+    input.appendChild(option);
+  });
+}
+    else if (field.type === 'fundsOrigin') {
+      input = document.createElement('select');
+      input.id = containerId + '_' + field.key;
+      if (field.required) input.required = true;
+
+      const defaultOption = document.createElement('option');
+      defaultOption.value = '';
+      defaultOption.textContent = 'Select Funds Origin';
+      input.appendChild(defaultOption);
+
+      asyncFieldOptions.fundsOrigin.forEach(origin => {
+        const option = document.createElement('option');
+        option.value = origin.value;
+        option.textContent = origin.label;
+        input.appendChild(option);
+      });
+    }
       else {
         input = document.createElement('input');
         input.id = containerId + '_' + field.key;
@@ -777,32 +838,40 @@ function createAsyncOnboardingPayload(entityType, formData) {
         url: "https://greataml.com/"
       }
     };
-  } else if (entityType === 'PM') {
-    return {
-      systemName: "T24",
-      systemId: formData.systemId || `system_${Date.now()}`,
-      formId: "2",
-      onBehalfOfUser: "admin",
-      items: {
-        businessName: formData.businessName || "",
-        legalForm: formData.legalForm || "",
-        countryOfIncorporation: formData.countryOfIncorporation || "",
-        registrationNumber: formData.registrationNumber || "",
-        produit: [formData.produits || ""],
-        canal_de_distribution: formData.canal || "",
-        entityType: "PM",
-        form_entity_type: "PM",
-        createdBy: "admin",
-        createdOn: currentDateTime,
-        current_date: currentDateTime,
-        id: customerId,
-        agence: "headquarters",
-        agencyId: 3,
-        agencyName: "headquarters"
-      }
-    };
-  }
+  } } else if (entityType === 'PM') {
+  return {
+    systemName: "T24",
+    systemId: formData.systemId || `system_${Date.now()}`,
+    formId: "2",
+    onBehalfOfUser: "admin",
+    items: {
+      businessName: formData.businessName || "",
+      legalForm: formData.legalForm || "",
+      dateOfIncorporation: formData.dateOfIncorporation || "",
+      countryOfIncorporation: formData.countryOfIncorporation || "",
+      registrationNumber: formData.registrationNumber || "",
+      shareCapital: parseInt(formData.shareCapital) || 0,
+      activitySector: formData.activitySector || "",
+      canal_de_distribution: formData.canal || "",
+      produit: [formData.produits || ""],
+      fundsOrigin: formData.fundsOrigin || "",
+      entityType: "PM",
+      form_entity_type: "PM",
+      createdBy: "admin",
+      createdOn: currentDateTime,
+      current_date: currentDateTime,
+      id: customerId,
+      agence: "headquarters",
+      agencyId: 3,
+      agencyName: "headquarters",
+      birth_date: formData.dateOfIncorporation || "",
+      nationality: formData.countryOfIncorporation || "",
+      revenuAnnuelNet: 0,
+      customer_type: "manual-entry"
+    }
+  };
 }
+
 
 // Async onboarding function
 async function callSearchAsync(entityType, containerId) {
