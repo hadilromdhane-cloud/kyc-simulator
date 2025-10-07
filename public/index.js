@@ -1735,23 +1735,56 @@ function showScreeningResponsePopup(message, link = null, showContinueButton = f
         return;
       }
       
+      // ✅ CRITICAL FIX: Detect entity type from customerData
+      const entityType = customerData.businessName ? 'PM' : 'PP';
+      
+      console.log('🔍 Continue button clicked - Entity type detection:', {
+        businessName: customerData.businessName,
+        firstName: customerData.firstName,
+        lastName: customerData.lastName,
+        detectedEntityType: entityType,
+        customerId: customerId
+      });
+      
+      // Store screening data with entity type
       localStorage.setItem(`screeningData_${customerId}`, JSON.stringify({
         customerId: customerId,
+        entityType: entityType, // ✅ Store entity type
         firstName: customerData.firstName,
         lastName: customerData.lastName,
         birthDate: customerData.birthDate,
         nationality: customerData.nationality,
         citizenship: customerData.citizenship,
+        businessName: customerData.businessName, // ✅ Store business name for PM
         systemId: customerData.systemId,
         systemName: customerData.systemName,
         searchQueryId: apiResponse.search_query_id,
         screeningResult: apiResponse.maxScore > 0 ? 'HITS_FOUND' : 'NO_HITS',
         maxScore: apiResponse.maxScore || 0,
         timestamp: new Date().toISOString(),
-        tenant: 'bankfr',
+        tenant: tokenManager.getTenant() || localStorage.getItem('tenantName'),
         isScreeningDataLocked: true
       }));
       
+      // Also store in customerDataMappings
+      const customerMappings = JSON.parse(localStorage.getItem('customerDataMappings') || '{}');
+      customerMappings[customerId] = {
+        entityType: entityType,
+        businessName: customerData.businessName,
+        firstName: customerData.firstName,
+        lastName: customerData.lastName,
+        storedAt: new Date().toISOString(),
+        isLocked: true
+      };
+      localStorage.setItem('customerDataMappings', JSON.stringify(customerMappings));
+      
+      console.log('✅ Stored data for navigation:', {
+        customerId: customerId,
+        entityType: entityType,
+        businessName: customerData.businessName
+      });
+      
+      // Navigate to appropriate page
       navigateToOnboarding(customerId);
       popup.style.display = 'none';
     };
@@ -1768,6 +1801,76 @@ function showScreeningResponsePopup(message, link = null, showContinueButton = f
   popup.appendChild(content);
   popup.appendChild(buttonsContainer);
 }
+
+
+// ALSO UPDATE: navigateToOnboarding to better detect entity type
+function navigateToOnboarding(customerId) {
+  const currentTenant = localStorage.getItem('tenantName') || 'bankfr';
+  
+  let entityType = 'PP'; // Default to PP
+  
+  console.log('🔍 navigateToOnboarding called for customer:', customerId);
+  
+  // Try multiple methods to determine entity type
+  try {
+    // Method 1: Check screeningData (most reliable for decentralized)
+    const screeningData = localStorage.getItem(`screeningData_${customerId}`);
+    if (screeningData) {
+      const data = JSON.parse(screeningData);
+      console.log('📄 Screening data found:', data);
+      if (data.businessName || data.entityType === 'PM') {
+        entityType = 'PM';
+        console.log('✅ Entity type detected from screeningData: PM');
+      }
+    }
+    
+    // Method 2: Check customerData
+    if (entityType === 'PP') {
+      const customerData = localStorage.getItem(`customerData_${customerId}`);
+      if (customerData) {
+        const data = JSON.parse(customerData);
+        console.log('📄 Customer data found:', data);
+        if (data.businessName || data.entityType === 'PM') {
+          entityType = 'PM';
+          console.log('✅ Entity type detected from customerData: PM');
+        }
+      }
+    }
+    
+    // Method 3: Check customerDataMappings
+    if (entityType === 'PP') {
+      const mappings = JSON.parse(localStorage.getItem('customerDataMappings') || '{}');
+      if (mappings[customerId]) {
+        console.log('📄 Mapping found:', mappings[customerId]);
+        if (mappings[customerId].entityType === 'PM' || mappings[customerId].businessName) {
+          entityType = 'PM';
+          console.log('✅ Entity type detected from mappings: PM');
+        }
+      }
+    }
+  } catch (e) {
+    console.error('❌ Error determining entity type:', e);
+    console.log('⚠️ Defaulting to PP due to error');
+  }
+  
+  const tenantPageMap = {
+    'bankfr': {
+      'PP': 'onboarding_bankfr_PP.html',
+      'PM': 'onboarding_bankfr_PM.html'
+    },
+    'banque_en': {
+      'PP': 'onboarding_banque_en.html', 
+      'PM': 'onboarding_banque_en_PM.html'
+    }
+  };
+  
+  const onboardingPage = tenantPageMap[currentTenant][entityType] || 'onboarding_bankfr_PP.html';
+  
+  console.log(`🎯 Navigating to ${entityType} onboarding: ${onboardingPage} for tenant: ${currentTenant}`);
+  
+  window.location.href = `${onboardingPage}?customerId=${customerId}`;
+}
+
 
 function showPopup(message) {
   const popup = document.getElementById('popup');
@@ -1814,39 +1917,45 @@ document.getElementById('closePopup').addEventListener('click', () => {
   resetPopup();
 });
 
-function navigateToOnboarding(customerId) {
-  const currentTenant = localStorage.getItem('tenantName') || 'bankfr';
+
+function debugDecentralizedData() {
+  console.log('=== DEBUGGING DECENTRALIZED STORAGE ===');
   
-  let entityType = 'PP';
-  try {
-    const screeningData = localStorage.getItem(`screeningData_${customerId}`);
-    if (screeningData) {
-      const data = JSON.parse(screeningData);
-      if (data.businessName || data.entityType === 'PM') {
-        entityType = 'PM';
-      }
-    }
-  } catch (e) {
-    console.log('Could not determine entity type, defaulting to PP');
-  }
+  // Get all customer data
+  const allKeys = Object.keys(localStorage);
+  const screeningKeys = allKeys.filter(k => k.startsWith('screeningData_'));
+  const customerKeys = allKeys.filter(k => k.startsWith('customerData_'));
   
-  const tenantPageMap = {
-    'bankfr': {
-      'PP': 'onboarding_bankfr_PP.html',
-      'PM': 'onboarding_bankfr_PM.html'
-    },
-    'banque_en': {
-      'PP': 'onboarding_banque_en.html', 
-      'PM': 'onboarding_banque_en_PM.html'
-    }
-  };
+  console.log('Found screening data keys:', screeningKeys.length);
+  screeningKeys.forEach(key => {
+    const data = JSON.parse(localStorage.getItem(key));
+    console.log(key, '→', {
+      entityType: data.entityType,
+      businessName: data.businessName,
+      firstName: data.firstName,
+      lastName: data.lastName
+    });
+  });
   
-  const onboardingPage = tenantPageMap[currentTenant][entityType] || 'onboarding_bankfr_PP.html';
+  console.log('Found customer data keys:', customerKeys.length);
+  customerKeys.forEach(key => {
+    const data = JSON.parse(localStorage.getItem(key));
+    console.log(key, '→', {
+      entityType: data.entityType,
+      businessName: data.businessName,
+      firstName: data.firstName,
+      lastName: data.lastName
+    });
+  });
   
-  console.log(`Navigating to ${entityType} onboarding: ${onboardingPage} for tenant: ${currentTenant}`);
+  const mappings = JSON.parse(localStorage.getItem('customerDataMappings') || '{}');
+  console.log('Customer mappings:', mappings);
   
-  window.location.href = `${onboardingPage}?customerId=${customerId}`;
+  console.log('=== END DEBUG ===');
 }
+
+window.debugDecentralizedData = debugDecentralizedData;
+
 
 async function callSearch(entityType, containerId, responseId, isDecentralized = false) {
   if (!tenantName) { 
