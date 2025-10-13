@@ -29,6 +29,48 @@
     },
     "popup": {
       "close": "Close"
+    },
+    "notifications": {
+      "authenticate": "Please authenticate first!",
+      "authSuccess": "Authenticated successfully!",
+      "authFailed": "Authentication failed!",
+      "searchComplete": "Search completed successfully",
+      "searchFailed": "Search failed",
+      "asyncComplete": "KYC data successfully submitted!",
+      "asyncFailed": "Async onboarding failed",
+      "tokenRefreshed": "Token refreshed successfully",
+      "tokenExpired": "Authentication expired. Please login again.",
+      "historyCleared": "History cleared and event tracking reset",
+      "selectEntityType": "Please select an entity type",
+      "noCustomerId": "Error: Customer ID not found"
+    },
+    "buttons": {
+      "notifications": "Notifications",
+      "tokenStatus": "Token Status",
+      "clearHistory": "Clear All History",
+      "continueOnboarding": "Continue Onboarding",
+      "close": "Close"
+    },
+    "fields": {
+      "name": "Name",
+      "lastName": "Last Name",
+      "firstName": "First Name",
+      "birthDate": "Birth Date",
+      "citizenship": "Citizenship",
+      "nationality": "Nationality",
+      "businessName": "Business Name",
+      "queueName": "Queue Name",
+      "selectCountry": "Select Country",
+      "configuration": "CONFIGURATION"
+    },
+    "messages": {
+      "hitsFound": "Some hits were found. You can process them using this link.",
+      "noHitsFound": "No hits were found. You can proceed to the next step.",
+      "hitsFoundAsync": "Some hits were found. The alert is being processed by the compliance team. You can now continue with the onboarding.",
+      "hitsFoundSync": "Some hits were found. The alert has been assigned to the compliance team. You will receive a notification once the alert is processed.",
+      "kycDataGathered": "Customer KYC data have been successfully gathered by Reis KYC.\n\nThe Compliance team is currently checking the onboarding data. You will be notified once the process is complete.\n\nIn the meantime, you can access the Reis KYC Customer Card through the following link:",
+      "screeningCompleted": "Screening completed for",
+      "realWebhookReceived": "Real webhook received for customer"
     }
   },
   "fr": {
@@ -61,6 +103,48 @@
     },
     "popup": {
       "close": "Fermer"
+    },
+    "notifications": {
+      "authenticate": "Veuillez vous authentifier d'abord !",
+      "authSuccess": "Authentification réussie !",
+      "authFailed": "Échec de l'authentification !",
+      "searchComplete": "Recherche terminée avec succès",
+      "searchFailed": "Échec de la recherche",
+      "asyncComplete": "Données KYC soumises avec succès !",
+      "asyncFailed": "Échec de l'onboarding asynchrone",
+      "tokenRefreshed": "Jeton rafraîchi avec succès",
+      "tokenExpired": "Authentification expirée. Veuillez vous reconnecter.",
+      "historyCleared": "Historique effacé et suivi des événements réinitialisé",
+      "selectEntityType": "Veuillez sélectionner un type d'entité",
+      "noCustomerId": "Erreur : ID client introuvable"
+    },
+    "buttons": {
+      "notifications": "Notifications",
+      "tokenStatus": "État du Jeton",
+      "clearHistory": "Effacer Tout l'Historique",
+      "continueOnboarding": "Continuer l'Onboarding",
+      "close": "Fermer"
+    },
+    "fields": {
+      "name": "Nom",
+      "lastName": "Nom de Famille",
+      "firstName": "Prénom",
+      "birthDate": "Date de Naissance",
+      "citizenship": "Citoyenneté",
+      "nationality": "Nationalité",
+      "businessName": "Nom de l'Entreprise",
+      "queueName": "Nom de la File",
+      "selectCountry": "Sélectionner un Pays",
+      "configuration": "CONFIGURATION"
+    },
+    "messages": {
+      "hitsFound": "Des correspondances ont été trouvées. Vous pouvez les traiter en utilisant ce lien.",
+      "noHitsFound": "Aucune correspondance trouvée. Vous pouvez passer à l'étape suivante.",
+      "hitsFoundAsync": "Des correspondances ont été trouvées. L'alerte est en cours de traitement par l'équipe de conformité. Vous pouvez maintenant continuer avec l'onboarding.",
+      "hitsFoundSync": "Des correspondances ont été trouvées. L'alerte a été assignée à l'équipe de conformité. Vous recevrez une notification une fois l'alerte traitée.",
+      "kycDataGathered": "Les données KYC du client ont été collectées avec succès par Reis KYC.\n\nL'équipe de conformité vérifie actuellement les données d'onboarding. Vous serez notifié une fois le processus terminé.\n\nEn attendant, vous pouvez accéder à la Fiche Client Reis KYC via le lien suivant :",
+      "screeningCompleted": "Screening terminé pour",
+      "realWebhookReceived": "Webhook réel reçu pour le client"
     }
   }
 }

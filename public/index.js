@@ -185,6 +185,18 @@ class TokenManager {
     }
 }
 
+
+// Add this at the top of index.js, after the initial variable declarations
+
+// Translation helper function
+function t(key) {
+  if (typeof Translator !== 'undefined' && Translator.getTranslation) {
+    return Translator.getTranslation(key);
+  }
+  // Fallback to English if translator not loaded
+  return key;
+}
+
 // Global token manager instance
 const tokenManager = new TokenManager();
 
@@ -878,7 +890,7 @@ function createAsyncOnboardingPayload(entityType, formData) {
 // Async onboarding function
 async function callSearchAsync(entityType, containerId) {
   if (!tenantName) { 
-    showNotification('Please authenticate first!', 'warning');
+  showNotification(t('notifications.authenticate'), 'warning');
     return; 
   }
 
@@ -1584,7 +1596,7 @@ authBtn.addEventListener('click', async () => {
     tokenManager.storeToken(authToken, tenantName, 300);
     
     logMessage('Authentication successful', 'success');
-    showNotification('Authenticated successfully!', 'success');
+showNotification(t('notifications.authSuccess'), 'success');
 
     localStorage.setItem('authToken', authToken);
     localStorage.setItem('tenantName', tenantName);
@@ -1593,7 +1605,7 @@ authBtn.addEventListener('click', async () => {
     updateTokenStatusButton();
   } catch(err) {
     logMessage(`Authentication error: ${err.message}`, 'error');
-    showNotification('Authentication failed!', 'error');
+showNotification(t('notifications.authFailed'), 'error');
   }
 });
 
@@ -2097,7 +2109,7 @@ async function callSearch(entityType, containerId, responseId, isDecentralized =
     storeSearchEventForWebhook(payload, data);
 
     logMessage(`Search completed for ${entityType}`, 'success');
-    showNotification('Search completed successfully', 'success');
+showNotification(t('notifications.searchComplete'), 'success');
     
     if (isDecentralized) {
       if (data.maxScore && data.maxScore > 0) {
@@ -2214,7 +2226,7 @@ document.getElementById('submitAsync').addEventListener('click', () => {
   const entityType = document.getElementById('entityTypeAsync').value;
   console.log('Submit async clicked for entity type:', entityType);
   if (!entityType) {
-    showNotification('Please select an entity type', 'warning');
+  showNotification(t('notifications.selectEntityType'), 'warning');
     return;
   }
   callSearchAsync(entityType, 'asyncFields');
