@@ -18,79 +18,6 @@
             padding: 0;
         }
 
-        .info-box {
-            background: #e3f2fd;
-            border-left: 4px solid #2196f3;
-            padding: 15px;
-            margin: 20px 0;
-            border-radius: 4px;
-        }
-
-        .info-box h4 {
-            margin-bottom: 10px;
-            color: #1976d2;
-        }
-
-        /* Table styles */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            border: 1px solid #ddd;
-        }
-
-        table th,
-        table td {
-            padding: 12px;
-            border: 1px solid #ddd;
-            text-align: left;
-        }
-
-        table th {
-            background: #f8f9fa;
-            font-weight: 600;
-            color: #495057;
-        }
-
-        table input,
-        table select {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-
-        .add-btn {
-            background: #28a745;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-            margin-bottom: 20px;
-        }
-
-        .remove-btn {
-            background: #dc3545;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 3px;
-            cursor: pointer;
-            font-size: 12px;
-        }
-
-        .add-btn:hover,
-        .remove-btn:hover {
-            opacity: 0.9;
-        }
-
-        .form-row.three-cols {
-            grid-template-columns: 1fr 1fr 1fr;
-        }
-
         .page-header {
             background: white;
             padding: 20px 40px;
@@ -108,8 +35,8 @@
             max-width: 1000px;
             margin: 30px auto;
             background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
             overflow: hidden;
         }
 
@@ -121,9 +48,17 @@
         }
 
         .header h1 {
-            font-size: 2rem;
+            font-size: 2.2rem;
             margin-bottom: 10px;
-            font-weight: 400;
+            font-weight: 300;
+        }
+
+        .customer-info {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-size: 1.1rem;
         }
 
         .tabs {
@@ -187,6 +122,10 @@
 
         .form-row.full-width {
             grid-template-columns: 1fr;
+        }
+
+        .form-row.three-cols {
+            grid-template-columns: 1fr 1fr 1fr;
         }
 
         .form-group {
@@ -329,26 +268,99 @@
                 align-items: center;
             }
         }
+
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .info-box h4 {
+            margin-bottom: 10px;
+            color: #1976d2;
+        }
+
+        /* Table styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            border: 1px solid #ddd;
+        }
+
+        table th,
+        table td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        table input,
+        table select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .add-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .remove-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .add-btn:hover,
+        .remove-btn:hover {
+            opacity: 0.9;
+        }
     </style>
 </head>
 <body>
     <header class="page-header">
-        <img src="logos2.png" alt="Company Logo" style="height: 120px;" />
-        <img src="logos2.png" alt="Company Logo" style="height: 120px;" />
+        <img src="logos3.png" alt="Company Logo" />
+        <img src="logos2.png" alt="Company Logo" style="padding-right: 20px;" />
     </header>
 
     <div class="container">
         <div class="header">
             <h1>Fiche de Connaissance Client</h1>
-            <p>Personne Physique - BankFR</p>
+            <p>Personne Morale - BankFR</p>
+            <div class="customer-info" id="customerInfo">
+                <strong>Client ID:</strong> <span id="customerId">Chargement...</span>
+            </div>
         </div>
 
         <div class="tabs">
-            <button class="tab-button active" onclick="showTab('identification')">Identification Client</button>
+            <button class="tab-button active" onclick="showTab('identification')">Identification</button>
             <button class="tab-button" onclick="showTab('financial')">Informations Financières</button>
+            <button class="tab-button" onclick="showTab('relations')">Relations</button>
         </div>
 
-        <form id="onboardingForm">
+        <form id="pmOnboardingForm">
             <!-- Identification Tab -->
             <div id="identification" class="tab-content active">
                 <div class="form-section">
@@ -405,7 +417,7 @@
                         <div class="form-group">
                             <label for="paysImmatriculation">Pays d'immatriculation <span class="required">*</span></label>
                             <select id="paysImmatriculation" name="country" required>
-                                <option value="">-- Sélectionner --</option>
+                                <!-- Options will be populated by JavaScript -->
                             </select>
                         </div>
                     </div>
@@ -472,7 +484,7 @@
                         <div class="form-group">
                             <label for="paysSiege">Pays du siège social <span class="required">*</span></label>
                             <select id="paysSiege" name="PaysDeResidence" required>
-                                <option value="">-- Sélectionner --</option>
+                                <!-- Options will be populated by JavaScript -->
                             </select>
                         </div>
                         <div class="form-group">
@@ -498,7 +510,7 @@
             <div id="financial" class="tab-content">
                 <div class="form-section">
                     <h2 class="section-title">
-                        💰 Informations Financières
+                        Informations Financières
                     </h2>
                     
                     <div class="form-row">
@@ -647,7 +659,10 @@
         // Function to populate select elements with countries
         function populateCountriesSelect(selectId, countries, defaultText = "-- Sélectionner --") {
             const selectElement = document.getElementById(selectId);
-            if (!selectElement) return;
+            if (!selectElement) {
+                console.warn(`Select element with ID '${selectId}' not found`);
+                return;
+            }
             
             selectElement.innerHTML = `<option value="">${defaultText}</option>`;
             
@@ -657,6 +672,25 @@
                 option.textContent = country;
                 selectElement.appendChild(option);
             });
+        }
+
+        // Tab switching functionality
+        function showTab(tabName) {
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => content.classList.remove('active'));
+
+            const tabButtons = document.querySelectorAll('.tab-button');
+            tabButtons.forEach(button => button.classList.remove('active'));
+
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Go back function
+        function goBack() {
+            if (confirm('Êtes-vous sûr de vouloir retourner? Les données non sauvegardées seront perdues.')) {
+                window.location.href = 'index.html';
+            }
         }
 
         // Table functionality
@@ -723,67 +757,89 @@
             }
         }
 
-        // Tab switching functionality
-        function showTab(tabName) {
-            const tabContents = document.querySelectorAll('.tab-content');
-            tabContents.forEach(content => content.classList.remove('active'));
-
-            const tabButtons = document.querySelectorAll('.tab-button');
-            tabButtons.forEach(button => button.classList.remove('active'));
-
-            document.getElementById(tabName).classList.add('active');
-            event.target.classList.add('active');
-        }
-
-        // Go back function
-        function goBack() {
-            if (confirm('Êtes-vous sûr de vouloir retourner? Les données non sauvegardées seront perdues.')) {
-                window.history.back();
-            }
-        }
-
-        // Initialize when page loads
+        // Initialize everything when the page loads
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize country dropdowns
             populateCountriesSelect('paysImmatriculation', countriesFrench);
             populateCountriesSelect('paysSiege', countriesFrench);
             
-            // Initialize add person button
+            // Initialize table functionality
             const addBtn = document.getElementById('addPersonBtn');
             if (addBtn) {
                 addBtn.addEventListener('click', addPersonRow);
             }
-        });
-
-        // Form submission
-        document.getElementById('pmOnboardingForm').addEventListener('submit', function(e) {
-            e.preventDefault();
             
-            // Collect form data
-            const formData = new FormData(this);
-            const data = {};
-            
-            for (let [key, value] of formData.entries()) {
-                data[key] = value;
-            }
-            
-            // Collect persons table data
-            const personsData = [];
-            const tableRows = document.querySelectorAll('#personsTable tbody tr');
-            tableRows.forEach((row) => {
-                const inputs = row.querySelectorAll('input, select');
-                const personData = {};
-                inputs.forEach(input => {
-                    const fieldName = input.name.split('_').slice(2).join('_');
-                    personData[fieldName] = input.value;
+            // Form submission handler
+            document.getElementById('pmOnboardingForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+                
+                // Basic validation
+                const requiredFields = this.querySelectorAll('[required]');
+                let isValid = true;
+                
+                requiredFields.forEach(field => {
+                    if (!field.value.trim()) {
+                        field.style.borderColor = '#dc3545';
+                        isValid = false;
+                    } else {
+                        field.style.borderColor = '#e9ecef';
+                    }
                 });
-                if (personData.firstName || personData.lastName) {
-                    personsData.push(personData);
+                
+                if (!isValid) {
+                    alert('Veuillez remplir tous les champs obligatoires.');
+                    return;
                 }
+                
+                // Collect form data
+                const formData = new FormData(this);
+                const data = {};
+                
+                for (let [key, value] of formData.entries()) {
+                    data[key] = value;
+                }
+                
+                // Collect persons table data
+                const personsData = [];
+                const tableRows = document.querySelectorAll('#personsTable tbody tr');
+                tableRows.forEach((row, index) => {
+                    const inputs = row.querySelectorAll('input, select');
+                    const personData = {};
+                    inputs.forEach(input => {
+                        const fieldName = input.name.split('_').slice(2).join('_');
+                        personData[fieldName] = input.value;
+                    });
+                    if (personData.firstName || personData.lastName) {
+                        personsData.push(personData);
+                    }
+                });
+                data.relatedPersons = personsData;
+                
+                // Simulate form submission
+                const submitBtn = document.getElementById('submitBtn');
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Traitement en cours...';
+                
+                setTimeout(() => {
+                    console.log('Form data:', data);
+                    alert('Onboarding PM terminé avec succès!');
+                    
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Finaliser l\'Onboarding';
+                }, 2000);
             });
-            data.relatedPersons = personsData;
             
-            console.log('PM Form Data:', data);
-            alert('Formulaire soumis avec succès!');
+            // Add input validation on blur
+            const inputs = document.querySelectorAll('input, select, textarea');
+            inputs.forEach(input => {
+                input.addEventListener('blur', function() {
+                    if (this.hasAttribute('required') && !this.value.trim()) {
+                        this.style.borderColor = '#dc3545';
+                    } else {
+                        this.style.borderColor = '#e9ecef';
+                    }
+                });
+            });
         });
     </script>
 </body>
