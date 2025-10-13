@@ -1706,7 +1706,7 @@ function showScreeningResultsPopup(event) {
   content.style.cssText = 'padding: 20px; color: #333; line-height: 1.6; font-size: 0.95rem;';
   
   let contentHTML = `<div style="margin-bottom: 15px;"><strong>Tenant:</strong> ${currentTenant}</div>`;
-  contentHTML += `<div style="margin-bottom: 15px;"><strong>Customer:</strong> ${event.customerId}</div>`;
+  contentHTML += `<div style="margin-bottom: 15px;"><strong>Customer KYC ID +:</strong> ${event.customerId}</div>`;
   contentHTML += `<div style="margin-bottom: 15px;"><strong>Processing Results:</strong></div>`;
   contentHTML += `<div style="margin-left: 20px; margin-bottom: 10px;">`;
   contentHTML += `• <strong>PEP Status:</strong> ${event.isPEP ? '<span style="color: #ffc107;">⚠️ YES</span>' : '<span style="color: #28a745;">✅ NO</span>'} (${event.pepDecision || 'N/A'})<br>`;
@@ -1718,7 +1718,7 @@ function showScreeningResultsPopup(event) {
   if (event.isSanctioned) {
     contentHTML += `<span style="color: #721c24;">Your customer is confirmed as sanctioned. You cannot proceed with the onboarding.</span>`;
   } else {
-    contentHTML += `<span style="color: #155724;">Customer cleared for onboarding. You can proceed with the onboarding process.</span>`;
+    contentHTML += `<span style="color: #155724;">You can proceed with the onboarding process.</span>`;
   }
   contentHTML += `</div>`;
   
@@ -2103,10 +2103,10 @@ async function callSearch(entityType, containerId, responseId, isDecentralized =
       if (data.maxScore && data.maxScore > 0) {
         const link = `https://greataml.com/search/searchdecision/${data.search_query_id}`;
         logMessage(`Hits found for customer (Score: ${data.maxScore})`, 'warning');
-        showScreeningResponsePopup('Some hits are found. You can treat the hits via this link.', link, false, payload, data);
+        showScreeningResponsePopup('Some hits were found. You can process them using this link.', link, false, payload, data);
       } else {
-        logMessage('No hits found for customer', 'info');
-        showScreeningResponsePopup('No hits found. You can proceed with the next step.', null, true, payload, data);
+        logMessage('No hits were found for customer', 'info');
+        showScreeningResponsePopup('No hits were found. You can proceed to the next step.', null, true, payload, data);
       }
     } else {
       const isAsync = containerId === 'asyncFields';
@@ -2114,13 +2114,13 @@ async function callSearch(entityType, containerId, responseId, isDecentralized =
       if (data.maxScore && data.maxScore > 0) {
         logMessage(`Hits found for customer (Score: ${data.maxScore})`, 'warning');
         if (isAsync) {
-          showScreeningResponsePopup('Some hits are found. The alert is being treated by the compliance team. You can now continue the onboarding.', null, true, payload, data);
+          showScreeningResponsePopup('Some hits were found. The alert is being processed by the compliance team. You can now continue with the onboarding.', null, true, payload, data);
         } else {
-          showScreeningResponsePopup('Some hits are found. The alert is assigned to the compliance team. You will receive a notification once the alert is treated.', null, false, payload, data);
+          showScreeningResponsePopup('Some hits were found. The alert has been assigned to the compliance team. You will receive a notification once the alert is processed.', null, false, payload, data);
         }
       } else {
-        logMessage('No hits found for customer', 'info');
-        showScreeningResponsePopup('No hits found. You can proceed with the next step.', null, true, payload, data);
+        logMessage('No hits were found for customer', 'info');
+        showScreeningResponsePopup('No hits were found. You can proceed to the next step.', null, true, payload, data);
       }
     }
   } catch (err) {
