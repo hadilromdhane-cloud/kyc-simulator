@@ -969,7 +969,7 @@ const entityLabel = entityType === 'PM' ? 'entity' : 'customer';
 
 // Show success popup with the correct message and watch list link
 showScreeningResponsePopup(
-  `The ${entityLabel} KYC data is successfully submitted from your core system to Reis.\n\nThe ${entityLabel} will be screened and processed by the compliance team asynchronously.\n\nYou can view the ${entityLabel} card via this link:`,
+  `Customer KYC data have been successfully gathered by Reis KYC.\n\nThe Compliance team is currently checking the onboarding data. You will be notified once the process is complete.\n\nIn the meantime, you can access the Reis KYC Customer Card through the following link:`,
   customerWatchListUrl,
   false,
   formData,
