@@ -1,0 +1,66 @@
+{
+  "en": {
+    "header": {
+      "title": "Web Service Simulator"
+    },
+    "authentication": {
+      "title": "Authentication on the simulation tenant",
+      "tenantName": "Tenant Name:",
+      "selectTenant": "Select Tenant",
+      "username": "Username:",
+      "usernamePlaceholder": "Enter username",
+      "password": "Password:",
+      "passwordPlaceholder": "Enter password",
+      "authButton": "Authenticate"
+    },
+    "onboarding": {
+      "title": "Core System Onboarding UI",
+      "decentralized": "Decentralized Process",
+      "centralized": "Centralized Process",
+      "decentralizedTitle": "Decentralized Onboarding",
+      "centralizedTitle": "Centralized Onboarding",
+      "synchronous": "Synchronous",
+      "asynchronous": "Asynchronous",
+      "entityType": "Entity Type:",
+      "selectEntityType": "Select Entity Type",
+      "physicalPerson": "Physical Person (PP)",
+      "legalPerson": "Legal Person (PM)",
+      "simulate": "Simulate"
+    },
+    "popup": {
+      "close": "Close"
+    }
+  },
+  "fr": {
+    "header": {
+      "title": "Simulateur de Service Web"
+    },
+    "authentication": {
+      "title": "Authentification sur le tenant de simulation",
+      "tenantName": "Nom du Tenant :",
+      "selectTenant": "Sélectionner un Tenant",
+      "username": "Nom d'utilisateur :",
+      "usernamePlaceholder": "Entrez le nom d'utilisateur",
+      "password": "Mot de passe :",
+      "passwordPlaceholder": "Entrez le mot de passe",
+      "authButton": "S'authentifier"
+    },
+    "onboarding": {
+      "title": "Interface d'Onboarding du Système Central",
+      "decentralized": "Processus Décentralisé",
+      "centralized": "Processus Centralisé",
+      "decentralizedTitle": "Onboarding Décentralisé",
+      "centralizedTitle": "Onboarding Centralisé",
+      "synchronous": "Synchrone",
+      "asynchronous": "Asynchrone",
+      "entityType": "Type d'Entité :",
+      "selectEntityType": "Sélectionner un Type d'Entité",
+      "physicalPerson": "Personne Physique (PP)",
+      "legalPerson": "Personne Morale (PM)",
+      "simulate": "Simuler"
+    },
+    "popup": {
+      "close": "Fermer"
+    }
+  }
+}
