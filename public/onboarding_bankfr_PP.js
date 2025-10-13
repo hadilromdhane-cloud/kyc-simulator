@@ -761,31 +761,6 @@ fetchRiskLevel: async function(riskCalculationId) {
 
         console.log(`Total fields locked: ${fieldsLocked}`);
 
-        if (fieldsLocked > 0) {
-            const headerElement = document.querySelector('.header');
-            if (headerElement && !document.querySelector('.security-notice')) {
-                const securityNotice = document.createElement('div');
-                securityNotice.className = 'security-notice';
-                securityNotice.style.cssText = `
-                    background: linear-gradient(135deg, #d4edda, #c3e6cb);
-                    border: 2px solid #28a745;
-                    color: #155724;
-                    padding: 15px;
-                    border-radius: 10px;
-                    margin: 15px 0;
-                    font-size: 14px;
-                    text-align: left;
-                `;
-                securityNotice.innerHTML = `
-                    <strong>🔒 Sécurité / Security:</strong> 
-                    ${fieldsLocked} champ(s) pré-rempli(s) et verrouillé(s) depuis le screening pour des raisons de sécurité. 
-                    ${fieldsLocked} field(s) pre-filled and locked from screening data for security purposes.
-                    <br><small>Client ID: <code>${customerData.customerId}</code> | Tenant: <code>${customerData.tenant || tenantName}</code></small>
-                `;
-                headerElement.appendChild(securityNotice);
-                console.log('Added security notice');
-            }
-        }
     } else {
         console.log('Security lock branch not entered - falling back to legacy method');
         
