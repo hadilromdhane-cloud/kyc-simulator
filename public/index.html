@@ -1,165 +1,325 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title data-i18n="header.title">Web Service Simulator</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
+  <title>Option 1 - Minimaliste</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
-    .language-selector {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      z-index: 1000;
-      display: flex;
-      gap: 10px;
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f8f9fa;
+      color: #2c3e50;
+      line-height: 1.6;
+    }
+
+    header {
       background: white;
-      padding: 10px 15px;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid #e1e8ed;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo-section {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .logo-section img {
+      height: 50px;
+    }
+
+    .lang-buttons {
+      display: flex;
+      gap: 0.5rem;
     }
 
     .lang-btn {
-      padding: 8px 16px;
-      border: 2px solid #007ACC;
+      padding: 0.5rem 1rem;
+      border: 1px solid #ddd;
       background: white;
-      color: #007ACC;
       border-radius: 6px;
       cursor: pointer;
-      font-weight: 600;
-      font-size: 14px;
-      transition: all 0.3s ease;
-    }
-
-    .lang-btn:hover {
-      background: #f0f8ff;
+      font-size: 0.9rem;
+      transition: all 0.2s;
     }
 
     .lang-btn.active {
-      background: #007ACC;
+      background: #0066cc;
       color: white;
+      border-color: #0066cc;
     }
 
-    .lang-flag {
-      font-size: 18px;
-      margin-right: 5px;
+    .container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 2rem;
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 2rem;
+    }
+
+    .auth-card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      height: fit-content;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .auth-card h3 {
+      font-size: 1rem;
+      margin-bottom: 1.5rem;
+      color: #1a1a1a;
+      font-weight: 600;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      margin-bottom: 0.4rem;
+      color: #555;
+      font-weight: 500;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 0.6rem;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      transition: border 0.2s;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: #0066cc;
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 0.7rem;
+      background: #0066cc;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      transition: background 0.2s;
+    }
+
+    .btn-primary:hover {
+      background: #0052a3;
+    }
+
+    .main-card {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .main-card h2 {
+      font-size: 1.4rem;
+      margin-bottom: 1.5rem;
+      color: #1a1a1a;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 0;
+    }
+
+    .tab-btn {
+      padding: 0.7rem 1.5rem;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      font-size: 0.9rem;
+      color: #666;
+      transition: all 0.2s;
+    }
+
+    .tab-btn.active {
+      color: #0066cc;
+      border-bottom-color: #0066cc;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .subtabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      background: #f8f9fa;
+      padding: 0.3rem;
+      border-radius: 8px;
+      width: fit-content;
+    }
+
+    .subtab-btn {
+      padding: 0.5rem 1rem;
+      background: transparent;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+    }
+
+    .subtab-btn.active {
+      background: white;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+      .field-grid {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="language-selector" style="height: 40px;margin-top: 100px;">
-    <button class="lang-btn active" data-lang="en"> English</button>
-    <button class="lang-btn" data-lang="fr"> Français </button>
-  </div>
-
-  <header style="display: flex; align-items: center; gap: 15px;">
-    <img src="logos3.png" alt="Company Logo" style="height: 120px;" />
-    <img src="logos2.png" alt="Company Logo" style="height: 120px;padding-right: 200px;" />
+  <header>
+    <div class="logo-section">
+      <img src="logos3.png" alt="Logo 1">
+      <img src="logos2.png" alt="Logo 2">
+    </div>
+    <div class="lang-buttons">
+      <button class="lang-btn active">🇬🇧 EN</button>
+      <button class="lang-btn">🇫🇷 FR</button>
+    </div>
   </header>
 
-  <div class="main-layout">
-    <!-- Authentication Sidebar -->
-    <aside id="authSidebar" class="auth-sidebar">
-      <div class="resize-handle" id="resizeHandle"></div>
-      
-      <div class="sidebar-content">
-        <h2 data-i18n="authentication.title">Authentication on the simulation tenant</h2>
-        
-        <label for="tenantName" data-i18n="authentication.tenantName">Tenant Name:</label>
-        <select id="tenantName">
-          <option value="" data-i18n="authentication.selectTenant">Select Tenant</option>
-          <option value="banque_en">banque_en</option>
-          <option value="bankfr">bankfr</option>
-          <option value="assurance_fr">assurance_fr</option>
-          <option value="insurance_fr">insurance_fr</option>
-          <option value="en_bank">en_bank</option>
-          <option value="fr_bank">fr_bank</option>
-          <option value="en_insurance">en_insurance</option>
-          <option value="fr_insurance">fr_insurance</option>
-          <option value="pssandbox">pssandbox</option>
+  <div class="container">
+    <aside class="auth-card">
+      <h3>Authentication</h3>
+      <div class="form-group">
+        <label>Tenant</label>
+        <select>
+          <option>Select Tenant</option>
+          <option>banque_en</option>
+          <option>bankfr</option>
         </select>
-
-        <label for="username" data-i18n="authentication.username">Username:</label>
-        <input type="text" id="username" data-i18n-placeholder="authentication.usernamePlaceholder" placeholder="Enter username" />
-
-        <label for="password" data-i18n="authentication.password">Password:</label>
-        <input type="password" id="password" data-i18n-placeholder="authentication.passwordPlaceholder" placeholder="Enter password" />
-
-        <button id="authBtn" data-i18n="authentication.authButton">Authenticate</button>
       </div>
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" placeholder="Enter username">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" placeholder="Enter password">
+      </div>
+      <button class="btn-primary">Authenticate</button>
     </aside>
 
-    <!-- Main Content Area -->
-    <main class="main-content">
-      <section id="onboardingSimulator">
-        <h2 data-i18n="onboarding.title">Core System Onboarding UI</h2>
+    <main class="main-card">
+      <h2>Core System Onboarding</h2>
+      
+      <div class="tabs">
+        <button class="tab-btn active">Decentralized</button>
+        <button class="tab-btn">Centralized</button>
+      </div>
 
-        <div class="tabs">
-          <button class="tabBtn active" data-tab="decentralized" data-i18n="onboarding.decentralized">Decentralized Process</button>
-          <button class="tabBtn" data-tab="centralized" data-i18n="onboarding.centralized">Centralized Process</button>
-        </div>
-
-        <div class="tabContent" id="decentralized">
-          <h3 data-i18n="onboarding.decentralizedTitle">Decentralized Onboarding</h3>
-
-          <label for="entityTypeDecentralized"><b data-i18n="onboarding.entityType">Entity Type:</b></label>
-          <select id="entityTypeDecentralized">
-            <option value="" data-i18n="onboarding.selectEntityType">Select Entity Type</option>
-            <option value="PP" data-i18n="onboarding.physicalPerson">Physical Person (PP)</option>
-            <option value="PM" data-i18n="onboarding.legalPerson">Legal Person (PM)</option>
+      <div class="tab-content active">
+        <div class="form-group">
+          <label>Entity Type</label>
+          <select>
+            <option>Select Entity Type</option>
+            <option>Physical Person (PP)</option>
+            <option>Legal Person (PM)</option>
           </select>
-
-          <div id="decentralizedFields"></div>
-          <button id="submitDecentralized" data-i18n="onboarding.simulate">Simulate</button>
         </div>
 
-        <div class="tabContent" id="centralized" style="display:none">
-          <h3 data-i18n="onboarding.centralizedTitle">Centralized Onboarding</h3>
-          <div class="subTabs">
-            <button class="subTabBtn active" data-subtab="sync" data-i18n="onboarding.synchronous">Synchronous</button>
-            <button class="subTabBtn" data-subtab="async" data-i18n="onboarding.asynchronous">Asynchronous</button>
+        <div class="field-grid">
+          <div class="form-group">
+            <label>First Name</label>
+            <input type="text" placeholder="Enter first name">
           </div>
-
-          <!-- SYNCHRONOUS TAB -->
-          <div class="subTabContent" id="sync">
-            <label for="entityTypeSync"><b data-i18n="onboarding.entityType">Entity Type:</b></label>
-            <select id="entityTypeSync">
-              <option value="" data-i18n="onboarding.selectEntityType">Select Entity Type</option>
-              <option value="PP" data-i18n="onboarding.physicalPerson">Physical Person (PP)</option>
-              <option value="PM" data-i18n="onboarding.legalPerson">Legal Person (PM)</option>
-            </select>
-
-            <div id="syncFields"></div>
-            <button id="submitSync" data-i18n="onboarding.simulate">Simulate</button>
+          <div class="form-group">
+            <label>Last Name</label>
+            <input type="text" placeholder="Enter last name">
           </div>
-
-          <!-- ASYNCHRONOUS TAB -->
-          <div class="subTabContent" id="async" style="display:none">
-            <label for="entityTypeAsync"><b data-i18n="onboarding.entityType">Entity Type:</b></label>
-            <select id="entityTypeAsync">
-              <option value="" data-i18n="onboarding.selectEntityType">Select Entity Type</option>
-              <option value="PP" data-i18n="onboarding.physicalPerson">Physical Person (PP)</option>
-              <option value="PM" data-i18n="onboarding.legalPerson">Legal Person (PM)</option>
+          <div class="form-group">
+            <label>Birth Date</label>
+            <input type="date">
+          </div>
+          <div class="form-group">
+            <label>Nationality</label>
+            <select>
+              <option>Select country</option>
+              <option>France</option>
+              <option>Tunisia</option>
             </select>
-
-            <div id="asyncFields"></div>
-            <button id="submitAsync" data-i18n="onboarding.simulate">Simulate</button>
           </div>
         </div>
-      </section>
+
+        <button class="btn-primary">Simulate</button>
+      </div>
+
+      <div class="tab-content">
+        <div class="subtabs">
+          <button class="subtab-btn active">Synchronous</button>
+          <button class="subtab-btn">Asynchronous</button>
+        </div>
+        
+        <div class="form-group">
+          <label>Entity Type</label>
+          <select>
+            <option>Select Entity Type</option>
+            <option>Physical Person (PP)</option>
+            <option>Legal Person (PM)</option>
+          </select>
+        </div>
+
+        <button class="btn-primary">Simulate</button>
+      </div>
     </main>
   </div>
 
-  <div id="popup" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
-    background:white; padding:30px; border-radius:10px; box-shadow:0 5px 25px rgba(0,0,0,0.4);
-    z-index:1000; min-width:400px; max-width:600px;">
-    <p id="popupText" style="font-size:1.1rem; margin-bottom:15px;"></p>
-    <input type="text" id="popupLink" readonly style="width:100%; padding:8px; font-size:1rem; margin-bottom:15px; display:none;"/>
-    <button id="closePopup" data-i18n="popup.close" style="padding:8px 15px; font-size:1rem;">Close</button>
-  </div>
-
-  <script src="translator.js"></script>
-  <script src="index.js"></script>
+  <script>
+    // Simple tab switching demo
+    document.querySelectorAll('.tab-btn').forEach((btn, i) => {
+      btn.onclick = () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelectorAll('.tab-content')[i].classList.add('active');
+      };
+    });
+  </script>
 </body>
 </html>
