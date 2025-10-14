@@ -1110,6 +1110,15 @@ function handleRealWebhookEvent(webhookData) {
 
 // --- Notification System ---
 function createNotificationElements() {
+    if (document.getElementById('notificationContainer') && 
+      document.getElementById('notificationHistoryBtn') && 
+      document.getElementById('tokenStatusBtn')) {
+    console.log('✅ Notification elements already exist, skipping creation');
+    updateNotificationBadge();
+    updateTokenStatusButton();
+    return;
+  }
+
   const notificationContainer = document.createElement('div');
   notificationContainer.id = 'notificationContainer';
   notificationContainer.style.cssText = `
