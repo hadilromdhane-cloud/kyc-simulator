@@ -54,9 +54,8 @@
       "close": "Close"
     },
     "fields": {
-      "name": "Name",
-      "lastName": "Last Name",
       "firstName": "First Name",
+      "lastName": "Last Name",
       "birthDate": "Birth Date",
       "citizenship": "Citizenship",
       "nationality": "Nationality",
@@ -172,9 +171,8 @@
       "close": "Fermer"
     },
     "fields": {
-      "name": "Nom",
-      "lastName": "Nom de Famille",
       "firstName": "Prénom",
+      "lastName": "Nom de Famille",
       "birthDate": "Date de Naissance",
       "citizenship": "Citoyenneté",
       "nationality": "Nationalité",
