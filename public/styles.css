@@ -7,10 +7,6 @@ body {
   color: #222;
 }
 .language-selector {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  z-index: 1000;
   display: flex;
   gap: 8px;
   background: white;
