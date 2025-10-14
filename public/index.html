@@ -6,58 +6,17 @@
   <title data-i18n="header.title">Web Service Simulator</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
-  <style>
-    .language-selector {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      z-index: 1000;
-      display: flex;
-      gap: 10px;
-      background: white;
-      padding: 10px 15px;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-
-    .lang-btn {
-      padding: 8px 16px;
-      border: 2px solid #007ACC;
-      background: white;
-      color: #007ACC;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 14px;
-      transition: all 0.3s ease;
-    }
-
-    .lang-btn:hover {
-      background: #f0f8ff;
-    }
-
-    .lang-btn.active {
-      background: #007ACC;
-      color: white;
-    }
-
-    .lang-flag {
-      font-size: 18px;
-      margin-right: 5px;
-    }
-  </style>
 </head>
 <body>
-  <div class="language-selector" style="height: 50px;margin-top: 90px;">
+  <div class="language-selector">
     <button class="lang-btn active" data-lang="en"> English</button>
     <button class="lang-btn" data-lang="fr"> Français </button>
   </div>
 
-  <header style="display: flex; align-items: center; gap: 15px; height: auto;">
-    <img src="logo_left.png" alt="Company Logo" style="height: 100px; " />
-    <img src="logo_right.png" alt="Company Logo" style="height: 150px" />
-      <img src="logo_right.png" alt="Company Logo" style="height: 150px" />
-
+  <header>
+    <img src="logo_left.png" alt="Company Logo" />
+    <img src="logo_right.png" alt="Company Logo" />
+    <img src="logo_right.png" alt="Company Logo" />
   </header>
 
   <div class="main-layout">
@@ -116,7 +75,7 @@
           <button id="submitDecentralized" data-i18n="onboarding.simulate">Simulate</button>
         </div>
 
-        <div class="tabContent" id="centralized" style="display:none">
+        <div class="tabContent" id="centralized">
           <h3 data-i18n="onboarding.centralizedTitle">Centralized Onboarding</h3>
           <div class="subTabs">
             <button class="subTabBtn active" data-subtab="sync" data-i18n="onboarding.synchronous">Synchronous</button>
@@ -137,7 +96,7 @@
           </div>
 
           <!-- ASYNCHRONOUS TAB -->
-          <div class="subTabContent" id="async" style="display:none">
+          <div class="subTabContent" id="async">
             <label for="entityTypeAsync"><b data-i18n="onboarding.entityType">Entity Type:</b></label>
             <select id="entityTypeAsync">
               <option value="" data-i18n="onboarding.selectEntityType">Select Entity Type</option>
@@ -153,12 +112,10 @@
     </main>
   </div>
 
-  <div id="popup" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
-    background:white; padding:30px; border-radius:10px; box-shadow:0 5px 25px rgba(0,0,0,0.4);
-    z-index:1000; min-width:400px; max-width:600px;">
-    <p id="popupText" style="font-size:1.1rem; margin-bottom:15px;"></p>
-    <input type="text" id="popupLink" readonly style="width:100%; padding:8px; font-size:1rem; margin-bottom:15px; display:none;"/>
-    <button id="closePopup" data-i18n="popup.close" style="padding:8px 15px; font-size:1rem;">Close</button>
+  <div id="popup">
+    <p id="popupText"></p>
+    <input type="text" id="popupLink" readonly />
+    <button id="closePopup" data-i18n="popup.close">Close</button>
   </div>
 
   <script src="translator.js"></script>

@@ -5,56 +5,118 @@ body {
   margin: 0;
   padding: 0;
   color: #222;
+  min-height: 100vh;
 }
 
+/* Header with flexible sizing */
 header {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 30px;
-  padding: 30px 0 40px;
+  gap: clamp(15px, 3vw, 30px);
+  padding: clamp(15px, 3vh, 30px) 20px clamp(20px, 4vh, 40px);
   border-bottom: 2px solid #007ACC;
   background: white;
+  flex-wrap: wrap;
+  height: auto;
 }
 
 header img { 
-  height: 250px;
+  height: 100px;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+header img:nth-of-type(1) {
+  height: 100px;
+}
+
+header img:nth-of-type(2),
+header img:nth-of-type(3) {
+  height: 150px;
 }
 
 header h1 {
   font-weight: 700;
-  font-size: 2.8rem;
+  font-size: clamp(1.5rem, 4vw, 2.8rem);
   color: #004080;
   margin: 0;
+  text-align: center;
 }
 
-/* Main Layout with Sidebar */
+/* Language Selector - Responsive positioning */
+.language-selector {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  display: flex;
+  gap: 10px;
+  background: white;
+  padding: 10px 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  flex-wrap: wrap;
+  height: 50px;
+  margin-top: 90px;
+}
+
+.lang-btn {
+  padding: 8px 16px;
+  border: 2px solid #007ACC;
+  background: white;
+  color: #007ACC;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.lang-btn:hover {
+  background: #f0f8ff;
+}
+
+.lang-btn.active {
+  background: #007ACC;
+  color: white;
+}
+
+.lang-flag {
+  font-size: 18px;
+  margin-right: 5px;
+}
+
+/* Main Layout with Sidebar - Flexible */
 .main-layout {
   display: flex;
   min-height: calc(100vh - 200px);
 }
 
-/* Authentication Sidebar */
+/* Authentication Sidebar - Improved responsive behavior */
 .auth-sidebar {
-  width: 280px;
-  min-width: 200px;
-  max-width: 600px;
+  width: clamp(250px, 20vw, 350px);
+  min-width: 250px;
   background: white;
   border-right: 2px solid #007ACC;
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.08);
-  transition: none;
+  transition: width 0.3s ease;
   position: relative;
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .auth-sidebar.collapsed {
   width: 60px;
+  min-width: 60px;
 }
 
 .auth-sidebar.collapsed .sidebar-content {
   opacity: 0;
   visibility: hidden;
+  pointer-events: none;
 }
 
 .toggle-sidebar-btn {
@@ -92,7 +154,7 @@ header h1 {
   margin-top: 0;
   margin-bottom: 20px;
   text-align: center;
-  font-size: 1.4rem;
+  font-size: clamp(1.1rem, 2vw, 1.4rem);
 }
 
 .auth-sidebar label {
@@ -100,7 +162,7 @@ header h1 {
   margin-top: 15px;
   font-weight: 500;
   color: #333;
-  font-size: 0.9rem;
+  font-size: clamp(0.85rem, 1.5vw, 0.9rem);
 }
 
 .auth-sidebar input,
@@ -110,7 +172,8 @@ header h1 {
   margin-top: 6px;
   border: 1.8px solid #ccc;
   border-radius: 5px;
-  font-size: 0.95rem;
+  font-size: clamp(0.85rem, 1.5vw, 0.95rem);
+  box-sizing: border-box;
 }
 
 .auth-sidebar input:focus,
@@ -127,7 +190,7 @@ header h1 {
   border: none;
   padding: 10px 0;
   width: 100%;
-  font-size: 1rem;
+  font-size: clamp(0.9rem, 1.5vw, 1rem);
   border-radius: 6px;
   cursor: pointer;
   font-weight: 600;
@@ -162,44 +225,48 @@ header h1 {
 }
 
 .status-text {
-  font-size: 0.85rem;
+  font-size: clamp(0.75rem, 1.2vw, 0.85rem);
   color: #555;
   font-weight: 500;
 }
 
-/* Main Content Area */
+/* Main Content Area - Flexible */
 .main-content {
   flex: 1;
-  padding: 30px;
+  padding: clamp(15px, 3vw, 30px);
   overflow-y: auto;
+  min-width: 0; /* Prevents flex overflow issues */
 }
 
 section#onboardingSimulator {
   background: white;
   border-radius: 8px;
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
-  padding: 25px 30px;
+  padding: clamp(20px, 3vw, 30px);
   max-width: 1200px;
+  margin: 0 auto;
 }
 
 h2 { 
   color: #004080; 
   margin-top: 0; 
   text-align: center;
-  font-size: 1.8rem;
+  font-size: clamp(1.3rem, 3vw, 1.8rem);
 }
 
 h3 {
   color: #004080;
   margin-top: 0;
   margin-bottom: 20px;
+  font-size: clamp(1.1rem, 2.5vw, 1.4rem);
 }
 
 label { 
   display: block; 
   margin-top: 15px; 
   font-weight: 500; 
-  color: #333; 
+  color: #333;
+  font-size: clamp(0.9rem, 1.5vw, 1rem);
 }
 
 input, select {
@@ -208,7 +275,7 @@ input, select {
   margin-top: 6px; 
   border: 1.8px solid #ccc;
   border-radius: 5px; 
-  font-size: 1rem;
+  font-size: clamp(0.9rem, 1.5vw, 1rem);
   box-sizing: border-box;
 }
 
@@ -225,10 +292,11 @@ button {
   border: none;
   padding: 12px 0; 
   width: 100%; 
-  font-size: 1.1rem; 
+  font-size: clamp(0.95rem, 1.8vw, 1.1rem);
   border-radius: 6px; 
   cursor: pointer;
   font-weight: 600;
+  transition: background-color 0.3s ease;
 }
 
 button:hover { 
@@ -244,24 +312,28 @@ button:hover {
   white-space: pre-wrap;
   word-wrap: break-word;
   margin-top: 15px;
-  font-size: 0.9rem;
+  font-size: clamp(0.8rem, 1.5vw, 0.9rem);
   color: #222;
 }
 
 .tabs, .subTabs { 
   display: flex; 
   gap: 10px; 
-  margin-top: 15px; 
+  margin-top: 15px;
+  flex-wrap: wrap;
 }
 
 .tabBtn, .subTabBtn {
   flex: 1; 
+  min-width: 140px;
   padding: 10px; 
   border-radius: 6px; 
   border: none; 
   cursor: pointer;
   background: #e0e0e0; 
   font-weight: 600;
+  font-size: clamp(0.85rem, 1.5vw, 0.95rem);
+  transition: background 0.3s ease;
 }
 
 .tabBtn.active, .subTabBtn.active { 
@@ -277,52 +349,6 @@ button:hover {
   margin-top: 5px;
   margin-bottom: 10px;
 }
-
-/* Responsive Design */
-@media (max-width: 900px) { 
-  .main-layout { 
-    flex-direction: column; 
-  }
-  
-  .auth-sidebar {
-    width: 100%;
-    border-right: none;
-    border-bottom: 2px solid #007ACC;
-  }
-  
-  .auth-sidebar.collapsed {
-    width: 100%;
-    height: 60px;
-  }
-  
-  .toggle-sidebar-btn {
-    top: 12px;
-    right: 12px;
-  }
-}
-
-@media (max-width: 600px) {
-  header {
-    flex-wrap: wrap;
-  }
-  
-  header h1 {
-    font-size: 1.6rem;
-  }
-  
-  header img {
-    height: 60px;
-  }
-  
-  .main-content {
-    padding: 15px;
-  }
-  
-  section#onboardingSimulator {
-    padding: 20px;
-  }
-}
-
 
 /* Resize Handle */
 .resize-handle {
@@ -345,8 +371,153 @@ button:hover {
   background: rgba(0, 122, 204, 0.5);
 }
 
-/* Cursor pour toute la page pendant le drag */
 body.resizing {
   cursor: col-resize;
   user-select: none;
+}
+
+/* Popup - Responsive */
+#popup {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+  min-width: min(400px, 90vw);
+  max-width: min(600px, 95vw);
+}
+
+#popupText {
+  font-size: 1.1rem;
+  margin-bottom: 15px;
+}
+
+#popupLink {
+  width: 100%;
+  padding: 8px;
+  font-size: 1rem;
+  margin-bottom: 15px;
+  display: none;
+}
+
+#closePopup {
+  padding: 8px 15px;
+  font-size: 1rem;
+}
+
+/* Tablet Breakpoint */
+@media (max-width: 1024px) {
+  .auth-sidebar {
+    width: clamp(220px, 25vw, 280px);
+    min-width: 220px;
+  }
+  
+  .language-selector {
+    top: 10px;
+    right: 10px;
+    padding: 8px 12px;
+    gap: 8px;
+  }
+  
+  .lang-btn {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+}
+
+/* Mobile Breakpoint */
+@media (max-width: 768px) { 
+  .main-layout { 
+    flex-direction: column; 
+  }
+  
+  .auth-sidebar {
+    width: 100%;
+    min-width: 100%;
+    border-right: none;
+    border-bottom: 2px solid #007ACC;
+  }
+  
+  .auth-sidebar.collapsed {
+    width: 100%;
+    height: 60px;
+  }
+  
+  .toggle-sidebar-btn {
+    top: 12px;
+    right: 12px;
+  }
+  
+  .resize-handle {
+    display: none; /* Disable resize on mobile */
+  }
+  
+  header {
+    padding: 15px 10px 20px;
+    gap: 15px;
+  }
+  
+  header img {
+    height: clamp(60px, 12vh, 100px);
+  }
+  
+  .main-content {
+    padding: 15px;
+  }
+  
+  section#onboardingSimulator {
+    padding: 20px 15px;
+  }
+  
+  .tabs, .subTabs {
+    flex-direction: column;
+  }
+  
+  .tabBtn, .subTabBtn {
+    width: 100%;
+    min-width: 100%;
+  }
+  
+  .language-selector {
+    position: static;
+    margin: 10px;
+    justify-content: center;
+  }
+}
+
+/* Small Mobile Breakpoint */
+@media (max-width: 480px) {
+  .language-selector {
+    flex-direction: column;
+    width: calc(100% - 20px);
+    margin: 10px;
+  }
+  
+  .lang-btn {
+    width: 100%;
+  }
+  
+  header img {
+    height: 60px;
+  }
+  
+  section#onboardingSimulator {
+    padding: 15px;
+  }
+}
+
+/* Large Screen Optimization */
+@media (min-width: 1600px) {
+  .main-content {
+    padding: 40px;
+  }
+  
+  section#onboardingSimulator {
+    max-width: 1400px;
+  }
 }
