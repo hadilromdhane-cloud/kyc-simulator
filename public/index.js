@@ -1108,14 +1108,12 @@ function handleRealWebhookEvent(webhookData) {
   console.log('Real webhook event processed:', realEvent);
 }
 
-// --- Notification System ---
 function createNotificationElements() {
-    if (document.getElementById('notificationContainer') && 
-      document.getElementById('notificationHistoryBtn') && 
-      document.getElementById('tokenStatusBtn')) {
+  if (document.getElementById('notificationContainer') && 
+      document.getElementById('notificationHistoryBtn')) {
     console.log('✅ Notification elements already exist, skipping creation');
     updateNotificationBadge();
-    updateTokenStatusButton();
+    updateTokenStatusDisplay();
     return;
   }
 
@@ -1132,7 +1130,7 @@ function createNotificationElements() {
 
   const notificationButton = document.createElement('button');
   notificationButton.id = 'notificationHistoryBtn';
-notificationButton.innerHTML = t('buttons.notifications');
+  notificationButton.innerHTML = t('buttons.notifications');
   notificationButton.style.cssText = `
     position: fixed;
     top: 85px;
@@ -1167,63 +1165,41 @@ notificationButton.innerHTML = t('buttons.notifications');
   notificationButton.onclick = showNotificationHistory;
   document.body.appendChild(notificationButton);
 
-  const tokenStatusButton = document.createElement('button');
-  tokenStatusButton.id = 'tokenStatusBtn';
-  tokenStatusButton.innerHTML = t('buttons.tokenStatus');
-  tokenStatusButton.style.cssText = `
-    position: fixed;
-    top: 35px;
-    right: 20px;
-    z-index: 10000;
-    padding: 10px 15px;
-    background-color: #007ACC;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 600;
-    font-family: 'Roboto', sans-serif;
-    box-shadow: 0 3px 8px rgb(0 0 0 / 0.1);
-    transition: background-color 0.2s ease;
-    width: auto;
-    margin-top: 0;
-    min-width: 120px;
-  `;
-  tokenStatusButton.onclick = showTokenStatus;
-  document.body.appendChild(tokenStatusButton);
-
   updateNotificationBadge();
-  updateTokenStatusButton();
+  updateTokenStatusDisplay();
 }
 
-function updateTokenStatusButton() {
-  const button = document.getElementById('tokenStatusBtn');
-  if (!button) return;
-
-  const status = tokenManager.getTokenStatus();
-  button.innerHTML = `Token: ${status}`;
+function updateTokenStatusDisplay() {
+  const statusIndicator = document.getElementById('tokenStatusIndicator');
+  const statusText = document.getElementById('tokenStatusText');
   
-  if (status.includes('Expired')) {
-    button.style.backgroundColor = '#dc3545';
-  } else if (status.includes('Needs refresh')) {
-    button.style.backgroundColor = '#ffc107';
-  } else if (status.includes('Valid')) {
-    button.style.backgroundColor = '#28a745';
-  } else {
-    button.style.backgroundColor = '#17a2b8';
+  if (!statusIndicator || !statusText) {
+    console.warn('Token status elements not found in sidebar');
+    return;
   }
-}
 
-function showTokenStatus() {
   const status = tokenManager.getTokenStatus();
-  const token = tokenManager.getToken();
-  const tenant = tokenManager.getTenant();
+  statusText.textContent = status;
   
-  showPopup(`Token Status: ${status}\nTenant: ${tenant}\nToken: ${token ? `${token.substring(0, 20)}...` : 'None'}`);
+  // Remove all status classes
+  statusIndicator.classList.remove('valid', 'refresh', 'expired', 'none');
+  
+  // Add appropriate class based on status
+  if (status.includes('Expired')) {
+    statusIndicator.classList.add('expired');
+  } else if (status.includes('Needs refresh')) {
+    statusIndicator.classList.add('refresh');
+  } else if (status.includes('Valid')) {
+    statusIndicator.classList.add('valid');
+  } else {
+    statusIndicator.classList.add('none');
+  }
+  
+  console.log('Token status updated:', status);
 }
 
-setInterval(updateTokenStatusButton, 10000);
+
+setInterval(updateTokenStatusDisplay, 10000);
 
 function updateNotificationBadge() {
   const button = document.getElementById('notificationHistoryBtn');
@@ -1664,7 +1640,7 @@ showNotification(t('notifications.authSuccess'), 'success');
     localStorage.setItem('tenantName', tenantName);
     console.log('Auth tokens stored for onboarding page');
     
-    updateTokenStatusButton();
+    updateTokenStatusDisplay();
   } catch(err) {
     logMessage(`Authentication error: ${err.message}`, 'error');
 showNotification(t('notifications.authFailed'), 'error');
@@ -2355,7 +2331,7 @@ document.addEventListener('DOMContentLoaded', function() {
   logMessage('Application initialized', 'info');
   createNotificationElements();
   
-  updateTokenStatusButton();
+  updateTokenStatusDisplay();
   
   setTimeout(() => {
     if (!pollingInterval) {
@@ -2418,7 +2394,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     logMessage('Application initialized', 'info');
     createNotificationElements();
     
-    updateTokenStatusButton();
+    updateTokenStatusDisplay();
     
     setTimeout(() => {
         if (!pollingInterval) {
