@@ -45,49 +45,41 @@ header h1 {
   text-align: center;
 }
 
-/* Language Selector - Responsive positioning */
+/* Language Selector - Compact Toggle Top Right */
 .language-selector {
   position: fixed;
-  top: 20px;
+  top: 15px;
   right: 20px;
   z-index: 1000;
   display: flex;
-  gap: 10px;
-  background: white;
-  padding: 10px 15px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  flex-wrap: wrap;
-  height: 50px;
-  margin-top: 90px;
-}
-
-.lang-btn {
-  padding: 8px 16px;
-  border: 2px solid #007ACC;
-  background: white;
-  color: #007ACC;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 14px;
-  transition: all 0.3s ease;
-  white-space: nowrap;
-}
-
-.lang-btn:hover {
   background: #f0f8ff;
+  border: 2px solid #007ACC;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 
-.lang-btn.active {
+.lang-toggle-btn {
+  padding: 6px 18px;
+  border: none;
+  background: transparent;
+  color: #007ACC;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  letter-spacing: 0.5px;
+}
+
+.lang-toggle-btn:hover:not(.active) {
+  background: rgba(0, 122, 204, 0.1);
+}
+
+.lang-toggle-btn.active {
   background: #007ACC;
   color: white;
 }
 
-.lang-flag {
-  font-size: 18px;
-  margin-right: 5px;
-}
 
 /* Main Layout with Sidebar - Flexible */
 .main-layout {
@@ -568,24 +560,29 @@ body.resizing {
     width: 100%;
     min-width: 100%;
   }
-  
-  .language-selector {
-    position: static;
-    margin: 10px;
-    justify-content: center;
+    .language-selector {
+    top: 10px;
+    right: 10px;
+    border-radius: 18px;
   }
+  
+  .lang-toggle-btn {
+    padding: 5px 14px;
+    font-size: 12px;
+  }
+  
 }
 
 /* Small Mobile Breakpoint */
 @media (max-width: 480px) {
-  .language-selector {
-    flex-direction: column;
-    width: calc(100% - 20px);
-    margin: 10px;
+    .language-selector {
+    top: 8px;
+    right: 8px;
   }
   
-  .lang-btn {
-    width: 100%;
+  .lang-toggle-btn {
+    padding: 4px 12px;
+    font-size: 11px;
   }
   
   header img {
