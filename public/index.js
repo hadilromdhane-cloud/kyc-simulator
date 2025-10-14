@@ -296,54 +296,54 @@ function getCurrentCountries() {
 
 const visibleTemplates = {
   PP: {
-    decentralized: [
-      { label: 'Name', key: 'firstName' },
-      { label: 'Last Name', key: 'lastName' },
-      { label: 'Birth Date', key: 'birthDate', type: 'date' },
-      { label: 'Citizenship', key: 'citizenship', type: 'country' },
-      { label: 'Nationality', key: 'nationality', type: 'country' }
+decentralized: [
+      { label: t('fields.firstName'), key: 'firstName' },
+      { label: t('fields.lastName'), key: 'lastName' },
+      { label: t('fields.birthDate'), key: 'birthDate', type: 'date' },
+      { label: t('fields.citizenship'), key: 'citizenship', type: 'country' },
+      { label: t('fields.nationality'), key: 'nationality', type: 'country' }
     ],
     centralized: [
-      { label: 'Name', key: 'firstName' },
-      { label: 'Last Name', key: 'lastName' },
-      { label: 'Birth Date', key: 'birthDate', type: 'date' },
-      { label: 'Nationality', key: 'nationality', type: 'country'},
-      { label: 'Citizenship', key: 'citizenship',type: 'country' },
-      { label: 'Queue Name', key: 'queueName' }
+      { label: t('fields.firstName'), key: 'firstName' },
+      { label: t('fields.lastName'), key: 'lastName' },
+      { label: t('fields.birthDate'), key: 'birthDate', type: 'date' },
+      { label: t('fields.nationality'), key: 'nationality', type: 'country'},
+      { label: t('fields.citizenship'), key: 'citizenship',type: 'country' },
+      { label: t('fields.queueName'), key: 'queueName' }
     ],
     // NEW: Add async-specific template for PP
-    async: [
-      { label: 'First Name', key: 'firstName', required: true },
-      { label: 'Last Name', key: 'lastName', required: true },
-      { label: 'Birth Date', key: 'birthDate', type: 'date', required: true },
-      { label: 'Citizenship', key: 'citizenship', type: 'country', required: true },
-      { label: 'Nationality', key: 'nationality', type: 'country', required: true },
-      { label: 'Type de la pièce d\'identité', key: 'typePiece', type: 'idType', required: true },
-      { label: 'Numéro de la pièce d\'identité', key: 'numeroPiece', required: true },
-      { label: 'Profession', key: 'profession', type: 'profession', required: true },
-      { label: 'Produits/Services cibles', key: 'produits', type: 'products', required: true },
-      { label: 'Canal de distribution', key: 'canal', type: 'channel', required: true },
-      { label: 'Revenu annuel net', key: 'revenu', type: 'number', placeholder: 'Numeric only', required: true }
+   async: [
+      { label: t('fields.firstName'), key: 'firstName', required: true },
+      { label: t('fields.lastName'), key: 'lastName', required: true },
+      { label: t('fields.birthDate'), key: 'birthDate', type: 'date', required: true },
+      { label: t('fields.citizenship'), key: 'citizenship', type: 'country', required: true },
+      { label: t('fields.nationality'), key: 'nationality', type: 'country', required: true },
+      { label: t('fields.idType'), key: 'typePiece', type: 'idType', required: true },
+      { label: t('fields.idNumber'), key: 'numeroPiece', required: true },
+      { label: t('fields.profession'), key: 'profession', type: 'profession', required: true },
+      { label: t('fields.targetProducts'), key: 'produits', type: 'products', required: true },
+      { label: t('fields.distributionChannel'), key: 'canal', type: 'channel', required: true },
+      { label: t('fields.annualIncome'), key: 'revenu', type: 'number', placeholder: t('fields.numericOnly'), required: true }
     ]
   },
   PM: {
-    decentralized: [{ label: 'Business Name', key: 'businessName' }],
+     decentralized: [{ label: t('fields.businessName'), key: 'businessName' }],
     centralized: [
-      { label: 'Business Name', key: 'businessName' },
-      { label: 'Queue Name', key: 'queueName' }
+      { label: t('fields.businessName'), key: 'businessName' },
+      { label: t('fields.queueName'), key: 'queueName' }
     ],
     async: [
-    { label: 'Business Name', key: 'businessName', required: true },
-    { label: 'Legal Form', key: 'legalForm', type: 'legalForm', required: true },
-    { label: 'Date of Incorporation', key: 'dateOfIncorporation', type: 'date', required: true },
-    { label: 'Registration Number', key: 'registrationNumber', required: true },
-    { label: 'Country of Incorporation', key: 'countryOfIncorporation', type: 'country', required: true },
-    { label: 'Share Capital (EUR)', key: 'shareCapital', type: 'number', placeholder: 'Numeric only', required: true },
-    { label: 'Activity Sector', key: 'activitySector', type: 'activitySector', required: true },
-    { label: 'Distribution Channel', key: 'canal', type: 'channel', required: true },
-    { label: 'Target Products/Services', key: 'produits', type: 'products', required: true },
-    { label: 'Funds Origin', key: 'fundsOrigin', type: 'fundsOrigin', required: true }
-  ]
+      { label: t('fields.businessName'), key: 'businessName', required: true },
+      { label: t('fields.legalForm'), key: 'legalForm', type: 'legalForm', required: true },
+      { label: t('fields.incorporationDate'), key: 'dateOfIncorporation', type: 'date', required: true },
+      { label: t('fields.registrationNumber'), key: 'registrationNumber', required: true },
+      { label: t('fields.incorporationCountry'), key: 'countryOfIncorporation', type: 'country', required: true },
+      { label: t('fields.shareCapital'), key: 'shareCapital', type: 'number', placeholder: t('fields.numericOnly'), required: true },
+      { label: t('fields.activitySector'), key: 'activitySector', type: 'activitySector', required: true },
+      { label: t('fields.distributionChannel'), key: 'canal', type: 'channel', required: true },
+      { label: t('fields.targetProducts'), key: 'produits', type: 'products', required: true },
+      { label: t('fields.fundsOrigin'), key: 'fundsOrigin', type: 'fundsOrigin', required: true }
+    ]
   }
 };
 
@@ -475,8 +475,7 @@ function renderFields(containerId, entityType, processType) {
       
       // Create configuration header badge
       const configHeader = document.createElement('div');
-      configHeader.textContent = 'CONFIGURATION';
-      configHeader.style.cssText = `
+      configHeader.textContent = t('fields.configuration');      configHeader.style.cssText = `
         position: absolute;
         top: -12px;
         left: 15px;
@@ -558,7 +557,7 @@ function renderFields(containerId, entityType, processType) {
 
         const defaultOption = document.createElement('option');
         defaultOption.value = '';
-        defaultOption.textContent = 'Select Country';
+        defaultOption.textContent = t('fields.selectCountry');
         input.appendChild(defaultOption);
 
         const currentCountries = getCurrentCountries();
@@ -1070,7 +1069,7 @@ function createNotificationElements() {
 
   const notificationButton = document.createElement('button');
   notificationButton.id = 'notificationHistoryBtn';
-  notificationButton.innerHTML = 'Notifications';
+notificationButton.innerHTML = t('buttons.notifications');
   notificationButton.style.cssText = `
     position: fixed;
     top: 85px;
@@ -1107,7 +1106,7 @@ function createNotificationElements() {
 
   const tokenStatusButton = document.createElement('button');
   tokenStatusButton.id = 'tokenStatusBtn';
-  tokenStatusButton.innerHTML = 'Token Status';
+  tokenStatusButton.innerHTML = t('buttons.tokenStatus');
   tokenStatusButton.style.cssText = `
     position: fixed;
     top: 35px;
@@ -1172,10 +1171,10 @@ function updateNotificationBadge() {
   ).length;
 
   if (unfinishedCount > 0) {
-    button.innerHTML = `Notifications (${unfinishedCount})`;
+button.innerHTML = `${t('buttons.notifications')} (${unfinishedCount})`;
     button.style.backgroundColor = '#dc3545';
   } else {
-    button.innerHTML = 'Notifications';
+button.innerHTML = t('buttons.notifications');
     button.style.backgroundColor = '#007ACC';
   }
 }
@@ -1204,13 +1203,13 @@ function showNotificationHistory() {
     max-width: 800px;
     width: 90%;
     max-height: 80%;
-    overflow-y: auto;
+    overflow-y: auto; 
   `;
 
   let historyHTML = `
-    <h2 style="color: #004080; margin-top: 0; text-align: center;">Notifications History</h2>
+    <h2 style="color: #004080; margin-top: 0; text-align: center;">${t('buttons.notificationsHistory')}</h2>
     <div style="margin-bottom: 20px;">
-      <button id="clearHistory" style="background: #dc3545; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer;">Clear All History</button>
+      <button id="clearHistory" style="background: #dc3545; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer;">${t('buttons.clearHistory')}</button>
     </div>
   `;
 
@@ -1298,7 +1297,7 @@ function showNotificationHistory() {
   document.body.appendChild(historyOverlay);
 
   document.getElementById('clearHistory').onclick = () => {
-    if (confirm('Clear all notification history and reset event tracking?')) {
+if (confirm(t('messages.confirmClearHistory'))) {
       notificationsHistory = [];
       localStorage.setItem('notificationsHistory', JSON.stringify(notificationsHistory));
       
@@ -1741,7 +1740,7 @@ function showScreeningResultsPopup(event) {
   
   if (!event.isSanctioned) {
     const continueBtn = document.createElement('button');
-    continueBtn.textContent = 'Continue Onboarding';
+    continueBtn.textContent = t('buttons.continueOnboarding');
     continueBtn.style.cssText = 'padding: 10px 20px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: 600;';
     continueBtn.onclick = () => {
       navigateToOnboarding(event.customerId);
@@ -1751,7 +1750,7 @@ function showScreeningResultsPopup(event) {
   }
   
   const closeBtn = document.createElement('button');
-  closeBtn.textContent = 'Close';
+closeBtn.textContent = t('buttons.close');
   closeBtn.style.cssText = 'padding: 10px 20px; background-color: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: 600;';
   closeBtn.onclick = () => popup.style.display = 'none';
   buttonsContainer.appendChild(closeBtn);
@@ -1811,7 +1810,7 @@ function showScreeningResponsePopup(message, link = null, showContinueButton = f
   
   if (showContinueButton && customerData && apiResponse) {
     const continueBtn = document.createElement('button');
-    continueBtn.textContent = 'Continue Onboarding';
+continueBtn.textContent = t('buttons.continueOnboarding');
     continueBtn.style.cssText = 'padding: 10px 20px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: 600;';
     continueBtn.onclick = () => {
       const customerId = apiResponse.customerId || apiResponse.customer_id || apiResponse.id;
@@ -1877,7 +1876,7 @@ function showScreeningResponsePopup(message, link = null, showContinueButton = f
   }
   
   const closeBtn = document.createElement('button');
-  closeBtn.textContent = 'Close';
+closeBtn.textContent = t('buttons.close');
   closeBtn.style.cssText = 'padding: 10px 20px; background-color: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: 600;';
   closeBtn.onclick = () => popup.style.display = 'none';
   buttonsContainer.appendChild(closeBtn);
@@ -2115,10 +2114,10 @@ showNotification(t('notifications.searchComplete'), 'success');
       if (data.maxScore && data.maxScore > 0) {
         const link = `https://greataml.com/search/searchdecision/${data.search_query_id}`;
         logMessage(`Hits found for customer (Score: ${data.maxScore})`, 'warning');
-        showScreeningResponsePopup('Some hits were found. You can process them using this link.', link, false, payload, data);
+        showScreeningResponsePopup(t('messages.hitsFound'), link, false, payload, data);
       } else {
         logMessage('No hits were found for customer', 'info');
-        showScreeningResponsePopup('No hits were found. You can proceed to the next step.', null, true, payload, data);
+        showScreeningResponsePopup(t('messages.noHitsFound'), null, true, payload, data);
       }
     } else {
       const isAsync = containerId === 'asyncFields';
@@ -2126,13 +2125,15 @@ showNotification(t('notifications.searchComplete'), 'success');
       if (data.maxScore && data.maxScore > 0) {
         logMessage(`Hits found for customer (Score: ${data.maxScore})`, 'warning');
         if (isAsync) {
-          showScreeningResponsePopup('Some hits were found. The alert is being processed by the compliance team. You can now continue with the onboarding.', null, true, payload, data);
+        showScreeningResponsePopup(t('messages.hitsFoundAsync'), null, true, payload, data);
         } else {
-          showScreeningResponsePopup('Some hits were found. The alert has been assigned to the compliance team. You will receive a notification once the alert is processed.', null, false, payload, data);
+    showScreeningResponsePopup(t('messages.hitsFoundSync'), null, false, payload, data);
         }
       } else {
         logMessage('No hits were found for customer', 'info');
-        showScreeningResponsePopup('No hits were found. You can proceed to the next step.', null, true, payload, data);
+    showScreeningResponsePopup(t('messages.noHitsFound'), null, true, payload, data);
+
+    
       }
     }
   } catch (err) {
