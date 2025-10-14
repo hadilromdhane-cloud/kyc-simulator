@@ -364,12 +364,14 @@ const Translator = (function() {
 
     // Initialize language selector buttons
     function initializeLanguageSelector() {
-        document.querySelectorAll('.lang-btn').forEach(button => {
-            button.addEventListener('click', function() {
-                const lang = this.getAttribute('data-lang');
-                changeLanguage(lang);
-            });
-        });
+        document.querySelectorAll('.lang-toggle-btn').forEach(button => {
+  button.addEventListener('click', function() {
+    document.querySelectorAll('.lang-toggle-btn').forEach(btn => btn.classList.remove('active'));
+    this.classList.add('active');
+    const lang = this.getAttribute('data-lang');
+    Translator.changeLanguage(lang);
+  });
+});
     }
 
     // Initialize translator
