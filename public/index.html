@@ -48,6 +48,13 @@
         <input type="password" id="password" data-i18n-placeholder="authentication.passwordPlaceholder" placeholder="Enter password" />
 
         <button id="authBtn" data-i18n="authentication.authButton">Authenticate</button>
+           <div class="token-status-container" id="tokenStatusDisplay">
+      <span class="token-status-label" data-i18n="authentication.tokenStatus">Token Status</span>
+      <div class="token-status-badge">
+        <span class="token-status-indicator none" id="tokenStatusIndicator"></span>
+        <span class="token-status-text" id="tokenStatusText" data-i18n="authentication.noToken">No Token</span>
+      </div>
+    </div>
       </div>
     </aside>
 
