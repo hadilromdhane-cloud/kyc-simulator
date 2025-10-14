@@ -42,10 +42,12 @@
       "tokenExpired": "Authentication expired. Please login again.",
       "historyCleared": "History cleared and event tracking reset",
       "selectEntityType": "Please select an entity type",
-      "noCustomerId": "Error: Customer ID not found"
+      "noCustomerId": "Error: Customer ID not found",
+      "warningCustomerData": "Warning: Customer data may not be available for onboarding"
     },
     "buttons": {
       "notifications": "Notifications",
+      "notificationsHistory": "Notifications History",
       "tokenStatus": "Token Status",
       "clearHistory": "Clear All History",
       "continueOnboarding": "Continue Onboarding",
@@ -87,7 +89,32 @@
       "hitsFoundSync": "Some hits were found. The alert has been assigned to the compliance team. You will receive a notification once the alert is processed.",
       "kycDataGathered": "Customer KYC data have been successfully gathered by Reis KYC.\n\nThe Compliance team is currently checking the onboarding data. You will be notified once the process is complete.\n\nIn the meantime, you can access the Reis KYC Customer Card through the following link:",
       "screeningCompleted": "Screening completed for",
-      "realWebhookReceived": "Real webhook received for customer"
+      "realWebhookReceived": "Real webhook received for customer",
+      "confirmClearHistory": "Clear all notification history and reset event tracking?",
+      "customerDataStored": "Customer data successfully stored for secure onboarding transfer",
+      "failedStoreCustomerData": "Failed to store customer data for onboarding",
+      "noCustomerIdInResponse": "Cannot store customer data: No customer ID found in API response"
+    },
+    "status": {
+      "sanctioned": "SANCTIONED",
+      "cleared": "CLEARED",
+      "pepYes": "YES",
+      "pepNo": "NO",
+      "adverseMediaYes": "YES",
+      "adverseMediaNo": "NO",
+      "pepStatus": "PEP Status:",
+      "sanctions": "Sanctions:",
+      "adverseMedia": "Adverse Media:",
+      "onboardingDecision": "Onboarding Decision:",
+      "cannotProceed": "Your customer is confirmed as sanctioned. You cannot proceed with the onboarding.",
+      "canProceed": "You can proceed with the onboarding process.",
+      "customerKycId": "Customer KYC ID:",
+      "processingResults": "Processing Results:",
+      "tenant": "Tenant:"
+    },
+    "popupTitles": {
+      "reisKycHits": "Reis KYC Hits Processing Results",
+      "screeningResponse": "Reis KYC Screening Response"
     }
   },
   "fr": {
@@ -133,10 +160,12 @@
       "tokenExpired": "Authentification expirée. Veuillez vous reconnecter.",
       "historyCleared": "Historique effacé et suivi des événements réinitialisé",
       "selectEntityType": "Veuillez sélectionner un type d'entité",
-      "noCustomerId": "Erreur : ID client introuvable"
+      "noCustomerId": "Erreur : ID client introuvable",
+      "warningCustomerData": "Attention : Les données client peuvent ne pas être disponibles pour l'onboarding"
     },
     "buttons": {
       "notifications": "Notifications",
+      "notificationsHistory": "Historique des Notifications",
       "tokenStatus": "État du Jeton",
       "clearHistory": "Effacer Tout l'Historique",
       "continueOnboarding": "Continuer l'Onboarding",
@@ -152,7 +181,24 @@
       "businessName": "Nom de l'Entreprise",
       "queueName": "Nom de la File",
       "selectCountry": "Sélectionner un Pays",
-      "configuration": "CONFIGURATION"
+      "configuration": "CONFIGURATION",
+      "idType": "Type de pièce d'identité",
+      "idNumber": "Numéro de pièce d'identité",
+      "profession": "Profession",
+      "targetProducts": "Produits/Services cibles",
+      "distributionChannel": "Canal de distribution",
+      "annualIncome": "Revenu annuel net (EUR)",
+      "numericOnly": "Numérique uniquement",
+      "legalForm": "Forme juridique",
+      "incorporationDate": "Date de constitution",
+      "registrationNumber": "Numéro d'immatriculation",
+      "incorporationCountry": "Pays de constitution",
+      "shareCapital": "Capital social (EUR)",
+      "activitySector": "Secteur d'activité",
+      "fundsOrigin": "Origine des fonds",
+      "queueDefault": "Par défaut",
+      "queueMaker": "Créateur",
+      "queueChecker": "Vérificateur"
     },
     "messages": {
       "hitsFound": "Des correspondances ont été trouvées. Vous pouvez les traiter en utilisant ce lien.",
@@ -161,7 +207,32 @@
       "hitsFoundSync": "Des correspondances ont été trouvées. L'alerte a été assignée à l'équipe de conformité. Vous recevrez une notification une fois l'alerte traitée.",
       "kycDataGathered": "Les données KYC du client ont été collectées avec succès par Reis KYC.\n\nL'équipe de conformité vérifie actuellement les données d'onboarding. Vous serez notifié une fois le processus terminé.\n\nEn attendant, vous pouvez accéder à la Fiche Client Reis KYC via le lien suivant :",
       "screeningCompleted": "Screening terminé pour",
-      "realWebhookReceived": "Webhook réel reçu pour le client"
+      "realWebhookReceived": "Webhook réel reçu pour le client",
+      "confirmClearHistory": "Effacer tout l'historique des notifications et réinitialiser le suivi des événements ?",
+      "customerDataStored": "Données client stockées avec succès pour le transfert sécurisé vers l'onboarding",
+      "failedStoreCustomerData": "Échec du stockage des données client pour l'onboarding",
+      "noCustomerIdInResponse": "Impossible de stocker les données client : Aucun ID client trouvé dans la réponse API"
+    },
+    "status": {
+      "sanctioned": "SANCTIONNÉ",
+      "cleared": "APPROUVÉ",
+      "pepYes": "OUI",
+      "pepNo": "NON",
+      "adverseMediaYes": "OUI",
+      "adverseMediaNo": "NON",
+      "pepStatus": "Statut PEP :",
+      "sanctions": "Sanctions :",
+      "adverseMedia": "Média Négatif :",
+      "onboardingDecision": "Décision d'Onboarding :",
+      "cannotProceed": "Votre client est confirmé comme sanctionné. Vous ne pouvez pas procéder à l'onboarding.",
+      "canProceed": "Vous pouvez procéder au processus d'onboarding.",
+      "customerKycId": "ID KYC Client :",
+      "processingResults": "Résultats du Traitement :",
+      "tenant": "Tenant :"
+    },
+    "popupTitles": {
+      "reisKycHits": "Résultats du Traitement des Correspondances Reis KYC",
+      "screeningResponse": "Réponse du Screening Reis KYC"
     }
   }
 }
