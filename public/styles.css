@@ -465,6 +465,22 @@ body.resizing {
   header img {
     height: clamp(60px, 12vh, 100px);
   }
+  .tabContent {
+  display: none;
+}
+
+.tabContent#decentralized {
+  display: block;
+}
+
+/* SubTab Content - Hide by default except first */
+.subTabContent {
+  display: none;
+}
+
+.subTabContent#sync {
+  display: block;
+}
   
   .main-content {
     padding: 15px;
