@@ -521,3 +521,70 @@ body.resizing {
     max-width: 1400px;
   }
 }
+.token-status-container {
+  margin-top: 20px;
+  padding: 15px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 8px;
+  border: 2px solid #dee2e6;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.token-status-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.token-status-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.token-status-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #6c757d;
+  flex-shrink: 0;
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+.token-status-indicator.valid {
+  background: #28a745;
+}
+
+.token-status-indicator.refresh {
+  background: #ffc107;
+}
+
+.token-status-indicator.expired {
+  background: #dc3545;
+}
+
+.token-status-indicator.none {
+  background: #6c757d;
+}
+
+.token-status-text {
+  font-size: clamp(0.85rem, 1.3vw, 0.9rem);
+  color: #333;
+  font-weight: 600;
+  flex: 1;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { 
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 0.6;
+    transform: scale(1.2);
+  }
+}
