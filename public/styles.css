@@ -230,12 +230,81 @@ header h1 {
   font-weight: 500;
 }
 
+/* Token Status Display */
+.token-status-container {
+  margin-top: 20px;
+  padding: 15px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 8px;
+  border: 2px solid #dee2e6;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.token-status-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.token-status-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.token-status-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #6c757d;
+  flex-shrink: 0;
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+.token-status-indicator.valid {
+  background: #28a745;
+}
+
+.token-status-indicator.refresh {
+  background: #ffc107;
+}
+
+.token-status-indicator.expired {
+  background: #dc3545;
+}
+
+.token-status-indicator.none {
+  background: #6c757d;
+}
+
+.token-status-text {
+  font-size: clamp(0.85rem, 1.3vw, 0.9rem);
+  color: #333;
+  font-weight: 600;
+  flex: 1;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { 
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 0.6;
+    transform: scale(1.2);
+  }
+}
+
 /* Main Content Area - Flexible */
 .main-content {
   flex: 1;
   padding: clamp(15px, 3vw, 30px);
   overflow-y: auto;
-  min-width: 0; /* Prevents flex overflow issues */
+  min-width: 0;
 }
 
 section#onboardingSimulator {
@@ -316,6 +385,7 @@ button:hover {
   color: #222;
 }
 
+/* Tabs and SubTabs */
 .tabs, .subTabs { 
   display: flex; 
   gap: 10px; 
@@ -341,8 +411,24 @@ button:hover {
   color: white; 
 }
 
-.tabContent, .subTabContent { 
-  margin-top: 20px; 
+/* Tab Content Visibility Control */
+.tabContent { 
+  margin-top: 20px;
+  display: none;
+}
+
+.tabContent.active {
+  display: block;
+}
+
+/* SubTab Content Visibility Control */
+.subTabContent { 
+  margin-top: 20px;
+  display: none;
+}
+
+.subTabContent.active {
+  display: block;
 }
 
 .entity-fields input {
@@ -454,7 +540,7 @@ body.resizing {
   }
   
   .resize-handle {
-    display: none; /* Disable resize on mobile */
+    display: none;
   }
   
   header {
@@ -465,22 +551,6 @@ body.resizing {
   header img {
     height: clamp(60px, 12vh, 100px);
   }
-  .tabContent {
-  display: none;
-}
-
-.tabContent#decentralized {
-  display: block;
-}
-
-/* SubTab Content - Hide by default except first */
-.subTabContent {
-  display: none;
-}
-
-.subTabContent#sync {
-  display: block;
-}
   
   .main-content {
     padding: 15px;
@@ -535,72 +605,5 @@ body.resizing {
   
   section#onboardingSimulator {
     max-width: 1400px;
-  }
-}
-.token-status-container {
-  margin-top: 20px;
-  padding: 15px;
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  border-radius: 8px;
-  border: 2px solid #dee2e6;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.token-status-label {
-  font-size: 0.7rem;
-  font-weight: 600;
-  color: #6c757d;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 8px;
-  display: block;
-}
-
-.token-status-badge {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.token-status-indicator {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: #6c757d;
-  flex-shrink: 0;
-  animation: pulse-dot 2s ease-in-out infinite;
-}
-
-.token-status-indicator.valid {
-  background: #28a745;
-}
-
-.token-status-indicator.refresh {
-  background: #ffc107;
-}
-
-.token-status-indicator.expired {
-  background: #dc3545;
-}
-
-.token-status-indicator.none {
-  background: #6c757d;
-}
-
-.token-status-text {
-  font-size: clamp(0.85rem, 1.3vw, 0.9rem);
-  color: #333;
-  font-weight: 600;
-  flex: 1;
-}
-
-@keyframes pulse-dot {
-  0%, 100% { 
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% { 
-    opacity: 0.6;
-    transform: scale(1.2);
   }
 }

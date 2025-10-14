@@ -1650,30 +1650,39 @@ showNotification(t('notifications.authFailed'), 'error');
 // --- Tabs ---
 const tabButtons = document.querySelectorAll('.tabBtn');
 const tabContents = document.querySelectorAll('.tabContent');
+
 tabButtons.forEach(btn => btn.addEventListener('click', () => {
+  // Remove active from all buttons
   tabButtons.forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  tabContents.forEach(tc => tc.style.display = 'none');
+  
+  // Remove active from all tab contents
+  tabContents.forEach(tc => tc.classList.remove('active'));
+  
+  // Add active to selected tab
   const activeTab = document.getElementById(btn.dataset.tab);
-  activeTab.style.display = 'block';
-
-  // Don't auto-render when switching to centralized tab
-  // Let the subtabs handle their own rendering
+  if (activeTab) {
+    activeTab.classList.add('active');
+  }
 }));
-
 // --- Subtabs ---
 const subTabButtons = document.querySelectorAll('.subTabBtn');
 const subTabContents = document.querySelectorAll('.subTabContent');
+
 subTabButtons.forEach(btn => btn.addEventListener('click', () => {
   console.log('🔵 Subtab clicked:', btn.dataset.subtab);
   
+  // Remove active from all subtab buttons
   subTabButtons.forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  subTabContents.forEach(tc => tc.style.display = 'none');
-  const activeSubtab = document.getElementById(btn.dataset.subtab);
   
+  // Remove active from all subtab contents
+  subTabContents.forEach(tc => tc.classList.remove('active'));
+  
+  // Add active to selected subtab
+  const activeSubtab = document.getElementById(btn.dataset.subtab);
   if (activeSubtab) {
-    activeSubtab.style.display = 'block';
+    activeSubtab.classList.add('active');
     console.log('✅ Showing subtab:', btn.dataset.subtab);
   } else {
     console.error('❌ Subtab not found:', btn.dataset.subtab);
