@@ -2248,69 +2248,82 @@ function storeCustomerDataForOnboarding(customerData, apiResponse) {
   }
 }
 
-// ===== BUTTON AND EVENT LISTENERS - ALL IN ONE PLACE =====
-document.getElementById('submitDecentralized').addEventListener('click', () => 
-  callSearch(
-    document.getElementById('entityTypeDecentralized').value,
-    'decentralizedFields',
-    'responseDecentralized',
-    true
-  )
-);
-
-document.getElementById('submitSync').addEventListener('click', () => 
-  callSearch(document.getElementById('entityTypeSync').value, 'syncFields', 'responseSync')
-);
-
-document.getElementById('submitAsync').addEventListener('click', () => {
-  const entityType = document.getElementById('entityTypeAsync').value;
-  console.log('Submit async clicked for entity type:', entityType);
-  if (!entityType) {
-  showNotification(t('notifications.selectEntityType'), 'warning');
+// ===== BUTTON AND EVENT LISTENERS - INITIALIZE ONCE =====
+function initializeEventListeners() {
+  // Prevent multiple initializations
+  if (window.eventListenersInitialized) {
+    console.log('⚠️ Event listeners already initialized, skipping');
     return;
   }
-  callSearchAsync(entityType, 'asyncFields');
-});
-
-document.getElementById('entityTypeDecentralized').addEventListener('change', () => {
-  const entityType = document.getElementById('entityTypeDecentralized').value;
-  console.log('🟢 Decentralized entity type changed to:', entityType);
-  if (entityType) {
-    renderFields('decentralizedFields', entityType, 'decentralized');
-  }
-});
-
-document.getElementById('entityTypeSync').addEventListener('change', () => {
-  const entityType = document.getElementById('entityTypeSync').value;
-  console.log('🔵 Sync entity type changed to:', entityType);
-  if (entityType) {
-    // Clear async fields to prevent crossover
-    const asyncFields = document.getElementById('asyncFields');
-    if (asyncFields) asyncFields.innerHTML = '';
-    
-    renderFields('syncFields', entityType, 'centralized');
-  }
-});
-
-// ONLY ONE listener for async entity type - WITH DEFENSIVE CLEARING
-document.getElementById('entityTypeAsync').addEventListener('change', () => {
-  const entityType = document.getElementById('entityTypeAsync').value;
-  console.log('🟠 Async entity type changed to:', entityType);
   
-  if (entityType) {
-    // CRITICAL: Clear sync fields to prevent crossover
-    const syncFields = document.getElementById('syncFields');
-    if (syncFields) {
-      syncFields.innerHTML = '';
-      console.log('🧹 Cleared syncFields to prevent crossover');
-    }
-    
-    // Render in async container ONLY
-    console.log('🎯 Rendering in asyncFields container with async template');
-    renderFields('asyncFields', entityType, 'async');
+  console.log('✅ Initializing event listeners...');
+  
+  // Submit buttons
+  const submitDecentralized = document.getElementById('submitDecentralized');
+  if (submitDecentralized) {
+    submitDecentralized.addEventListener('click', () => 
+      callSearch(
+        document.getElementById('entityTypeDecentralized').value,
+        'decentralizedFields',
+        'responseDecentralized',
+        true
+      )
+    );
   }
-});
 
+  const submitSync = document.getElementById('submitSync');
+  if (submitSync) {
+    submitSync.addEventListener('click', () => 
+      callSearch(document.getElementById('entityTypeSync').value, 'syncFields', 'responseSync')
+    );
+  }
+
+  const submitAsync = document.getElementById('submitAsync');
+  if (submitAsync) {
+    submitAsync.addEventListener('click', () => {
+      const entityType = document.getElementById('entityTypeAsync').value;
+      if (!entityType) {
+        showNotification(t('notifications.selectEntityType'), 'warning');
+        return;
+      }
+      callSearchAsync(entityType, 'asyncFields');
+    });
+  }
+
+  // Entity type selectors
+  const entityTypeDecentralized = document.getElementById('entityTypeDecentralized');
+  if (entityTypeDecentralized) {
+    entityTypeDecentralized.addEventListener('change', () => {
+      const entityType = entityTypeDecentralized.value;
+      if (entityType) {
+        renderFields('decentralizedFields', entityType, 'decentralized');
+      }
+    });
+  }
+
+  const entityTypeSync = document.getElementById('entityTypeSync');
+  if (entityTypeSync) {
+    entityTypeSync.addEventListener('change', () => {
+      const entityType = entityTypeSync.value;
+      if (entityType) {
+        renderFields('syncFields', entityType, 'centralized');
+      }
+    });
+  }
+
+  const entityTypeAsync = document.getElementById('entityTypeAsync');
+  if (entityTypeAsync) {
+    entityTypeAsync.addEventListener('change', () => {
+      const entityType = entityTypeAsync.value;
+      if (entityType) {
+        renderFields('asyncFields', entityType, 'async');
+      }
+    });
+  }
+  
+  window.eventListenersInitialized = true;
+  console.log('✅ Event listeners initialized successfully');
+}
 async function receiveDirectWebhook(event) {
   try {
     const webhookData = typeof event === 'string' ? JSON.parse(event) : event;
@@ -2388,7 +2401,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Your existing initialization code
     logMessage('Application initialized', 'info');
     createNotificationElements();
-    
+    initializeEventListeners(); // ← ADD THIS LINE
     updateTokenStatusDisplay();
     
     setTimeout(() => {
