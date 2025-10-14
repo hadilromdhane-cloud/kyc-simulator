@@ -2327,18 +2327,6 @@ async function receiveDirectWebhook(event) {
 
 window.receiveDirectWebhook = receiveDirectWebhook;
 
-document.addEventListener('DOMContentLoaded', function() {
-  logMessage('Application initialized', 'info');
-  createNotificationElements();
-  
-  updateTokenStatusDisplay();
-  
-  setTimeout(() => {
-    if (!pollingInterval) {
-      setupEventPolling();
-    }
-  }, 1000);
-});
 
 window.addEventListener('beforeunload', function() {
   if (pollingInterval) {
@@ -2384,6 +2372,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('🚀 DOM Content Loaded');
+    
+    // ✅ CLEAR EXPIRED TOKENS ON PAGE LOAD
+    const status = tokenManager.getTokenStatus();
+    if (status === 'Expired' || status.includes('Expired')) {
+        console.log('Clearing expired token on page load');
+        tokenManager.clearTokens();
+    }
     
     // ✅ WAIT FOR TRANSLATOR BEFORE INITIALIZING
     await waitForTranslator();
