@@ -1,3 +1,53 @@
+let translatorReady = false;
+
+// Listen for translator ready event
+document.addEventListener('translatorReady', function() {
+    console.log('✅ Translator ready event received');
+    translatorReady = true;
+});
+
+// Helper function to wait for translator
+async function waitForTranslator() {
+    if (translatorReady) {
+        console.log('✅ Translator already ready');
+        return Promise.resolve();
+    }
+    
+    return new Promise((resolve) => {
+        console.log('⏳ Waiting for Translator...');
+        
+        const checkInterval = setInterval(() => {
+            if (typeof Translator !== 'undefined' && 
+                Translator.getTranslation && 
+                Translator.getTranslation('fields.firstName') !== 'fields.firstName') {
+                console.log('✅ Translator now ready');
+                clearInterval(checkInterval);
+                translatorReady = true;
+                resolve();
+            }
+        }, 100);
+        
+        // Timeout after 5 seconds
+        setTimeout(() => {
+            clearInterval(checkInterval);
+            console.warn('⚠️ Translator timeout - proceeding anyway');
+            resolve();
+        }, 5000);
+    });
+}
+
+// Translation function with safety check
+function t(key) {
+    if (typeof Translator === 'undefined' || !Translator.getTranslation) {
+        console.warn('⚠️ Translator not ready for key:', key);
+        return key;
+    }
+    
+    const translation = Translator.getTranslation(key);
+    return translation;
+}
+
+
 let authToken = null;
 let tenantName = null;
 let eventSource = null;
@@ -294,58 +344,59 @@ function getCurrentCountries() {
     return getCountriesForTenant(currentTenant);
 }
 
-const visibleTemplates = {
-  PP: {
-decentralized: [
-      { label: t('fields.firstName'), key: 'firstName' },
-      { label: t('fields.lastName'), key: 'lastName' },
-      { label: t('fields.birthDate'), key: 'birthDate', type: 'date' },
-      { label: t('fields.citizenship'), key: 'citizenship', type: 'country' },
-      { label: t('fields.nationality'), key: 'nationality', type: 'country' }
-    ],
-    centralized: [
-      { label: t('fields.firstName'), key: 'firstName' },
-      { label: t('fields.lastName'), key: 'lastName' },
-      { label: t('fields.birthDate'), key: 'birthDate', type: 'date' },
-      { label: t('fields.nationality'), key: 'nationality', type: 'country'},
-      { label: t('fields.citizenship'), key: 'citizenship',type: 'country' },
-      { label: t('fields.queueName'), key: 'queueName' }
-    ],
-    // NEW: Add async-specific template for PP
-   async: [
-      { label: t('fields.firstName'), key: 'firstName', required: true },
-      { label: t('fields.lastName'), key: 'lastName', required: true },
-      { label: t('fields.birthDate'), key: 'birthDate', type: 'date', required: true },
-      { label: t('fields.citizenship'), key: 'citizenship', type: 'country', required: true },
-      { label: t('fields.nationality'), key: 'nationality', type: 'country', required: true },
-      { label: t('fields.idType'), key: 'typePiece', type: 'idType', required: true },
-      { label: t('fields.idNumber'), key: 'numeroPiece', required: true },
-      { label: t('fields.profession'), key: 'profession', type: 'profession', required: true },
-      { label: t('fields.targetProducts'), key: 'produits', type: 'products', required: true },
-      { label: t('fields.distributionChannel'), key: 'canal', type: 'channel', required: true },
-      { label: t('fields.annualIncome'), key: 'revenu', type: 'number', placeholder: t('fields.numericOnly'), required: true }
-    ]
-  },
-  PM: {
-     decentralized: [{ label: t('fields.businessName'), key: 'businessName' }],
-    centralized: [
-      { label: t('fields.businessName'), key: 'businessName' },
-      { label: t('fields.queueName'), key: 'queueName' }
-    ],
-    async: [
-      { label: t('fields.businessName'), key: 'businessName', required: true },
-      { label: t('fields.legalForm'), key: 'legalForm', type: 'legalForm', required: true },
-      { label: t('fields.incorporationDate'), key: 'dateOfIncorporation', type: 'date', required: true },
-      { label: t('fields.registrationNumber'), key: 'registrationNumber', required: true },
-      { label: t('fields.incorporationCountry'), key: 'countryOfIncorporation', type: 'country', required: true },
-      { label: t('fields.shareCapital'), key: 'shareCapital', type: 'number', placeholder: t('fields.numericOnly'), required: true },
-      { label: t('fields.activitySector'), key: 'activitySector', type: 'activitySector', required: true },
-      { label: t('fields.distributionChannel'), key: 'canal', type: 'channel', required: true },
-      { label: t('fields.targetProducts'), key: 'produits', type: 'products', required: true },
-      { label: t('fields.fundsOrigin'), key: 'fundsOrigin', type: 'fundsOrigin', required: true }
-    ]
-  }
-};
+function getVisibleTemplates() {
+    return {
+        PP: {
+            decentralized: [
+                { label: t('fields.firstName'), key: 'firstName' },
+                { label: t('fields.lastName'), key: 'lastName' },
+                { label: t('fields.birthDate'), key: 'birthDate', type: 'date' },
+                { label: t('fields.citizenship'), key: 'citizenship', type: 'country' },
+                { label: t('fields.nationality'), key: 'nationality', type: 'country' }
+            ],
+            centralized: [
+                { label: t('fields.firstName'), key: 'firstName' },
+                { label: t('fields.lastName'), key: 'lastName' },
+                { label: t('fields.birthDate'), key: 'birthDate', type: 'date' },
+                { label: t('fields.nationality'), key: 'nationality', type: 'country'},
+                { label: t('fields.citizenship'), key: 'citizenship',type: 'country' },
+                { label: t('fields.queueName'), key: 'queueName' }
+            ],
+            async: [
+                { label: t('fields.firstName'), key: 'firstName', required: true },
+                { label: t('fields.lastName'), key: 'lastName', required: true },
+                { label: t('fields.birthDate'), key: 'birthDate', type: 'date', required: true },
+                { label: t('fields.citizenship'), key: 'citizenship', type: 'country', required: true },
+                { label: t('fields.nationality'), key: 'nationality', type: 'country', required: true },
+                { label: t('fields.idType'), key: 'typePiece', type: 'idType', required: true },
+                { label: t('fields.idNumber'), key: 'numeroPiece', required: true },
+                { label: t('fields.profession'), key: 'profession', type: 'profession', required: true },
+                { label: t('fields.targetProducts'), key: 'produits', type: 'products', required: true },
+                { label: t('fields.distributionChannel'), key: 'canal', type: 'channel', required: true },
+                { label: t('fields.annualIncome'), key: 'revenu', type: 'number', placeholder: t('fields.numericOnly'), required: true }
+            ]
+        },
+        PM: {
+            decentralized: [{ label: t('fields.businessName'), key: 'businessName' }],
+            centralized: [
+                { label: t('fields.businessName'), key: 'businessName' },
+                { label: t('fields.queueName'), key: 'queueName' }
+            ],
+            async: [
+                { label: t('fields.businessName'), key: 'businessName', required: true },
+                { label: t('fields.legalForm'), key: 'legalForm', type: 'legalForm', required: true },
+                { label: t('fields.incorporationDate'), key: 'dateOfIncorporation', type: 'date', required: true },
+                { label: t('fields.registrationNumber'), key: 'registrationNumber', required: true },
+                { label: t('fields.incorporationCountry'), key: 'countryOfIncorporation', type: 'country', required: true },
+                { label: t('fields.shareCapital'), key: 'shareCapital', type: 'number', placeholder: t('fields.numericOnly'), required: true },
+                { label: t('fields.activitySector'), key: 'activitySector', type: 'activitySector', required: true },
+                { label: t('fields.distributionChannel'), key: 'canal', type: 'channel', required: true },
+                { label: t('fields.targetProducts'), key: 'produits', type: 'products', required: true },
+                { label: t('fields.fundsOrigin'), key: 'fundsOrigin', type: 'fundsOrigin', required: true }
+            ]
+        }
+    };
+}
 
 // Default hidden values
 const defaultValues = {
@@ -430,28 +481,31 @@ const asyncFieldOptions = {
 
 // FIXED renderFields function
 function renderFields(containerId, entityType, processType) {
-  const container = document.getElementById(containerId);
-  if (!container) {
-    console.error('Container not found:', containerId);
-    return;
-  }
-  
-  console.log('=== renderFields called ===');
-  console.log('containerId:', containerId);
-  console.log('entityType:', entityType);
-  console.log('processType:', processType);
-  
-  container.innerHTML = '';
+    const container = document.getElementById(containerId);
+    if (!container) {
+        console.error('Container not found:', containerId);
+        return;
+    }
+    
+    console.log('=== renderFields called ===');
+    console.log('containerId:', containerId);
+    console.log('entityType:', entityType);
+    console.log('processType:', processType);
+    
+    container.innerHTML = '';
 
-  // Determine which template to use
-  let fields;
-  if (containerId === 'asyncFields' || processType === 'async') {
-    fields = visibleTemplates[entityType]?.async || [];
-    console.log('✅ Using ASYNC template with', fields.length, 'fields');
-  } else {
-    fields = visibleTemplates[entityType]?.[processType] || [];
-    console.log('Using', processType, 'template with', fields.length, 'fields');
-  }
+    // ✅ CALL THE FUNCTION TO GET FRESH TRANSLATIONS
+    const visibleTemplates = getVisibleTemplates();
+
+    // Determine which template to use
+    let fields;
+    if (containerId === 'asyncFields' || processType === 'async') {
+        fields = visibleTemplates[entityType]?.async || [];
+        console.log('✅ Using ASYNC template with', fields.length, 'fields');
+    } else {
+        fields = visibleTemplates[entityType]?.[processType] || [];
+        console.log('Using', processType, 'template with', fields.length, 'fields');
+    }
 
   if (fields.length === 0) {
     console.warn('⚠️ No fields found for', entityType, processType);
@@ -2341,4 +2395,25 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
+});
+
+document.addEventListener('DOMContentLoaded', async function() {
+    console.log('🚀 DOM Content Loaded');
+    
+    // ✅ WAIT FOR TRANSLATOR BEFORE INITIALIZING
+    await waitForTranslator();
+    
+    console.log('✅ Starting application initialization...');
+    
+    // Your existing initialization code
+    logMessage('Application initialized', 'info');
+    createNotificationElements();
+    
+    updateTokenStatusButton();
+    
+    setTimeout(() => {
+        if (!pollingInterval) {
+            setupEventPolling();
+        }
+    }, 1000);
 });
