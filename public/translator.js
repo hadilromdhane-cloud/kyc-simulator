@@ -209,7 +209,13 @@ const Translator = (function() {
     };
 })();
 
-// Initialize when DOM is ready
-document.addEventListener('DOMContentLoaded', function() {
+// Initialize immediately or when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', Translator.init);
+} else {
+    // DOM already loaded, init now
     Translator.init();
-});
+}
+
+// Expose globally for immediate access
+window.Translator = Translator;
