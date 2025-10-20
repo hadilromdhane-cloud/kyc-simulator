@@ -1000,6 +1000,8 @@ async function callSearchAsync(entityType, containerId) {
     // Store for potential onboarding continuation
     localStorage.setItem(`customerData_${formData.customerId}`, JSON.stringify(customerData));
     console.log('Stored customer data for async onboarding:', customerData);
+    
+    localStorage.setItem(`processType_${formData.customerId}`, 'async');
 
     // Create the async onboarding payload
     const payload = createAsyncOnboardingPayload(entityType, formData);
@@ -1502,9 +1504,17 @@ function setupEventPolling() {
           localStorage.setItem('lastEventId', lastEventId.toString());
           
           if (event.source === 'Reis_KYC' && !wasEventProcessedBefore) {
-            console.log('Showing popup for new event:', event.customerId);
-            showScreeningResultsPopup(event);
-            showNotification(`[${event.tenant}] Screening completed for ${event.customerId}`, 'warning');
+            // ✅ CHECK: Skip popup for async processes
+            const processType = localStorage.getItem(`processType_${event.customerId}`);
+            
+            if (processType === 'async') {
+              console.log('Skipping Reis popup for async process:', event.customerId);
+              // Still add to history, but don't show popup
+            } else {
+              console.log('Showing popup for new event:', event.customerId);
+              showScreeningResultsPopup(event);
+              showNotification(`[${event.tenant}] Screening completed for ${event.customerId}`, 'warning');
+            }
             
             notificationsHistory.unshift(event);
             if (notificationsHistory.length > 50) {
@@ -2123,6 +2133,12 @@ async function callSearch(entityType, containerId, responseId, isDecentralized =
     payload.systemId = generatedSystemId;
     payload.systemName = defaultValues[entityType].systemName;
     payload.searchQuerySource = defaultValues[entityType].searchQuerySource;
+        if (isDecentralized) {
+      localStorage.setItem(`processType_${customerIdentifier}`, 'decentralized');
+    } else {
+      const isSyncProcess = containerId === 'syncFields';
+      localStorage.setItem(`processType_${customerIdentifier}`, isSyncProcess ? 'sync' : 'centralized');
+    }
 
     const customerIdentifier = payload.firstName + '_' + payload.lastName + '_' + payload.birthDate;
     localStorage.setItem(`systemId_${customerIdentifier}`, generatedSystemId);
@@ -2204,6 +2220,9 @@ function storeCustomerDataForOnboarding(customerData, apiResponse) {
     }
 
     const entityType = customerData.businessName ? 'PM' : 'PP';
+
+      const processType = localStorage.getItem(`processType_${customerId}`) || 'unknown';
+
 
     const completeCustomerData = {
       customerId: customerId,

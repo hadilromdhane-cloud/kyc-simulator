@@ -13,12 +13,12 @@ header {
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: center;
-  gap: clamp(15px, 3vw, 30px);
+  justify-content: space-between;  /* Changed from center */
+  gap: 0;  /* Remove gap */
   padding: clamp(15px, 3vh, 30px) 20px clamp(20px, 4vh, 40px);
   border-bottom: 2px solid #007ACC;
   background: white;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;  /* Prevent wrapping */
   height: auto;
 }
 
