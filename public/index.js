@@ -2129,20 +2129,26 @@ async function callSearch(entityType, containerId, responseId, isDecentralized =
       payload[input.id.replace(containerId + '_', '')] = input.value;
     });
 
-    const generatedSystemId = `system_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+const generatedSystemId = `system_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
     payload.systemId = generatedSystemId;
     payload.systemName = defaultValues[entityType].systemName;
     payload.searchQuerySource = defaultValues[entityType].searchQuerySource;
-        if (isDecentralized) {
+
+    // ✅ DEFINE customerIdentifier FIRST before using it
+    const customerIdentifier = payload.firstName + '_' + payload.lastName + '_' + payload.birthDate;
+    localStorage.setItem(`systemId_${customerIdentifier}`, generatedSystemId);
+    console.log('Stored systemId for customer:', customerIdentifier, '→', generatedSystemId);
+
+    // ✅ NOW mark process type (after customerIdentifier is defined)
+    if (isDecentralized) {
       localStorage.setItem(`processType_${customerIdentifier}`, 'decentralized');
     } else {
       const isSyncProcess = containerId === 'syncFields';
       localStorage.setItem(`processType_${customerIdentifier}`, isSyncProcess ? 'sync' : 'centralized');
     }
 
-    const customerIdentifier = payload.firstName + '_' + payload.lastName + '_' + payload.birthDate;
-    localStorage.setItem(`systemId_${customerIdentifier}`, generatedSystemId);
-    console.log('Stored systemId for customer:', customerIdentifier, '→', generatedSystemId);
+     localStorage.setItem(`customerIdentifier_temp_${generatedSystemId}`, customerIdentifier);
+
 
     if (!isDecentralized) {
       payload.queueName = payload.queueName || defaultValues[entityType].queueName;
@@ -2221,8 +2227,17 @@ function storeCustomerDataForOnboarding(customerData, apiResponse) {
 
     const entityType = customerData.businessName ? 'PM' : 'PP';
 
-      const processType = localStorage.getItem(`processType_${customerId}`) || 'unknown';
-
+    let processType = localStorage.getItem(`processType_${customerId}`);
+    
+    if (!processType) {
+      const customerIdentifier = `${customerData.firstName}_${customerData.lastName}_${customerData.birthDate}`;
+      processType = localStorage.getItem(`processType_${customerIdentifier}`) || 'unknown';
+      
+    if (processType !== 'unknown') {
+        localStorage.setItem(`processType_${customerId}`, processType);
+        console.log(`Mapped processType for customerId ${customerId}: ${processType}`);
+      }
+    }
 
     const completeCustomerData = {
       customerId: customerId,
