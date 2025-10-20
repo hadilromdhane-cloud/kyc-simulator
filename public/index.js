@@ -1020,28 +1020,47 @@ async function callSearchAsync(entityType, containerId) {
       },
       body: JSON.stringify(payload)
     });
-
     const data = await res.json();
     console.log('Async onboarding response:', data);
 
-logMessage(`Async onboarding completed for ${entityType}`, 'success');
-showNotification(`${entityType} KYC data successfully submitted!`, 'success');
+    // ✅ Get the Reis ID from the response FIRST
+    const reisId = data.reisId || data.reis_id || data.id || data.customerId;
+    
+    // ✅ CRITICAL FIX: Store processType using the ACTUAL reisId from response
+    if (reisId) {
+      localStorage.setItem(`processType_${reisId}`, 'async');
+      console.log(`✅ Stored processType=async for reisId: ${reisId}`);
+      
+      // Also update the customerData with the correct reisId
+      const updatedCustomerData = {
+        ...customerData,
+        customerId: reisId, // Update with actual ID
+        reisId: reisId,
+        processType: 'async'
+      };
+      localStorage.setItem(`customerData_${reisId}`, JSON.stringify(updatedCustomerData));
+      console.log(`✅ Updated customerData with reisId: ${reisId}`);
+    }
 
-// Get the Reis ID from the response (try multiple possible field names)
-const reisId = data.reisId || data.reis_id || data.id || data.customerId;
-const customerWatchListUrl = `https://greataml.com/profiles/customer-card/${reisId}`;
+    logMessage(`Async onboarding completed for ${entityType}`, 'success');
+    showNotification(`${entityType} KYC data successfully submitted!`, 'success');
 
-// Determine the entity label for the message
-const entityLabel = entityType === 'PM' ? 'entity' : 'customer';
+    const customerWatchListUrl = `https://greataml.com/profiles/customer-card/${reisId}`;
 
-// Show success popup with the correct message and watch list link
-showScreeningResponsePopup(
-  `Customer KYC data have been successfully gathered by Reis KYC.\n\nThe Compliance team is currently checking the onboarding data. You will be notified once the process is complete.\n\nIn the meantime, you can access the Reis KYC Customer Card through the following link:`,
-  customerWatchListUrl,
-  false,
-  formData,
-  data
-);
+    // Determine the entity label for the message
+    const entityLabel = entityType === 'PM' ? 'entity' : 'customer';
+
+    // Show success popup with the correct message and watch list link
+    showScreeningResponsePopup(
+      `Customer KYC data have been successfully gathered by Reis KYC.\n\nThe Compliance team is currently checking the onboarding data. You will be notified once the process is complete.\n\nIn the meantime, you can access the Reis KYC Customer Card through the following link:`,
+      customerWatchListUrl,
+      false,
+      formData,
+      data
+    );
+
+
+
 
   } catch (err) {
     const errorMsg = `Async onboarding error: ${err.message}`;
