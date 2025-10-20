@@ -1503,19 +1503,43 @@ function setupEventPolling() {
           lastEventId = event.id;
           localStorage.setItem('lastEventId', lastEventId.toString());
           
-          if (event.source === 'Reis_KYC' && !wasEventProcessedBefore) {
-            // ✅ CHECK: Skip popup for async processes
-            const processType = localStorage.getItem(`processType_${event.customerId}`);
+if (event.source === 'Reis_KYC' && !wasEventProcessedBefore) {
+            // ✅ CHECK: Get processType from multiple possible sources
+            let processType = localStorage.getItem(`processType_${event.customerId}`);
             
+            // ✅ If not found by customerId, try to find by searching stored customer data
+            if (!processType) {
+              const customerDataKeys = Object.keys(localStorage).filter(k => 
+                k.startsWith('customerData_') || k.startsWith('screeningData_')
+              );
+              
+              for (const key of customerDataKeys) {
+                try {
+                  const data = JSON.parse(localStorage.getItem(key));
+                  if (data.customerId === event.customerId && data.processType) {
+                    processType = data.processType;
+                    console.log(`Found processType from stored data: ${processType}`);
+                    break;
+                  }
+                } catch (e) {
+                  // Skip invalid JSON
+                }
+              }
+            }
+            
+            console.log(`Event ${event.customerId} - processType: ${processType || 'unknown'}`);
+            
+            // ✅ Only show popup if NOT async process
             if (processType === 'async') {
-              console.log('Skipping Reis popup for async process:', event.customerId);
-              // Still add to history, but don't show popup
+              console.log('✅ Skipping Reis popup for async process:', event.customerId);
+              // Don't show popup for async processes
             } else {
-              console.log('Showing popup for new event:', event.customerId);
+              console.log('✅ Showing popup for non-async event:', event.customerId);
               showScreeningResultsPopup(event);
               showNotification(`[${event.tenant}] Screening completed for ${event.customerId}`, 'warning');
             }
             
+            // ✅ Always add to history (for both async and non-async)
             notificationsHistory.unshift(event);
             if (notificationsHistory.length > 50) {
               notificationsHistory = notificationsHistory.slice(0, 50);
@@ -2227,15 +2251,17 @@ function storeCustomerDataForOnboarding(customerData, apiResponse) {
 
     const entityType = customerData.businessName ? 'PM' : 'PP';
 
-    let processType = localStorage.getItem(`processType_${customerId}`);
+        let processType = localStorage.getItem(`processType_${customerId}`);
     
+    // If not found by customerId, try to find by customerIdentifier
     if (!processType) {
       const customerIdentifier = `${customerData.firstName}_${customerData.lastName}_${customerData.birthDate}`;
       processType = localStorage.getItem(`processType_${customerIdentifier}`) || 'unknown';
       
-    if (processType !== 'unknown') {
+      // Store mapping for future use
+      if (processType !== 'unknown') {
         localStorage.setItem(`processType_${customerId}`, processType);
-        console.log(`Mapped processType for customerId ${customerId}: ${processType}`);
+        console.log(`✅ Mapped processType for customerId ${customerId}: ${processType}`);
       }
     }
 
