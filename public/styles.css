@@ -8,15 +8,6 @@ body {
   min-height: 100vh;
 }
 
-header {
-  padding: clamp(15px, 3vh, 30px) 0;  /* Vertical padding */
-  height: auto;  /* Height adjusts to content */
-}
-
-header img { 
-  height: 100px;  /* Each logo is 100px tall */
-  max-width: 33.33%;  /* Each logo takes 1/3 of width */
-}
 
 
 header h1 {
