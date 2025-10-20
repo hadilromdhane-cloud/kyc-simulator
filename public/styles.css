@@ -8,7 +8,27 @@ body {
   min-height: 100vh;
 }
 
+header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: 0;
+  border-bottom: 2px solid #007ACC;
+  background: white;
+  height: auto;
+  width: 100%;
+  overflow: hidden;  /* Prevent overflow */
+}
 
+header img { 
+  width: 100%;  /* Take full width of container */
+  height: auto;  /* Maintain aspect ratio */
+  max-height: 100px;  /* Limit maximum height */
+  object-fit: contain;  /* Keep entire image visible */
+  display: block;
+}
 
 header h1 {
   font-weight: 700;
