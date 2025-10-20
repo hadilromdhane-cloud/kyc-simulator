@@ -57,10 +57,12 @@ header h1 {
   border-radius: 20px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  padding: 0;  
+  gap: 0;      
 }
 
 .lang-toggle-btn {
-  padding: 6px 18px;
+  padding: 8px 20px;  /* Increase padding for better fit */
   border: none;
   background: transparent;
   color: #007ACC;
@@ -69,6 +71,7 @@ header h1 {
   cursor: pointer;
   transition: all 0.3s ease;
   letter-spacing: 0.5px;
+  margin: 0;  /* Remove any margin */
 }
 
 .lang-toggle-btn:hover:not(.active) {
