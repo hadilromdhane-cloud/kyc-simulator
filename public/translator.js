@@ -54,7 +54,10 @@ const Translator = (function() {
                 "historyCleared": "History cleared and event tracking reset",
                 "selectEntityType": "Please select an entity type",
                 "noCustomerId": "Error: Customer ID not found",
-                "warningCustomerData": "Warning: Customer data may not be available for onboarding"
+                "warningCustomerData": "Warning: Customer data may not be available for onboarding",
+                "noNotifications": "No notifications yet.",
+                "customer": "Customer",
+                "tenant": "Tenant:"
             },
             "buttons": {
                 "notifications": "Notifications",
@@ -90,7 +93,15 @@ const Translator = (function() {
                 "fundsOrigin": "Funds Origin",
                 "queueDefault": "Default",
                 "queueMaker": "Maker",
-                "queueChecker": "Checker"
+                "queueChecker": "Checker",
+                    "selectIdType": "Select ID Type",
+                    "selectProfession": "Select Profession",
+                    "selectProduct": "Select Product",
+                    "selectChannel": "Select Channel",
+                    "selectLegalForm": "Select Legal Form",
+                    "selectActivitySector": "Select Activity Sector",
+                    "selectFundsOrigin": "Select Funds Origin"
+                
             },
             "messages": {
                 "hitsFound": "Some hits were found. You can process them using this link.",
@@ -171,6 +182,10 @@ const Translator = (function() {
                 "historyCleared": "Historique effacé et suivi des événements réinitialisé",
                 "selectEntityType": "Veuillez sélectionner un type d'entité",
                 "noCustomerId": "Erreur : ID client introuvable",
+                "noNotifications": "No notifications yet.",
+                "noNotifications": "Aucune notification pour le moment.",
+                "customer": "Client",
+                "tenant": "Tenant :",
                 "warningCustomerData": "Attention : Les données client peuvent ne pas être disponibles pour l'onboarding"
             },
             "buttons": {
@@ -207,7 +222,16 @@ const Translator = (function() {
                 "fundsOrigin": "Origine des fonds",
                 "queueDefault": "Par défaut",
                 "queueMaker": "Créateur",
-                "queueChecker": "Vérificateur"
+                "queueChecker": "Vérificateur",
+                "selectIdType": "Sélectionner le type",
+                "selectProfession": "Sélectionner la profession",
+                "selectProduct": "Sélectionner le produit",
+                "selectChannel": "Sélectionner le canal",
+                "selectLegalForm": "Sélectionner la forme juridique",
+                "selectActivitySector": "Sélectionner le secteur d'activité",
+                "selectFundsOrigin": "Sélectionner l'origine des fonds"
+
+
             },
             "messages": {
                 "hitsFound": "Des correspondances ont été trouvées. Vous pouvez les traiter en utilisant ce lien.",

@@ -629,7 +629,7 @@ function renderFields(containerId, entityType, processType) {
 
         const defaultOption = document.createElement('option');
         defaultOption.value = '';
-        defaultOption.textContent = 'Sélectionner le type';
+        defaultOption.textContent = t('fields.selectIdType');
         input.appendChild(defaultOption);
 
         asyncFieldOptions.idType.forEach(type => {
@@ -646,7 +646,7 @@ function renderFields(containerId, entityType, processType) {
 
         const defaultOption = document.createElement('option');
         defaultOption.value = '';
-        defaultOption.textContent = 'Sélectionner la profession';
+        defaultOption.textContent = t('fields.selectProfession');
         input.appendChild(defaultOption);
 
         asyncFieldOptions.profession.forEach(prof => {
@@ -663,7 +663,7 @@ function renderFields(containerId, entityType, processType) {
 
         const defaultOption = document.createElement('option');
         defaultOption.value = '';
-        defaultOption.textContent = 'Sélectionner le produit';
+        defaultOption.textContent = t('fields.selectProduct');
         input.appendChild(defaultOption);
 
         asyncFieldOptions.products.forEach(product => {
@@ -680,7 +680,7 @@ function renderFields(containerId, entityType, processType) {
 
         const defaultOption = document.createElement('option');
         defaultOption.value = '';
-        defaultOption.textContent = 'Sélectionner le canal';
+        defaultOption.textContent = t('fields.selectChannel');
         input.appendChild(defaultOption);
 
         asyncFieldOptions.channel.forEach(channel => {
@@ -697,7 +697,7 @@ function renderFields(containerId, entityType, processType) {
 
         const defaultOption = document.createElement('option');
         defaultOption.value = '';
-        defaultOption.textContent = 'Sélectionner la forme juridique';
+        defaultOption.textContent = t('fields.selectLegalForm');
         input.appendChild(defaultOption);
 
         asyncFieldOptions.legalForm.forEach(form => {
@@ -714,7 +714,7 @@ function renderFields(containerId, entityType, processType) {
 
   const defaultOption = document.createElement('option');
   defaultOption.value = '';
-  defaultOption.textContent = 'Select Activity Sector';
+  defaultOption.textContent = t('fields.selectActivitySector');
   input.appendChild(defaultOption);
 
   asyncFieldOptions.activitySector.forEach(sector => {
@@ -729,9 +729,9 @@ function renderFields(containerId, entityType, processType) {
       input.id = containerId + '_' + field.key;
       if (field.required) input.required = true;
 
-      const defaultOption = document.createElement('option');
+       const defaultOption = document.createElement('option');
       defaultOption.value = '';
-      defaultOption.textContent = 'Select Funds Origin';
+      defaultOption.textContent = t('fields.selectFundsOrigin');
       input.appendChild(defaultOption);
 
       asyncFieldOptions.fundsOrigin.forEach(origin => {
@@ -813,7 +813,7 @@ function createAsyncOnboardingPayload(entityType, formData) {
         agency_location: null,
         birth_date: formData.birthDate || "",
         businessName: "",
-        canal_de_distribution: formData.canal || "",
+        CanalDeDistribution: formData.canal || "",
         citizenship: formData.citizenship || "",
         containerelm: {
           "profession-2": "",
@@ -873,14 +873,14 @@ function createAsyncOnboardingPayload(entityType, formData) {
         nationality: formData.nationality || "",
         nid: formData.numeroPiece || "",
         obnl_name: formData.lastName || "",
-        origine_des_fonds: ["investmentReturns"],
+        OrigineDesFonds: ["investmentReturns"],
         outboundSystems: null,
         pays: formData.nationality || "",
         pep: "",
         pliberal: "",
         postal_code: "",
         process_type: "",
-        produit: [formData.produits || ""],
+        Produit: [formData.produits || ""],
         profession: formData.profession || "",
         revenuAnnuelNet: parseInt(formData.revenu) || 0,
         rm_fn: "System",
@@ -918,8 +918,8 @@ function createAsyncOnboardingPayload(entityType, formData) {
       registrationNumber: formData.registrationNumber || "",
       shareCapital: parseInt(formData.shareCapital) || 0,
       activitySector: formData.activitySector || "",
-      canal_de_distribution: formData.canal || "",
-      produit: [formData.produits || ""],
+      CanalDeDistribution: formData.canal || "",
+      Produit: [formData.produits || ""],
       fundsOrigin: formData.fundsOrigin || "",
       entityType: "PM",
       form_entity_type: "PM",
@@ -1252,9 +1252,9 @@ function showNotificationHistory() {
     </div>
   `;
 
-  if (notificationsHistory.length === 0) {
-    historyHTML += '<p style="text-align: center; color: #666;">No notifications yet.</p>';
-  } else {
+ if (notificationsHistory.length === 0) {
+    historyHTML += `<p style="text-align: center; color: #666;">${t('notifications.noNotifications')}</p>`;
+} else {
     const sortedHistory = [...notificationsHistory].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
     
     sortedHistory.forEach((notification, index) => {
@@ -1759,25 +1759,29 @@ function showScreeningResultsPopup(event) {
   
   const header = document.createElement('div');
   header.style.cssText = 'display: flex; align-items: center; gap: 12px; padding: 20px; border-bottom: 1px solid #e0e0e0;';
-  header.innerHTML = '<span style="font-size: 2rem;">🔔</span><h3 style="color: #FF9800; font-size: 1.2rem; font-weight: 600; margin: 0;">Reis KYC Hits Processing Results</h3>';
+  header.innerHTML = `<span style="font-size: 2rem;">🔔</span><h3 style="color: #FF9800; font-size: 1.2rem; font-weight: 600; margin: 0;">${t('popupTitles.reisKycHits')}</h3>`;
   
   const content = document.createElement('div');
   content.style.cssText = 'padding: 20px; color: #333; line-height: 1.6; font-size: 0.95rem;';
   
-  let contentHTML = `<div style="margin-bottom: 15px;"><strong>Tenant:</strong> ${currentTenant}</div>`;
-  contentHTML += `<div style="margin-bottom: 15px;"><strong>Customer KYC ID +:</strong> ${event.customerId}</div>`;
-  contentHTML += `<div style="margin-bottom: 15px;"><strong>Processing Results:</strong></div>`;
+  const pepText = event.isPEP ? t('status.pepYes') : t('status.pepNo');
+  const sanctionText = event.isSanctioned ? t('status.pepYes') : t('status.pepNo');
+  const adverseMediaText = event.isAdverseMedia ? t('status.adverseMediaYes') : t('status.adverseMediaNo');
+  
+  let contentHTML = `<div style="margin-bottom: 15px;"><strong>${t('status.tenant')}</strong> ${currentTenant}</div>`;
+  contentHTML += `<div style="margin-bottom: 15px;"><strong>${t('status.customerKycId')}</strong> ${event.customerId}</div>`;
+  contentHTML += `<div style="margin-bottom: 15px;"><strong>${t('status.processingResults')}</strong></div>`;
   contentHTML += `<div style="margin-left: 20px; margin-bottom: 10px;">`;
-  contentHTML += `• <strong>PEP Status:</strong> ${event.isPEP ? '<span style="color: #ffc107;">⚠️ YES</span>' : '<span style="color: #28a745;">✅ NO</span>'} (${event.pepDecision || 'N/A'})<br>`;
-  contentHTML += `• <strong>Sanctions:</strong> ${event.isSanctioned ? '<span style="color: #dc3545;">🚨 YES</span>' : '<span style="color: #28a745;">✅ NO</span>'} (${event.sanctionDecision || 'N/A'})<br>`;
-  contentHTML += `• <strong>Adverse Media:</strong> ${event.isAdverseMedia ? '<span style="color: #ffc107;">⚠️ YES</span>' : '<span style="color: #28a745;">✅ NO</span>'}`;
+  contentHTML += `• <strong>${t('status.pepStatus')}</strong> ${event.isPEP ? `<span style="color: #ffc107;">⚠️ ${pepText}</span>` : `<span style="color: #28a745;">✅ ${pepText}</span>`} (${event.pepDecision || 'N/A'})<br>`;
+  contentHTML += `• <strong>${t('status.sanctions')}</strong> ${event.isSanctioned ? `<span style="color: #dc3545;">🚨 ${sanctionText}</span>` : `<span style="color: #28a745;">✅ ${sanctionText}</span>`} (${event.sanctionDecision || 'N/A'})<br>`;
+  contentHTML += `• <strong>${t('status.adverseMedia')}</strong> ${event.isAdverseMedia ? `<span style="color: #ffc107;">⚠️ ${adverseMediaText}</span>` : `<span style="color: #28a745;">✅ ${adverseMediaText}</span>`}`;
   contentHTML += `</div>`;
   contentHTML += `<div style="margin-top: 15px; padding: 15px; background: ${event.isSanctioned ? '#f8d7da' : '#d4edda'}; border-radius: 5px;">`;
-  contentHTML += `<strong>Onboarding Decision:</strong><br>`;
+  contentHTML += `<strong>${t('status.onboardingDecision')}</strong><br>`;
   if (event.isSanctioned) {
-    contentHTML += `<span style="color: #721c24;">Your customer is confirmed as sanctioned. You cannot proceed with the onboarding.</span>`;
+    contentHTML += `<span style="color: #721c24;">${t('status.cannotProceed')}</span>`;
   } else {
-    contentHTML += `<span style="color: #155724;">You can proceed with the onboarding process.</span>`;
+    contentHTML += `<span style="color: #155724;">${t('status.canProceed')}</span>`;
   }
   contentHTML += `</div>`;
   
@@ -1838,8 +1842,7 @@ function showScreeningResponsePopup(message, link = null, showContinueButton = f
   
   const header = document.createElement('div');
   header.style.cssText = 'display: flex; align-items: center; gap: 12px; padding: 20px; border-bottom: 1px solid #e0e0e0;';
-  header.innerHTML = '<span style="font-size: 2rem;">🔍</span><h3 style="color: #007ACC; font-size: 1.2rem; font-weight: 600; margin: 0;">Reis KYC Screening Response</h3>';
-  
+  header.innerHTML = `<span style="font-size: 2rem;">🔍</span><h3 style="color: #007ACC; font-size: 1.2rem; font-weight: 600; margin: 0;">${t('popupTitles.screeningResponse')}</h3>`;
   const content = document.createElement('div');
   content.style.cssText = 'padding: 20px; color: #333; line-height: 1.6; font-size: 0.95rem;';
   content.textContent = message;
