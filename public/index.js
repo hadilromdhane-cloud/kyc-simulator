@@ -1051,13 +1051,30 @@ async function callSearchAsync(entityType, containerId) {
     const entityLabel = entityType === 'PM' ? 'entity' : 'customer';
 
     // Show success popup with the correct message and watch list link
-    showScreeningResponsePopup(
-      `Customer KYC data have been successfully gathered by Reis KYC.\n\nThe Compliance team is currently checking the onboarding data. You will be notified once the process is complete.\n\nIn the meantime, you can access the Reis KYC Customer Card through the following link:`,
-      customerWatchListUrl,
-      false,
-      formData,
-      data
-    );
+showScreeningResponsePopup(
+  `<div style="margin-bottom: 15px;">
+     <h4 style="color:#004080; margin-bottom: 8px;">Compliance View</h4>
+     <p style="margin:0;">
+       Customer KYC data have been successfully gathered by Reis KYC.<br><br>
+       The Compliance team is currently checking the onboarding data. You will be notified once the process is complete.<br><br>
+       In the meantime, you can access the Reis KYC Customer Card through the following link:
+     </p>
+   </div>
+
+   <hr style="border: none; border-top: 1px dashed #ccc; margin: 20px 0;">
+
+   <div>
+     <h4 style="color:#004080; margin-bottom: 8px;">Front User View</h4>
+     <p style="margin:0;">
+       Your account has been successfully created.<br><br>
+       It is now being processed by the Compliance team. You will be notified once it is approved.
+     </p>
+   </div>`,
+  customerWatchListUrl,
+  false,
+  formData,
+  data
+);
 
 
 
