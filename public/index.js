@@ -1052,15 +1052,23 @@ async function callSearchAsync(entityType, containerId) {
 
     // Show success popup with the correct message and watch list link
 showScreeningResponsePopup(
-  "--- Officer View ---\nCustomer KYC data have been successfully gathered by Reis KYC.\nThe Compliance team is currently checking the onboarding data. You will be notified once it is complete.\nLink: " + customerWatchListUrl + "\n" +
-  "-----------------------------\n" +
-  "--- Front User View ---\nYour account has been successfully created.\nIt is now being processed by the Compliance team. You will be notified once it is approved.",
-  "",
+  `
+   ----------------- Front User View ----------------- \n\n
+  Your account has been successfully created.\n\n
+  It is now being processed by the Compliance team. You will be notified once it is approved.
+  \n\n\n\n\n\n
+  ---------------------------------------------------------------------------------------------------
+  ---------------------------------------------------------------------------------------------------
+
+  ----------------- Officer View -----------------\n\n
+  Customer KYC data have been successfully gathered by Reis KYC.\n\n
+  The Compliance team is currently checking the onboarding data. You will be notified once the process is complete.\n\n
+  In the meantime, you can access the Reis KYC Customer Card through the following link:\n\n`,
+  customerWatchListUrl,
   false,
   formData,
   data
 );
-
 
 
 
