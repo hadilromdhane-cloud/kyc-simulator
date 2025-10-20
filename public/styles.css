@@ -88,12 +88,24 @@ header h1 {
   width: clamp(250px, 20vw, 350px);
   min-width: 250px;
   background: white;
-  border-right: 2px solid #007ACC;
-  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.08);
-  transition: width 0.3s ease;
+  border-right: none; /* remove flat border */
+  border-radius: 12px; /* rounded corners */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* soft card-like shadow */
+  transition: width 0.3s ease, transform 0.3s ease;
   position: relative;
   overflow: hidden;
   flex-shrink: 0;
+  margin: 20px; /* space around to show card separation */
+  padding: 20px; /* inner space like a card */
+}
+
+/* Optional hover lift effect (for aesthetics) */
+.auth-sidebar:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+.sidebar-content {
+  padding: 60px 10px 25px; /* reduce side padding since parent has it */
 }
 
 .auth-sidebar.collapsed {
