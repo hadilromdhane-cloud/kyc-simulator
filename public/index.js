@@ -1171,6 +1171,7 @@ function createNotificationElements() {
   notificationButton.innerHTML = t('buttons.notifications');
   notificationButton.style.cssText = `
   position: fixed;
+  width: 100px;
   `;
   
 notificationButton.onmouseover = () => {
