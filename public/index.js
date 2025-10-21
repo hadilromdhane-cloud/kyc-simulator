@@ -881,7 +881,7 @@ function createAsyncOnboardingPayload(entityType, formData) {
         postal_code: "",
         process_type: "",
         Produit: [formData.produits || ""],
-        profession: formData.profession || "",
+        Profession: formData.profession || "",
         revenuAnnuelNet: parseInt(formData.revenu) || 0,
         rm_fn: "System",
         rm_ln: "User",
