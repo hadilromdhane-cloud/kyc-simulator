@@ -1171,8 +1171,10 @@ function createNotificationElements() {
   notificationButton.innerHTML = t('buttons.notifications');
   notificationButton.style.cssText = `
   position: fixed;
-  width: 100px;
-  `;
+  width: 150px;
+  top: 15px;
+  right: 150px;
+`;
   
 notificationButton.onmouseover = () => {
     notificationButton.style.backgroundColor = '#004080';
