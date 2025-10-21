@@ -89,18 +89,18 @@ header h1 {
 
 /* Authentication Sidebar - Improved responsive behavior */
 .auth-sidebar {
-  width: clamp(250px, 20vw, 350px);
-  min-width: 30px;
+  width: clamp(280px, 25vw, 350px);  /* ✅ Responsive width */
+  min-width: 280px;
+  max-width: 350px;
   background: white;
-  border-right: none; /* remove flat border */
-  border-radius: 12px; /* rounded corners */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* soft card-like shadow */
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   transition: width 0.3s ease, transform 0.3s ease;
   position: relative;
-  overflow: hidden;
+  overflow: hidden;  /* ✅ CRITICAL: allows logos to extend edge-to-edge */
   flex-shrink: 0;
-  margin: 20px; /* space around to show card separation */
-  padding: 20px; /* inner space like a card */
+  margin: 20px;
+  padding: 20px;
 }
 
 /* Optional hover lift effect (for aesthetics) */
@@ -147,7 +147,7 @@ header h1 {
 }
 
 .sidebar-content {
-  padding: 60px 25px 25px;
+  padding: 0;  /* ✅ Let logo banner handle spacing */
   opacity: 1;
   visibility: visible;
   transition: opacity 0.3s ease, visibility 0.3s ease;
@@ -318,11 +318,12 @@ section#onboardingSimulator {
   background: white;
   border-radius: 8px;
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
-  padding: clamp(20px, 3vw, 30px);
-  width: 100%;  /* ✅ ADDED: Full width of parent */
-  max-width: none;  /* ✅ CHANGED: Remove max-width limit */
+  padding: 0;  /* ✅ CHANGED: Let logo banner handle padding */
+  width: 100%;
+  max-width: none;
   margin: 0 auto;
-  box-sizing: border-box;  /* ✅ ADDED: Include padding in width */
+  box-sizing: border-box;
+  overflow: hidden;  /* ✅ CRITICAL: allows logos to extend edge-to-edge */
 }
 
 h2 { 
