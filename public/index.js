@@ -873,7 +873,7 @@ function createAsyncOnboardingPayload(entityType, formData) {
         Nationalite: formData.nationality || "",
         nid: formData.numeroPiece || "",
         obnl_name: formData.lastName || "",
-        OrigineDesFonds: ["investmentReturns"],
+        OrigineDesFonds:formData.OrigineDesFonds || "",
         outboundSystems: null,
         pays: formData.nationality || "",
         pep: "",
