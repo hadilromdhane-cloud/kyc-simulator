@@ -1169,9 +1169,7 @@ function createNotificationElements() {
   document.body.appendChild(notificationContainer);
   console.log('✅ Notification container created');
 
-  // Create notification button
-// Create notification button
-  const notificationButton = document.createElement('button');
+    const notificationButton = document.createElement('button');
   notificationButton.id = 'notificationHistoryBtn';
   notificationButton.textContent = 'Notifications';
   notificationButton.style.cssText = `
@@ -1187,7 +1185,7 @@ function createNotificationElements() {
     border: 2px solid #007ACC;
     border-radius: 20px;
     cursor: pointer;
-    font-size: 18px;
+    font-size: 13px;
     font-weight: 600;
     font-family: 'Roboto', sans-serif;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
@@ -1195,6 +1193,7 @@ function createNotificationElements() {
     display: flex;
     align-items: center;
     justify-content: center;
+    white-space: nowrap;
   `;
   
   notificationButton.onmouseover = () => {
