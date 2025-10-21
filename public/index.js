@@ -1171,7 +1171,9 @@ function createNotificationElements() {
   notificationButton.innerHTML = t('buttons.notifications');
   notificationButton.style.cssText = `
     position: fixed;
-    width: 70px;
+    top: 15px;
+    right: 180px;
+    left: 500px;
     z-index: 10000;
     padding: 8px 20px;
     background-color: #007ACC;
@@ -1183,6 +1185,7 @@ function createNotificationElements() {
     font-weight: 600;
     font-family: 'Roboto', sans-serif;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
     letter-spacing: 0.5px;
   `;
   
