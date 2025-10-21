@@ -1166,13 +1166,13 @@ function createNotificationElements() {
   `;
   document.body.appendChild(notificationContainer);
 
-const notificationButton = document.createElement('button');
+  const notificationButton = document.createElement('button');
   notificationButton.id = 'notificationHistoryBtn';
   notificationButton.innerHTML = '🔔';
   notificationButton.style.cssText = `
     position: fixed;
     top: 15px;
-    right: 200px;
+    right: 160px;
     z-index: 10000;
     width: 50px;
     height: 36px;
