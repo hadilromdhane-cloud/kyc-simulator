@@ -86,7 +86,7 @@ header h1 {
 /* Authentication Sidebar - Improved responsive behavior */
 .auth-sidebar {
   width: clamp(250px, 20vw, 350px);
-  min-width: 250px;
+  min-width: 30px;
   background: white;
   border-right: none; /* remove flat border */
   border-radius: 12px; /* rounded corners */
@@ -436,31 +436,7 @@ button:hover {
   margin-bottom: 10px;
 }
 
-/* Resize Handle */
-.resize-handle {
-  position: absolute;
-  top: 0;
-  right: -5px;
-  width: 10px;
-  height: 100%;
-  cursor: col-resize;
-  background: transparent;
-  z-index: 1000;
-  transition: background 0.2s;
-}
 
-.resize-handle:hover {
-  background: rgba(0, 122, 204, 0.3);
-}
-
-.resize-handle:active {
-  background: rgba(0, 122, 204, 0.5);
-}
-
-body.resizing {
-  cursor: col-resize;
-  user-select: none;
-}
 
 /* Popup - Responsive */
 #popup {
