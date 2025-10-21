@@ -1052,18 +1052,22 @@ async function callSearchAsync(entityType, containerId) {
 
     // Show success popup with the correct message and watch list link
 showScreeningResponsePopup(
-  `
-   ----------------- Front User View ----------------- \n\n
-  Your account has been successfully created.\n\n
-  It is now being processed by the Compliance team. You will be notified once it is approved.
-  \n\n\n\n\n\n
-  ---------------------------------------------------------------------------------------------------
-  ---------------------------------------------------------------------------------------------------
-
-  ----------------- Officer View -----------------\n\n
-  Customer KYC data have been successfully gathered by Reis KYC.\n\n
-  The Compliance team is currently checking the onboarding data. You will be notified once the process is complete.\n\n
-  In the meantime, you can access the Reis KYC Customer Card through the following link:\n\n`,
+  `<div style="text-align: left; line-height: 1.8;">
+    <div style="padding: 15px; background: #f0f8ff; border-radius: 6px; margin-bottom: 20px;">
+      <strong style="color: #007ACC; font-size: 1.05rem;">👤 Front User View</strong>
+      <p style="margin: 10px 0 5px 0;">Your account has been successfully created.</p>
+      <p style="margin: 0;">It is now being processed by the Compliance team. You will be notified once it is approved.</p>
+    </div>
+    
+    <div style="border-top: 2px solid #e0e0e0; margin: 25px 0;"></div>
+    
+    <div style="padding: 15px; background: #fff8f0; border-radius: 6px;">
+      <strong style="color: #FF9800; font-size: 1.05rem;">👮 Officer View</strong>
+      <p style="margin: 10px 0 5px 0;">Customer KYC data have been successfully gathered by Reis KYC.</p>
+      <p style="margin: 5px 0;">The Compliance team is currently checking the onboarding data. You will be notified once the process is complete.</p>
+      <p style="margin: 5px 0 0 0;">In the meantime, you can access the Reis KYC Customer Card through the following link:</p>
+    </div>
+  </div>`,
   customerWatchListUrl,
   false,
   formData,
@@ -1911,7 +1915,7 @@ function showScreeningResponsePopup(message, link = null, showContinueButton = f
   header.innerHTML = `<span style="font-size: 2rem;">🔍</span><h3 style="color: #007ACC; font-size: 1.2rem; font-weight: 600; margin: 0;">${t('popupTitles.screeningResponse')}</h3>`;
   const content = document.createElement('div');
   content.style.cssText = 'padding: 20px; color: #333; line-height: 1.6; font-size: 0.95rem;';
-  content.textContent = message;
+  content.innerHTML = message; 
   
   if (link) {
     const linkElement = document.createElement('a');
