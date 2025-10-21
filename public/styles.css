@@ -8,34 +8,8 @@ body {
   min-height: 100vh;
 }
 
-header {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  gap: 0;
-  padding: 0;
-  border-bottom: 2px solid #007ACC;
-  background: white;
-  width: 100%;
-  overflow: hidden;  /* Prevent overflow */
-}
 
-header img { 
-  width: 100%;  /* Take full width of container */
-  height: auto;  /* Maintain aspect ratio */
-  max-height: 100px;  /* Limit maximum height */
-  object-fit: contain;  /* Keep entire image visible */
-  display: block;
-}
 
-header h1 {
-  font-weight: 700;
-  font-size: clamp(1.5rem, 4vw, 2.8rem);
-  color: #004080;
-  margin: 0;
-  text-align: center;
-}
 
 /* Language Selector - Compact Toggle Top Right */
 .language-selector {
@@ -536,14 +510,9 @@ button:hover {
     display: none;
   }
   
-  header {
-    padding: 15px 10px 20px;
-    gap: 15px;
-  }
+
   
-  header img {
-    height: clamp(60px, 12vh, 100px);
-  }
+ 
   
   .main-content {
     padding: 15px;
@@ -588,10 +557,7 @@ button:hover {
     font-size: 11px;
   }
   
-  header img {
-    height: 60px;
-  }
-  
+
   section#onboardingSimulator {
     padding: 15px;
   }

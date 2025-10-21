@@ -1147,21 +1147,16 @@ function handleRealWebhookEvent(webhookData) {
 }
 
 function createNotificationElements() {
-  // Check if elements already exist
+  // Always remove old elements first
   const existingContainer = document.getElementById('notificationContainer');
   const existingButton = document.getElementById('notificationHistoryBtn');
   
-  if (existingContainer && existingButton) {
-    console.log('✅ Notification elements already exist, skipping creation');
-    updateNotificationBadge();
-    updateTokenStatusDisplay();
-    return;
-  }
-  
-  // Remove old elements if they exist
   if (existingContainer) existingContainer.remove();
   if (existingButton) existingButton.remove();
+  
+  console.log('Creating notification elements...');
 
+  // Create notification container
   const notificationContainer = document.createElement('div');
   notificationContainer.id = 'notificationContainer';
   notificationContainer.style.cssText = `
@@ -1172,15 +1167,17 @@ function createNotificationElements() {
     max-width: 350px;
   `;
   document.body.appendChild(notificationContainer);
+  console.log('✅ Notification container created');
 
+  // Create notification button
   const notificationButton = document.createElement('button');
   notificationButton.id = 'notificationHistoryBtn';
   notificationButton.innerHTML = '🔔';
   notificationButton.style.cssText = `
-    position: fixed;
-    top: 15px;
-    right: 160px;
-    z-index: 10000;
+    position: fixed !important;
+    top: 15px !important;
+    right: 160px !important;
+    z-index: 10001 !important;
     width: 50px;
     height: 36px;
     padding: 0;
@@ -1199,19 +1196,16 @@ function createNotificationElements() {
     justify-content: center;
   `;
   
-notificationButton.onmouseover = () => {
+  notificationButton.onmouseover = () => {
     notificationButton.style.backgroundColor = '#004080';
   };
   notificationButton.onmouseout = () => {
-    const unfinishedCount = notificationsHistory.filter(n => 
-      n.source === 'Reis_KYC' && !n.isSanctioned && !n.onboardingCompleted
-    ).length;
-    // Keep blue, only show red badge in text
     notificationButton.style.backgroundColor = '#007ACC';
   };
   
   notificationButton.onclick = showNotificationHistory;
   document.body.appendChild(notificationButton);
+  console.log('✅ Notification button created at top: 15px, right: 160px');
 
   updateNotificationBadge();
   updateTokenStatusDisplay();
