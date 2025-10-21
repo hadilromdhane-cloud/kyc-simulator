@@ -1170,17 +1170,18 @@ function createNotificationElements() {
   console.log('✅ Notification container created');
 
   // Create notification button
+// Create notification button
   const notificationButton = document.createElement('button');
   notificationButton.id = 'notificationHistoryBtn';
-  notificationButton.innerHTML = '🔔';
+  notificationButton.textContent = 'Notifications';
   notificationButton.style.cssText = `
     position: fixed !important;
     top: 15px !important;
-    right: 160px !important;
+    right: 180px !important;
     z-index: 10001 !important;
-    width: 50px;
+    width: auto;
     height: 36px;
-    padding: 0;
+    padding: 0 20px;
     background-color: #007ACC;
     color: white;
     border: 2px solid #007ACC;
@@ -1252,10 +1253,10 @@ function updateNotificationBadge() {
   ).length;
 
   if (unfinishedCount > 0) {
-    button.innerHTML = `🔔 <span style="position: absolute; top: -5px; right: -5px; background: #dc3545; color: white; padding: 2px 6px; border-radius: 10px; font-size: 10px; font-weight: bold;">${unfinishedCount}</span>`;
+    button.innerHTML = `Notifications <span style="position: absolute; top: -5px; right: -5px; background: #dc3545; color: white; padding: 2px 6px; border-radius: 10px; font-size: 10px; font-weight: bold;">${unfinishedCount}</span>`;
     button.style.position = 'relative';
   } else {
-    button.innerHTML = '🔔';
+    button.textContent = 'Notifications';
   }
   button.style.backgroundColor = '#007ACC';
 }
