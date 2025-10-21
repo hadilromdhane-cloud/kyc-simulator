@@ -1056,7 +1056,7 @@ showScreeningResponsePopup(
     <div style="padding: 15px; background: #f0f8ff; border-radius: 6px; margin-bottom: 20px;">
       <strong style="color: #007ACC; font-size: 1.05rem;">👤 Front User View</strong>
       <p style="margin: 10px 0 5px 0;">Your account has been successfully created.</p>
-      <p style="margin: 0;">It is now being processed by the Compliance team. You will be notified once it is approved.</p>
+      <p style="margin: 0;">It is now being processed!</p>
     </div>
     
     <div style="border-top: 2px solid #e0e0e0; margin: 25px 0;"></div>
