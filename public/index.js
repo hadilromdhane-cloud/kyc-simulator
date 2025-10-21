@@ -1147,13 +1147,20 @@ function handleRealWebhookEvent(webhookData) {
 }
 
 function createNotificationElements() {
-  if (document.getElementById('notificationContainer') && 
-      document.getElementById('notificationHistoryBtn')) {
+  // Check if elements already exist
+  const existingContainer = document.getElementById('notificationContainer');
+  const existingButton = document.getElementById('notificationHistoryBtn');
+  
+  if (existingContainer && existingButton) {
     console.log('✅ Notification elements already exist, skipping creation');
     updateNotificationBadge();
     updateTokenStatusDisplay();
     return;
   }
+  
+  // Remove old elements if they exist
+  if (existingContainer) existingContainer.remove();
+  if (existingButton) existingButton.remove();
 
   const notificationContainer = document.createElement('div');
   notificationContainer.id = 'notificationContainer';
