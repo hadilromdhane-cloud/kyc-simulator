@@ -1171,9 +1171,10 @@ function createNotificationElements() {
   notificationButton.innerHTML = t('buttons.notifications');
   notificationButton.style.cssText = `
     position: fixed;
+    width: 70px;
+    z-index: 10000;
     padding: 8px 20px;
     background-color: #007ACC;
-    width: 50px;
     color: white;
     border: none;
     border-radius: 20px;
