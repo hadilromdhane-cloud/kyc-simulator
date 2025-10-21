@@ -8,30 +8,32 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-<div class="language-selector">
-  <button class="lang-toggle-btn active" data-lang="en">EN</button>
-  <button class="lang-toggle-btn" data-lang="fr">FR</button>
-</div>
-
-  <header>
-  </header>
-
-  <div class="main-layout">
-    <!-- Authentication Sidebar -->
-    <aside id="authSidebar" class="auth-sidebar">
-      <div class="resize-handle" id="resizeHandle"></div>
-      
-      <aside id="authSidebar" class="auth-sidebar">
-  <!-- Full-width responsive logo banner -->
-  <div style="margin: -20px -20px 20px -20px; padding: clamp(12px, 3vw, 20px); background: linear-gradient(135deg, #f0f8ff 0%, #e3f2fd 100%); display: flex; align-items: center; justify-content: center; gap: clamp(10px, 2vw, 20px); border-bottom: 3px solid #007ACC; flex-wrap: wrap;">
-    <img src="logo_vneuron.png" alt="Vneuron Logo" style="height: clamp(35px, 5vw, 50px); max-width: 45%; object-fit: contain;">
-    <div style="width: 2px; height: clamp(30px, 4vw, 40px); background: #007ACC; opacity: 0.3;"></div>
-    <img src="logo_reis.png" alt="Reis Logo" style="height: clamp(35px, 5vw, 50px); max-width: 45%; object-fit: contain;">
+  <!-- Language Selector -->
+  <div class="language-selector">
+    <button class="lang-toggle-btn active" data-lang="en">EN</button>
+    <button class="lang-toggle-btn" data-lang="fr">FR</button>
   </div>
 
-  <div class="sidebar-content" style="padding: 0 5px;">
-    <h2 data-i18n="authentication.title">Authentication on the simulation tenant</h2>
-  <h2 data-i18n="authentication.title">Authentication on the simulation tenant</h2>
+  <!-- Header -->
+  <header>
+    <img src="logos_partners.png" alt="Partners Logos" />
+  </header>
+
+  <!-- Main Layout -->
+  <div class="main-layout">
+    
+    <!-- ========== AUTHENTICATION SIDEBAR ========== -->
+    <aside id="authSidebar" class="auth-sidebar">
+      <!-- Full-width responsive logo banner -->
+      <div style="margin: -20px -20px 20px -20px; padding: clamp(12px, 3vw, 20px); background: linear-gradient(135deg, #f0f8ff 0%, #e3f2fd 100%); display: flex; align-items: center; justify-content: center; gap: clamp(10px, 2vw, 20px); border-bottom: 3px solid #007ACC; flex-wrap: wrap;">
+        <img src="logo_vneuron.png" alt="Vneuron Logo" style="height: clamp(35px, 5vw, 50px); max-width: 45%; object-fit: contain;">
+        <div style="width: 2px; height: clamp(30px, 4vw, 40px); background: #007ACC; opacity: 0.3;"></div>
+        <img src="logo_reis.png" alt="Reis Logo" style="height: clamp(35px, 5vw, 50px); max-width: 45%; object-fit: contain;">
+      </div>
+
+      <!-- Sidebar Content -->
+      <div class="sidebar-content" style="padding: 0 5px;">
+        <h2 data-i18n="authentication.title">Authentication on the simulation tenant</h2>
 
         <label for="tenantName" data-i18n="authentication.tenantName">Tenant Name:</label>
         <select id="tenantName">
@@ -54,91 +56,103 @@
         <input type="password" id="password" data-i18n-placeholder="authentication.passwordPlaceholder" placeholder="Enter password" />
 
         <button id="authBtn" data-i18n="authentication.authButton">Authenticate</button>
-           <div class="token-status-container" id="tokenStatusDisplay">
-      <span class="token-status-label" data-i18n="authentication.tokenStatus">Token Status</span>
-      <div class="token-status-badge">
-        <span class="token-status-indicator none" id="tokenStatusIndicator"></span>
-        <span class="token-status-text" id="tokenStatusText" data-i18n="authentication.noToken">No Token</span>
-      </div>
-      </div>
+
+        <!-- Token Status -->
+        <div class="token-status-container" id="tokenStatusDisplay">
+          <span class="token-status-label" data-i18n="authentication.tokenStatus">Token Status</span>
+          <div class="token-status-badge">
+            <span class="token-status-indicator none" id="tokenStatusIndicator"></span>
+            <span class="token-status-text" id="tokenStatusText" data-i18n="authentication.noToken">No Token</span>
+          </div>
+        </div>
       </div>
     </aside>
 
-    <!-- Main Content Area -->
+    <!-- ========== MAIN CONTENT AREA ========== -->
     <main class="main-content">
-   <section id="onboardingSimulator" style="padding: 0; overflow: hidden;">
-  <!-- Full-width responsive logo banner -->
-  <div style="padding: clamp(15px, 3vw, 25px) clamp(15px, 3vw, 30px); background: linear-gradient(135deg, #fff8f0 0%, #ffe6cc 100%); display: flex; align-items: center; justify-content: center; gap: clamp(10px, 2vw, 20px); border-bottom: 3px solid #FF9800; margin-bottom: clamp(20px, 3vw, 30px); flex-wrap: wrap;">
-    <img src="partners.png" alt="Partners Logo" style="height: clamp(40px, 6vw, 70px); max-width: 90%; object-fit: contain;">
-  </div>
-  
-  <!-- Content wrapper with responsive padding -->
-  <div style="padding: 0 clamp(15px, 3vw, 30px) clamp(20px, 3vw, 30px) clamp(15px, 3vw, 30px);">
-    <h2 data-i18n="onboarding.title" style="margin: 0 0 20px 0; font-size: clamp(1.2rem, 3vw, 1.6rem); text-align: center;">Core System Onboarding UI</h2>
-    
-    <div class="tabs">
-        <div class="tabs">
-          <button class="tabBtn active" data-tab="decentralized" data-i18n="onboarding.decentralized">Decentralized Process</button>
-          <button class="tabBtn" data-tab="centralized" data-i18n="onboarding.centralized">Centralized Process</button>
+      <section id="onboardingSimulator" style="padding: 0; overflow: hidden;">
+        
+        <!-- Full-width responsive logo banner -->
+        <div style="padding: clamp(15px, 3vw, 25px) clamp(15px, 3vw, 30px); background: linear-gradient(135deg, #fff8f0 0%, #ffe6cc 100%); display: flex; align-items: center; justify-content: center; gap: clamp(10px, 2vw, 20px); border-bottom: 3px solid #FF9800; margin-bottom: clamp(20px, 3vw, 30px); flex-wrap: wrap;">
+          <img src="partners.png" alt="Partners Logo" style="height: clamp(40px, 6vw, 70px); max-width: 90%; object-fit: contain;">
         </div>
+        
+        <!-- Content wrapper with responsive padding -->
+        <div style="padding: 0 clamp(15px, 3vw, 30px) clamp(20px, 3vw, 30px) clamp(15px, 3vw, 30px);">
+          <h2 data-i18n="onboarding.title" style="margin: 0 0 20px 0; font-size: clamp(1.2rem, 3vw, 1.6rem); text-align: center;">Core System Onboarding UI</h2>
+          
+          <!-- Main Tabs -->
+          <div class="tabs">
+            <button class="tabBtn active" data-tab="decentralized" data-i18n="onboarding.decentralized">Decentralized Process</button>
+            <button class="tabBtn" data-tab="centralized" data-i18n="onboarding.centralized">Centralized Process</button>
+          </div>
 
+          <!-- ========== DECENTRALIZED TAB ========== -->
           <div class="tabContent active" id="decentralized">
-          <h3 data-i18n="onboarding.decentralizedTitle">Decentralized Onboarding</h3>
+            <h3 data-i18n="onboarding.decentralizedTitle">Decentralized Onboarding</h3>
 
-          <label for="entityTypeDecentralized"><b data-i18n="onboarding.entityType">Entity Type:</b></label>
-          <select id="entityTypeDecentralized">
-            <option value="" data-i18n="onboarding.selectEntityType">Select Entity Type</option>
-            <option value="PP" data-i18n="onboarding.physicalPerson">Physical Person (PP)</option>
-            <option value="PM" data-i18n="onboarding.legalPerson">Legal Person (PM)</option>
-          </select>
-
-          <div id="decentralizedFields"></div>
-          <button id="submitDecentralized" data-i18n="onboarding.simulate">Simulate</button>
-        </div>
-
-        <div class="tabContent" id="centralized">
-          <h3 data-i18n="onboarding.centralizedTitle">Centralized Onboarding</h3>
-          <div class="subTabs">
-            <button class="subTabBtn active" data-subtab="sync" data-i18n="onboarding.synchronous">Synchronous</button>
-            <button class="subTabBtn" data-subtab="async" data-i18n="onboarding.asynchronous">Asynchronous</button>
-          </div>
-
-          <!-- SYNCHRONOUS TAB -->
-          <div class="subTabContent" id="sync">
-            <label for="entityTypeSync"><b data-i18n="onboarding.entityType">Entity Type:</b></label>
-            <select id="entityTypeSync">
+            <label for="entityTypeDecentralized"><b data-i18n="onboarding.entityType">Entity Type:</b></label>
+            <select id="entityTypeDecentralized">
               <option value="" data-i18n="onboarding.selectEntityType">Select Entity Type</option>
               <option value="PP" data-i18n="onboarding.physicalPerson">Physical Person (PP)</option>
               <option value="PM" data-i18n="onboarding.legalPerson">Legal Person (PM)</option>
             </select>
 
-            <div id="syncFields"></div>
-            <button id="submitSync" data-i18n="onboarding.simulate">Simulate</button>
+            <div id="decentralizedFields"></div>
+            <button id="submitDecentralized" data-i18n="onboarding.simulate">Simulate</button>
           </div>
 
-          <!-- ASYNCHRONOUS TAB -->
-          <div class="subTabContent" id="async">
-            <label for="entityTypeAsync"><b data-i18n="onboarding.entityType">Entity Type:</b></label>
-            <select id="entityTypeAsync">
-              <option value="" data-i18n="onboarding.selectEntityType">Select Entity Type</option>
-              <option value="PP" data-i18n="onboarding.physicalPerson">Physical Person (PP)</option>
-              <option value="PM" data-i18n="onboarding.legalPerson">Legal Person (PM)</option>
-            </select>
+          <!-- ========== CENTRALIZED TAB ========== -->
+          <div class="tabContent" id="centralized">
+            <h3 data-i18n="onboarding.centralizedTitle">Centralized Onboarding</h3>
+            
+            <!-- SubTabs -->
+            <div class="subTabs">
+              <button class="subTabBtn active" data-subtab="sync" data-i18n="onboarding.synchronous">Synchronous</button>
+              <button class="subTabBtn" data-subtab="async" data-i18n="onboarding.asynchronous">Asynchronous</button>
+            </div>
 
-            <div id="asyncFields"></div>
-            <button id="submitAsync" data-i18n="onboarding.simulate">Simulate</button>
+            <!-- SYNCHRONOUS SubTab -->
+            <div class="subTabContent active" id="sync">
+              <label for="entityTypeSync"><b data-i18n="onboarding.entityType">Entity Type:</b></label>
+              <select id="entityTypeSync">
+                <option value="" data-i18n="onboarding.selectEntityType">Select Entity Type</option>
+                <option value="PP" data-i18n="onboarding.physicalPerson">Physical Person (PP)</option>
+                <option value="PM" data-i18n="onboarding.legalPerson">Legal Person (PM)</option>
+              </select>
+
+              <div id="syncFields"></div>
+              <button id="submitSync" data-i18n="onboarding.simulate">Simulate</button>
+            </div>
+
+            <!-- ASYNCHRONOUS SubTab -->
+            <div class="subTabContent" id="async">
+              <label for="entityTypeAsync"><b data-i18n="onboarding.entityType">Entity Type:</b></label>
+              <select id="entityTypeAsync">
+                <option value="" data-i18n="onboarding.selectEntityType">Select Entity Type</option>
+                <option value="PP" data-i18n="onboarding.physicalPerson">Physical Person (PP)</option>
+                <option value="PM" data-i18n="onboarding.legalPerson">Legal Person (PM)</option>
+              </select>
+
+              <div id="asyncFields"></div>
+              <button id="submitAsync" data-i18n="onboarding.simulate">Simulate</button>
+            </div>
           </div>
-        </div>
+          
+        </div> <!-- Close content wrapper -->
       </section>
     </main>
-  </div>
+    
+  </div> <!-- Close main-layout -->
 
+  <!-- ========== POPUP ========== -->
   <div id="popup">
     <p id="popupText"></p>
     <input type="text" id="popupLink" readonly />
     <button id="closePopup" data-i18n="popup.close">Close</button>
   </div>
 
+  <!-- Scripts -->
   <script src="translator.js"></script>
   <script src="index.js"></script>
 </body>
