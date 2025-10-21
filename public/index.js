@@ -1183,7 +1183,6 @@ function createNotificationElements() {
   gap: 0;
   height: 36px; 
   align-items: center; 
-  display: flex;
 `;
   
 notificationButton.onmouseover = () => {
