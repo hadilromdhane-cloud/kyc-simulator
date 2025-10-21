@@ -1147,16 +1147,14 @@ function handleRealWebhookEvent(webhookData) {
 }
 
 function createNotificationElements() {
-  // Always remove old elements first
-  const existingContainer = document.getElementById('notificationContainer');
-  const existingButton = document.getElementById('notificationHistoryBtn');
-  
-  if (existingContainer) existingContainer.remove();
-  if (existingButton) existingButton.remove();
-  
-  console.log('Creating notification elements...');
+  if (document.getElementById('notificationContainer') && 
+      document.getElementById('notificationHistoryBtn')) {
+    console.log('✅ Notification elements already exist, skipping creation');
+    updateNotificationBadge();
+    updateTokenStatusDisplay();
+    return;
+  }
 
-  // Create notification container
   const notificationContainer = document.createElement('div');
   notificationContainer.id = 'notificationContainer';
   notificationContainer.style.cssText = `
@@ -1167,22 +1165,19 @@ function createNotificationElements() {
     max-width: 350px;
   `;
   document.body.appendChild(notificationContainer);
-  console.log('✅ Notification container created');
 
-    const notificationButton = document.createElement('button');
+  const notificationButton = document.createElement('button');
   notificationButton.id = 'notificationHistoryBtn';
-  notificationButton.textContent = 'Notifications';
+  notificationButton.innerHTML = t('buttons.notifications');
   notificationButton.style.cssText = `
-    position: fixed !important;
-    top: 15px !important;
-    right: 180px !important;
-    z-index: 10001 !important;
-    width: auto;
-    height: 36px;
-    padding: 0 20px;
+    position: fixed;
+    top: 15px;
+    right: 180px;
+    z-index: 10000;
+    padding: 8px 20px;
     background-color: #007ACC;
     color: white;
-    border: 2px solid #007ACC;
+    border: none;
     border-radius: 20px;
     cursor: pointer;
     font-size: 13px;
@@ -1190,22 +1185,22 @@ function createNotificationElements() {
     font-family: 'Roboto', sans-serif;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    white-space: nowrap;
+    letter-spacing: 0.5px;
   `;
   
-  notificationButton.onmouseover = () => {
+notificationButton.onmouseover = () => {
     notificationButton.style.backgroundColor = '#004080';
   };
   notificationButton.onmouseout = () => {
+    const unfinishedCount = notificationsHistory.filter(n => 
+      n.source === 'Reis_KYC' && !n.isSanctioned && !n.onboardingCompleted
+    ).length;
+    // Keep blue, only show red badge in text
     notificationButton.style.backgroundColor = '#007ACC';
   };
   
   notificationButton.onclick = showNotificationHistory;
   document.body.appendChild(notificationButton);
-  console.log('✅ Notification button created at top: 15px, right: 160px');
 
   updateNotificationBadge();
   updateTokenStatusDisplay();
@@ -1252,12 +1247,12 @@ function updateNotificationBadge() {
   ).length;
 
   if (unfinishedCount > 0) {
-    button.innerHTML = `Notifications <span style="position: absolute; top: -5px; right: -5px; background: #dc3545; color: white; padding: 2px 6px; border-radius: 10px; font-size: 10px; font-weight: bold;">${unfinishedCount}</span>`;
-    button.style.position = 'relative';
+    button.innerHTML = `${t('buttons.notifications')} <span style="background: #dc3545; color: white; padding: 2px 8px; border-radius: 10px; margin-left: 5px; font-size: 11px;">${unfinishedCount}</span>`;
+    button.style.backgroundColor = '#007ACC'; // Keep blue
   } else {
-    button.textContent = 'Notifications';
+    button.innerHTML = t('buttons.notifications');
+    button.style.backgroundColor = '#007ACC'; // Keep blue
   }
-  button.style.backgroundColor = '#007ACC';
 }
 
 
