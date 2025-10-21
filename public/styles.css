@@ -49,12 +49,14 @@ header h1 {
   border-radius: 20px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-  padding: 0;  
-  gap: 0;      
+  padding: 0;
+  gap: 0;
+  height: 36px; /* ✅ ADDED: Fixed height */
+  align-items: center; /* ✅ ADDED: Center content */
 }
 
 .lang-toggle-btn {
-  padding: 8px 20px;  /* Increase padding for better fit */
+  padding: 0 20px; /* ✅ CHANGED: Remove vertical padding */
   border: none;
   background: transparent;
   color: #007ACC;
@@ -63,7 +65,10 @@ header h1 {
   cursor: pointer;
   transition: all 0.3s ease;
   letter-spacing: 0.5px;
-  margin: 0;  /* Remove any margin */
+  margin: 0;
+  height: 100%; /* ✅ ADDED: Fill parent height */
+  display: flex; /* ✅ ADDED: Flexbox */
+  align-items: center; /* ✅ ADDED: Center text */
 }
 
 .lang-toggle-btn:hover:not(.active) {

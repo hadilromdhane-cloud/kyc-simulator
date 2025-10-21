@@ -1166,18 +1166,18 @@ function createNotificationElements() {
   `;
   document.body.appendChild(notificationContainer);
 
-  const notificationButton = document.createElement('button');
+ const notificationButton = document.createElement('button');
   notificationButton.id = 'notificationHistoryBtn';
   notificationButton.innerHTML = t('buttons.notifications');
   notificationButton.style.cssText = `
     position: fixed;
     top: 15px;
-    right: 180px;
+    right: 200px;
     z-index: 10000;
-    padding: 8px 20px;
+    padding: 8px 16px;
     background-color: #007ACC;
     color: white;
-    border: none;
+    border: 2px solid #007ACC;
     border-radius: 20px;
     cursor: pointer;
     font-size: 13px;
@@ -1186,6 +1186,10 @@ function createNotificationElements() {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     transition: all 0.3s ease;
     letter-spacing: 0.5px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   `;
   
 notificationButton.onmouseover = () => {
@@ -1247,11 +1251,11 @@ function updateNotificationBadge() {
   ).length;
 
   if (unfinishedCount > 0) {
-    button.innerHTML = `${t('buttons.notifications')} <span style="background: #dc3545; color: white; padding: 2px 8px; border-radius: 10px; margin-left: 5px; font-size: 11px;">${unfinishedCount}</span>`;
-    button.style.backgroundColor = '#007ACC'; // Keep blue
+    button.innerHTML = `${t('buttons.notifications')} <span style="background: #dc3545; color: white; padding: 1px 6px; border-radius: 8px; margin-left: 6px; font-size: 10px; font-weight: bold;">${unfinishedCount}</span>`;
+    button.style.backgroundColor = '#007ACC';
   } else {
     button.innerHTML = t('buttons.notifications');
-    button.style.backgroundColor = '#007ACC'; // Keep blue
+    button.style.backgroundColor = '#007ACC';
   }
 }
 
