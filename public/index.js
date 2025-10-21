@@ -1172,10 +1172,9 @@ function createNotificationElements() {
   notificationButton.style.cssText = `
     position: fixed;
     top: 15px;
-    right: 180px;
-    left: 500px;
+    right: 200px;
     z-index: 10000;
-    padding: 8px 20px;
+    padding: 0;
     background-color: #007ACC;
     color: white;
     border: none;
@@ -1185,8 +1184,8 @@ function createNotificationElements() {
     font-weight: 600;
     font-family: 'Roboto', sans-serif;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-    transition: all 0.3s ease;
-    letter-spacing: 0.5px;
+    height: 36px; /* ✅ ADDED: Fixed height */
+    align-items: center; /* ✅ ADDED: Center content */
   `;
   
 notificationButton.onmouseover = () => {
