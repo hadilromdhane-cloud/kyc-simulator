@@ -1171,33 +1171,32 @@ function createNotificationElements() {
   notificationButton.innerHTML = t('buttons.notifications');
   notificationButton.style.cssText = `
     position: fixed;
-    top: 85px;
-    right: 20px;
+    top: 15px;
+    right: 180px;
     z-index: 10000;
-    padding: 10px 15px;
+    padding: 8px 20px;
     background-color: #007ACC;
     color: white;
     border: none;
-    border-radius: 6px;
+    border-radius: 20px;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
     font-family: 'Roboto', sans-serif;
-    box-shadow: 0 3px 8px rgb(0 0 0 / 0.1);
-    transition: background-color 0.2s ease;
-    width: auto;
-    margin-top: 0;
-    min-width: 120px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    letter-spacing: 0.5px;
   `;
   
-  notificationButton.onmouseover = () => {
+notificationButton.onmouseover = () => {
     notificationButton.style.backgroundColor = '#004080';
   };
   notificationButton.onmouseout = () => {
     const unfinishedCount = notificationsHistory.filter(n => 
       n.source === 'Reis_KYC' && !n.isSanctioned && !n.onboardingCompleted
     ).length;
-    notificationButton.style.backgroundColor = unfinishedCount > 0 ? '#dc3545' : '#007ACC';
+    // Keep blue, only show red badge in text
+    notificationButton.style.backgroundColor = '#007ACC';
   };
   
   notificationButton.onclick = showNotificationHistory;
@@ -1248,13 +1247,14 @@ function updateNotificationBadge() {
   ).length;
 
   if (unfinishedCount > 0) {
-button.innerHTML = `${t('buttons.notifications')} (${unfinishedCount})`;
-    button.style.backgroundColor = '#dc3545';
+    button.innerHTML = `${t('buttons.notifications')} <span style="background: #dc3545; color: white; padding: 2px 8px; border-radius: 10px; margin-left: 5px; font-size: 11px;">${unfinishedCount}</span>`;
+    button.style.backgroundColor = '#007ACC'; // Keep blue
   } else {
-button.innerHTML = t('buttons.notifications');
-    button.style.backgroundColor = '#007ACC';
+    button.innerHTML = t('buttons.notifications');
+    button.style.backgroundColor = '#007ACC'; // Keep blue
   }
 }
+
 
 function showNotificationHistory() {
   const historyOverlay = document.createElement('div');
