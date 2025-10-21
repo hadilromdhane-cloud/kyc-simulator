@@ -1180,6 +1180,10 @@ function createNotificationElements() {
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
   padding: 0;
   gap: 0;
+  height: 36px; 
+  align-items: center; 
+
+
 `;
   
 notificationButton.onmouseover = () => {
