@@ -1178,12 +1178,12 @@ function createNotificationElements() {
   border: 2px solid #007ACC;
   border-radius: 20px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  overflow: hidden;
   padding: 0;
   gap: 0;
   height: 36px; 
   align-items: center; 
-
-
+  display: flex;
 `;
   
 notificationButton.onmouseover = () => {
