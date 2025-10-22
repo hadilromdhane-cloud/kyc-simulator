@@ -698,7 +698,7 @@ fetchRiskLevel: async function(riskCalculationId) {
         { screeningField: 'firstName', onboardingFields: ['prenom', 'firstName'], readonly: true, label: 'Prénom/First Name' },
         { screeningField: 'lastName', onboardingFields: ['nom', 'lastName'], readonly: true, label: 'Nom/Last Name' },
         { screeningField: 'birthDate', onboardingFields: ['dateNaissance', 'dateOfBirth'], readonly: true, label: 'Date de naissance/Birth Date' },
-        { screeningField: 'nationalite', onboardingFields: ['Nationalite', 'nationality',], readonly: true, label: 'Nationalité/Nationality', fieldType: 'select' },
+        { screeningField: 'Nationalite', onboardingFields: ['Nationalite', 'nationality',], readonly: true, label: 'Nationalité/Nationality', fieldType: 'select' },
         { screeningField: 'citizenship', onboardingFields: ['PaysDeResidence', 'countryOfResidence','citizenship'], readonly: true, label: 'Pays de Résidence/Country of Residence', fieldType: 'select' }
     ];
         let fieldsLocked = 0;
