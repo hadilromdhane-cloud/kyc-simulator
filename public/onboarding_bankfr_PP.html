@@ -630,7 +630,7 @@
         // Function to initialize all country dropdowns
         function initializeCountryDropdowns() {
             // For French forms (bankfr)
-            populateCountriesSelect('nationalite', countriesFrench);
+            populateCountriesSelect('Nationalite', countriesFrench);
             populateCountriesSelect('PaysDeResidence', countriesFrench);
             
             // For English forms (banque_en)
@@ -676,11 +676,6 @@
                 window.location.href = 'index.html';
             }
         }
-
-        // Initialize the onboarding handler when the page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            OnboardingHandler.init('onboardingForm', 'bankfr');
-        });
 
 
     </script>
