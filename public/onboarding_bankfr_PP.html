@@ -218,7 +218,63 @@
             transform: none;
         }
 
+
+        /* Language Selector - Compact Toggle Top Right */
+        .language-selector {
+            position: fixed;
+            top: 15px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            background: #f0f8ff;
+            border: 2px solid #007ACC;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            padding: 0;
+            gap: 0;
+            height: 36px;
+            align-items: center;
+        }
+
+        .lang-toggle-btn {
+            padding: 0 20px;
+            border: none;
+            background: transparent;
+            color: #007ACC;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            letter-spacing: 0.5px;
+            margin: 0;
+            height: 100%;
+            display: flex;
+            align-items: center;
+        }
+
+        .lang-toggle-btn:hover:not(.active) {
+            background: rgba(0, 122, 204, 0.1);
+        }
+
+        .lang-toggle-btn.active {
+            background: #007ACC;
+            color: white;
+        }
+
         @media (max-width: 768px) {
+            .language-selector {
+                top: 10px;
+                right: 10px;
+                border-radius: 18px;
+            }
+
+            .lang-toggle-btn {
+                padding: 5px 14px;
+                font-size: 12px;
+            }
+
+
             .container {
                 margin: 10px;
                 border-radius: 10px;
@@ -242,9 +298,27 @@
                 align-items: center;
             }
         }
+
+        @media (max-width: 480px) {
+            .language-selector {
+                top: 8px;
+                right: 8px;
+            }
+
+            .lang-toggle-btn {
+                padding: 4px 12px;
+                font-size: 11px;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- Language Selector -->
+    <div class="language-selector">
+        <button class="lang-toggle-btn active" data-lang="en">EN</button>
+        <button class="lang-toggle-btn" data-lang="fr">FR</button>
+    </div>
+
     <header style="display: flex; align-items: center; gap: 15px;">
     <img src="logos2.png" alt="Company Logo" style="height: 120px;" />
     <img src="logos2.png" alt="Company Logo" style="height: 120px;" />
