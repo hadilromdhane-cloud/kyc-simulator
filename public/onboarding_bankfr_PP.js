@@ -129,7 +129,7 @@ const OnboardingHandler = (function() {
                     items: {
                         isSanctionnedWorkflow: "Non",
                         AddressDataGrid: [],
-                        PaysDeResidence: formData.PaysDeResidence || "",
+                        PaysDeResidence: formData.citizenship || "",
                         address: [],
                         address_doc: [],
                         address_proof_type: {},
@@ -202,7 +202,7 @@ const OnboardingHandler = (function() {
                         obnl_name: formData.nom || "",
                         OrigineDesFonds: [formData.origineFonds || ""],
                         outboundSystems: null,
-                        Nationalite: formData.nationalite || "",
+                        Nationalite: formData.Nationalite || "",
                         pep: "",
                         pliberal: "",
                         postal_code: formData.codePostal || "",
