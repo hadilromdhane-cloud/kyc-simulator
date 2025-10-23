@@ -750,25 +750,21 @@ function renderFields(containerId, entityType, processType) {
   });
 }
 else if (field.type === 'fundsOriginPP') {
-  const select = document.createElement('select');
-  select.id = field.key;
-  select.name = field.key;
-  select.className = 'form-control';
-  if (field.required) select.required = true;
+  input = document.createElement('select');
+  input.id = containerId + '_' + field.key;
+  if (field.required) input.required = true;
 
   const defaultOption = document.createElement('option');
   defaultOption.value = '';
   defaultOption.textContent = '-- Sélectionner --';
-  select.appendChild(defaultOption);
+  input.appendChild(defaultOption);
 
   asyncFieldOptions.fundsOriginPP.forEach(origin => {
     const option = document.createElement('option');
     option.value = origin.value;
     option.textContent = origin.label;
-    select.appendChild(option);
+    input.appendChild(option);
   });
-
-  formGroup.appendChild(select);
 }
       else {
         input = document.createElement('input');
