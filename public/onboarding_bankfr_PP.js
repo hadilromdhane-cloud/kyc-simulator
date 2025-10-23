@@ -129,7 +129,7 @@ const OnboardingHandler = (function() {
                     items: {
                         isSanctionnedWorkflow: "Non",
                         AddressDataGrid: [],
-                        PaysDeResidence: formData.citizenship || "",
+                        PaysDeResidence: formData.PaysDeResidence || "",
                         address: [],
                         address_doc: [],
                         address_proof_type: {},
@@ -141,7 +141,6 @@ const OnboardingHandler = (function() {
                         birth_date: formData.dateNaissance || "",
                         businessName: "",
                         CanalDeDistribution: formData.canal || "",
-                        PaysDeResidence: formData.citizenship || "",
                         containerelm: {
                             "profession-2": "",
                             retrieved_dob: "",
@@ -699,7 +698,7 @@ fetchRiskLevel: async function(riskCalculationId) {
         { screeningField: 'lastName', onboardingFields: ['nom', 'lastName'], readonly: true, label: 'Nom/Last Name' },
         { screeningField: 'birthDate', onboardingFields: ['dateNaissance', 'dateOfBirth'], readonly: true, label: 'Date de naissance/Birth Date' },
         { screeningField: 'Nationalite', onboardingFields: ['Nationalite', 'nationality',], readonly: true, label: 'Nationalité/Nationality', fieldType: 'select' },
-        { screeningField: 'citizenship', onboardingFields: ['PaysDeResidence', 'countryOfResidence','citizenship'], readonly: true, label: 'Pays de Résidence/Country of Residence', fieldType: 'select' }
+        { screeningField: 'PaysDeResidence', onboardingFields: ['PaysDeResidence', 'countryOfResidence','citizenship'], readonly: true, label: 'Pays de Résidence/Country of Residence', fieldType: 'select' }
     ];
         let fieldsLocked = 0;
 
