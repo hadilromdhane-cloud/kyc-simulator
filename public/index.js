@@ -823,7 +823,7 @@ function createAsyncOnboardingPayload(entityType, formData) {
       items: {
         isSanctionnedWorkflow: "Non",
         AddressDataGrid: [],
-        PaysDeResidence: formData.citizenship || "",
+        PaysDeResidence: formData.citizenship || formData.PaysDeResidence ,
         address: [],
         address_doc: [],
         address_proof_type: {},
@@ -1979,6 +1979,7 @@ continueBtn.textContent = t('buttons.continueOnboarding');
         birthDate: customerData.birthDate,
         Nationalite: customerData.nationality,
         citizenship: customerData.citizenship,
+        PaysDeResidence: customerData.citizenship,
         businessName: customerData.businessName, // ✅ Store business name for PM
         systemId: customerData.systemId,
         systemName: customerData.systemName,
