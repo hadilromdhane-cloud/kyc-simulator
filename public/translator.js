@@ -91,16 +91,19 @@ const Translator = (function() {
                 "shareCapital": "Share Capital (EUR)",
                 "activitySector": "Activity Sector",
                 "fundsOrigin": "Funds Origin",
+                "OrigineDesFonds": "Source of Funds",
                 "queueDefault": "Default",
                 "queueMaker": "Maker",
                 "queueChecker": "Checker",
-                    "selectIdType": "Select ID Type",
-                    "selectProfession": "Select Profession",
-                    "selectProduct": "Select Product",
-                    "selectChannel": "Select Channel",
-                    "selectLegalForm": "Select Legal Form",
-                    "selectActivitySector": "Select Activity Sector",
-                    "selectFundsOrigin": "Select Funds Origin"
+                "selectIdType": "Select ID Type",
+                "selectProfession": "Select Profession",
+                "selectProduct": "Select Product",
+                "selectChannel": "Select Channel",
+                "selectLegalForm": "Select Legal Form",
+                "selectActivitySector": "Select Activity Sector",
+                "selectFundsOrigin": "Select Funds Origin",
+                "selectSourceOfFunds": "Select Source of Funds"
+
                 
             },
             "messages": {
@@ -219,7 +222,8 @@ const Translator = (function() {
                 "incorporationCountry": "Pays de constitution",
                 "shareCapital": "Capital social (EUR)",
                 "activitySector": "Secteur d'activité",
-                "fundsOrigin": "Origine des fonds",
+                "fundsOrigin": "Origine des Fonds",
+                "OrigineDesFonds": "Origine des Fonds",
                 "queueDefault": "Par défaut",
                 "queueMaker": "Créateur",
                 "queueChecker": "Vérificateur",
@@ -229,7 +233,8 @@ const Translator = (function() {
                 "selectChannel": "Sélectionner le canal",
                 "selectLegalForm": "Sélectionner la forme juridique",
                 "selectActivitySector": "Sélectionner le secteur d'activité",
-                "selectFundsOrigin": "Sélectionner l'origine des fonds"
+                "selectFundsOrigin": "Sélectionner l'origine des fonds",
+                "selectSourceOfFunds": "Sélectionner l'origine des fonds"
 
 
             },
