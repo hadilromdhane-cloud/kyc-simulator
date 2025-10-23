@@ -373,8 +373,8 @@ function getVisibleTemplates() {
                 { label: t('fields.profession'), key: 'profession', type: 'profession', required: true },
                 { label: t('fields.targetProducts'), key: 'produits', type: 'products', required: true },
                 { label: t('fields.distributionChannel'), key: 'canal', type: 'channel', required: true },
-                { label: 'Origine des Fonds', key: 'origineFonds', type: 'fundsOriginPP', required: true },
-                { label: t('fields.annualIncome'), key: 'revenu', type: 'number', placeholder: t('fields.numericOnly'), required: true }
+                { label: t('fields.annualIncome'), key: 'revenu', type: 'number', placeholder: t('fields.numericOnly'), required: true },
+                { label: 'Origine des Fonds', key: 'OrigineDesFonds', type: 'fundsOriginPP', required: true }
             ]
         },
         PM: {
@@ -2338,7 +2338,7 @@ function storeCustomerDataForOnboarding(customerData, apiResponse) {
       Nationalite: customerData.nationality,
       citizenship: customerData.citizenship,
       PaysDeResidence: customerData.citizenship || customerData.PaysDeResidence,
-      origineFonds: customerData.origineFonds,
+      OrigineDesFonds: customerData.OrigineDesFonds,
       businessName: customerData.businessName,
       legalForm: customerData.legalForm,
       countryOfIncorporation: customerData.countryOfIncorporation,
