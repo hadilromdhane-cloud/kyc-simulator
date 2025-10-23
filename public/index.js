@@ -1010,6 +1010,7 @@ async function callSearchAsync(entityType, containerId) {
       birthDate: formData.birthDate,
       Nationalite: formData.nationality,
       citizenship: formData.citizenship,
+      PaysDeResidence: formData.citizenship,
       systemId: generatedSystemId,
       systemName: "T24",
       entityType: entityType,
