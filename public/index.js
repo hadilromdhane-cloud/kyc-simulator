@@ -423,27 +423,48 @@ const asyncFieldOptions = {
   ],
   profession: [
     'CLERGE & RELIGIEUX',
-    'COMMERCE',
-    'ARTISAN',
-    'CADRE SUPERIEUR',
-    'EMPLOYE',
-    'PROFESSION LIBERALE',
-    'RETRAITE',
-    'ETUDIANT',
-    'SANS PROFESSION'
+    'COMMERCANTS',
+    'COMM.ARTISAN N.CLASS',
+    'PROF LIB.CABINET GR.',
+    'PROF.SCIENTIFIQUES',
+    'INGENIEURS& ASSIM.',
+    'AUT CAD SUP SEC PRIV',
+    'AUT CAD SUP SEC PUBL',
+    'DIRECTEUR DE SOCIETE',
+    'INGENIEURS& ASSIM.',
+    'AUT.PERS.DIRIG.SOCIE',
+    'CHOMEURS',
+        'ARCHITECTES SALARIES',
+    'NOTAIRE',
+    'COMM.ARTISAN N.CLASS',
+    'INCONNU',
+    'AGRICULTEUR EXPLOIT.',
+    'SALARIES AGRICOLES',
+    'AGRICULTEURS N.CLASS',
+    'ELEVEUR',
+    'INDUSTRIELS',
+    'INGENIEURS& ASSIM.',
+    'ARTISANS',
+    'PATRONS PECHEURS',
+    'GROS COM.& CHEF ENT.',
+    'PETITS COMMERCANTS'
+
   ],
   products: [
     { value: 'currentAccount', label: 'Compte courant' },
     { value: 'savingsAccount', label: 'Compte épargne' },
-    { value: 'loan', label: 'Prêt' },
+    { value: 'timeDeposit', label: 'Dépôt à Terme' },
     { value: 'creditCard', label: 'Carte de crédit' },
-    { value: 'mobileBanking', label: 'Banque mobile' }
+    { value: 'debitCard', label: 'Carte de Débit' },
+    { value: 'mobileBanking', label: 'Banque mobile' },
+    { value: 'internetBanking', label: 'Internet Banking' },
+    { value: 'remittances', label: 'Transferts Argent' }
+
+
   ],
   channel: [
-    { value: 'branch', label: 'Agence' },
-    { value: 'online', label: 'En ligne' },
-    { value: 'mobile', label: 'Mobile' },
-    { value: 'phone', label: 'Téléphone' }
+    { value: 'inagency', label: 'Agence' },
+    { value: 'online', label: 'En ligne' }
   ],
   legalForm: [
     'SARL',

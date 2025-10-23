@@ -141,7 +141,7 @@ const OnboardingHandler = (function() {
                         birth_date: formData.dateNaissance || "",
                         businessName: "",
                         CanalDeDistribution: formData.canal || "",
-                        PaysDeResidence: formData.pays || "",
+                        PaysDeResidence: formData.citizenship || "",
                         containerelm: {
                             "profession-2": "",
                             retrieved_dob: "",
