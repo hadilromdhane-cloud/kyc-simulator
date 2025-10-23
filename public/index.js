@@ -373,6 +373,7 @@ function getVisibleTemplates() {
                 { label: t('fields.profession'), key: 'profession', type: 'profession', required: true },
                 { label: t('fields.targetProducts'), key: 'produits', type: 'products', required: true },
                 { label: t('fields.distributionChannel'), key: 'canal', type: 'channel', required: true },
+                { label: 'Origine des Fonds', key: 'origineFonds', type: 'fundsOriginPP', required: true },
                 { label: t('fields.annualIncome'), key: 'revenu', type: 'number', placeholder: t('fields.numericOnly'), required: true }
             ]
         },
@@ -491,13 +492,16 @@ const asyncFieldOptions = {
     'Education',
     'Sante'
   ],
-  fundsOrigin: [
-    { value: 'business_revenue', label: 'Business Revenue' },
-    { value: 'investments', label: 'Investments' },
-    { value: 'loans', label: 'Loans' },
-    { value: 'shareholders', label: 'Shareholders' },
-    { value: 'other', label: 'Other' }
-  ]
+    fundsOriginPP: [
+      { value: 'employmentIncome', label: 'Revenus d\'Emploi' },
+      { value: 'businessProfits', label: 'Bénéfices d\'Entreprise' },
+      { value: 'inheritance', label: 'Héritage' },
+      { value: 'retirementPension', label: 'Pension de Retraite' },
+      { value: 'investmentReturns', label: 'Rendements d\'Investissement' },
+      { value: 'familySupport', label: 'Soutien Familial' },
+      { value: 'propertyRental', label: 'Location de Biens' },
+      { value: 'other', label: 'Autres' }
+    ]
 };
 
 // FIXED renderFields function
@@ -745,23 +749,27 @@ function renderFields(containerId, entityType, processType) {
     input.appendChild(option);
   });
 }
-    else if (field.type === 'fundsOrigin') {
-      input = document.createElement('select');
-      input.id = containerId + '_' + field.key;
-      if (field.required) input.required = true;
+else if (field.type === 'fundsOriginPP') {
+  const select = document.createElement('select');
+  select.id = field.key;
+  select.name = field.key;
+  select.className = 'form-control';
+  if (field.required) select.required = true;
 
-       const defaultOption = document.createElement('option');
-      defaultOption.value = '';
-      defaultOption.textContent = t('fields.selectFundsOrigin');
-      input.appendChild(defaultOption);
+  const defaultOption = document.createElement('option');
+  defaultOption.value = '';
+  defaultOption.textContent = '-- Sélectionner --';
+  select.appendChild(defaultOption);
 
-      asyncFieldOptions.fundsOrigin.forEach(origin => {
-        const option = document.createElement('option');
-        option.value = origin.value;
-        option.textContent = origin.label;
-        input.appendChild(option);
-      });
-    }
+  asyncFieldOptions.fundsOriginPP.forEach(origin => {
+    const option = document.createElement('option');
+    option.value = origin.value;
+    option.textContent = origin.label;
+    select.appendChild(option);
+  });
+
+  formGroup.appendChild(select);
+}
       else {
         input = document.createElement('input');
         input.id = containerId + '_' + field.key;
@@ -2330,6 +2338,7 @@ function storeCustomerDataForOnboarding(customerData, apiResponse) {
       Nationalite: customerData.nationality,
       citizenship: customerData.citizenship,
       PaysDeResidence: customerData.citizenship || customerData.PaysDeResidence,
+      origineFonds: customerData.origineFonds,
       businessName: customerData.businessName,
       legalForm: customerData.legalForm,
       countryOfIncorporation: customerData.countryOfIncorporation,
