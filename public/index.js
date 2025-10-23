@@ -2327,6 +2327,7 @@ function storeCustomerDataForOnboarding(customerData, apiResponse) {
       birthDate: customerData.birthDate,
       Nationalite: customerData.nationality,
       citizenship: customerData.citizenship,
+      PaysDeResidence: customerData.citizenship || customerData.PaysDeResidence,
       businessName: customerData.businessName,
       legalForm: customerData.legalForm,
       countryOfIncorporation: customerData.countryOfIncorporation,
