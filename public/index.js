@@ -250,6 +250,57 @@ function t(key) {
 // Global token manager instance
 const tokenManager = new TokenManager();
 
+// ✅ AUTOMATIC TOKEN REFRESH - Checks every 30 seconds
+let tokenRefreshInterval = null;
+
+function setupAutomaticTokenRefresh() {
+    // Clear any existing interval
+    if (tokenRefreshInterval) {
+        clearInterval(tokenRefreshInterval);
+    }
+    
+    // Check token status every 30 seconds
+    tokenRefreshInterval = setInterval(async () => {
+        const token = tokenManager.getToken();
+        
+        // Only try to refresh if we have a token
+        if (!token) {
+            console.log('⏭️ No token to refresh, skipping...');
+            return;
+        }
+        
+        // Check if token needs refresh
+        if (tokenManager.needsRefresh()) {
+            console.log('🔄 Token needs refresh, attempting automatic refresh...');
+            try {
+                await tokenManager.refreshToken();
+                console.log('✅ Token automatically refreshed');
+                updateTokenStatusDisplay();
+            } catch (error) {
+                console.error('❌ Automatic token refresh failed:', error.message);
+                showNotification('Session expired. Please login again.', 'warning');
+                tokenManager.clearTokens();
+                updateTokenStatusDisplay();
+            }
+        } else {
+            console.log('✓ Token still valid, no refresh needed');
+        }
+    }, 30000); // Check every 30 seconds
+    
+    console.log('✅ Automatic token refresh system started');
+}
+
+// Stop automatic refresh (call on logout)
+function stopAutomaticTokenRefresh() {
+    if (tokenRefreshInterval) {
+        clearInterval(tokenRefreshInterval);
+        tokenRefreshInterval = null;
+        console.log('⏹️ Automatic token refresh stopped');
+    }
+}
+
+
+
 // English countries array (for banque_en and default)
 const countriesEnglish = [
     "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda",
@@ -1721,17 +1772,19 @@ authBtn.addEventListener('click', async () => {
       showNotification('Authentication failed!', 'error');
       return; 
     }
-
     authToken = data.token;
     
     tokenManager.storeToken(authToken, tenantName, 300);
     
     logMessage('Authentication successful', 'success');
-showNotification(t('notifications.authSuccess'), 'success');
+    showNotification(t('notifications.authSuccess'), 'success');
 
     localStorage.setItem('authToken', authToken);
     localStorage.setItem('tenantName', tenantName);
     console.log('Auth tokens stored for onboarding page');
+    
+    // ✅ START AUTOMATIC TOKEN REFRESH after successful authentication
+    setupAutomaticTokenRefresh();
     
     updateTokenStatusDisplay();
   } catch(err) {
@@ -2479,6 +2532,8 @@ window.addEventListener('beforeunload', function() {
   if (pollingInterval) {
     clearInterval(pollingInterval);
   }
+  // Clean up token refresh interval
+  stopAutomaticTokenRefresh();
 });
 
 window.closeNotificationHistory = closeNotificationHistory;
@@ -2535,8 +2590,15 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Your existing initialization code
     logMessage('Application initialized', 'info');
     createNotificationElements();
-    initializeEventListeners(); // ← ADD THIS LINE
+    initializeEventListeners();
     updateTokenStatusDisplay();
+    
+    // ✅ START AUTOMATIC TOKEN REFRESH if user is already authenticated
+    const existingToken = tokenManager.getToken();
+    if (existingToken) {
+        console.log('✅ Found existing token, starting automatic refresh');
+        setupAutomaticTokenRefresh();
+    }
     
     setTimeout(() => {
         if (!pollingInterval) {
