@@ -1235,11 +1235,20 @@ function createNotificationElements() {
   const notificationContainer = document.createElement('div');
   notificationContainer.id = 'notificationContainer';
   notificationContainer.style.cssText = `
-    position: fixed;
-    top: 130px;
-    right: 20px;
-    z-index: 10000;
-    max-width: 350px;
+  position: fixed;
+  top: 15px;
+  right: 150px;
+  z-index: 1000;
+  display: flex;
+  background: #f0f8ff;
+  border: 2px solid #007ACC;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  padding: 0;
+  gap: 0;
+  height: 36px; /* ✅ ADDED: Fixed height */
+  align-items: center; /* ✅ ADDED: Center content */
   `;
   document.body.appendChild(notificationContainer);
 
@@ -1247,19 +1256,7 @@ function createNotificationElements() {
   notificationButton.id = 'notificationHistoryBtn';
   notificationButton.innerHTML = t('buttons.notifications');
   notificationButton.style.cssText = `
-  position: fixed;
-  width: 200px;
-  top: 0px;
-  right: 170px;
-  background: #f0f8ff;
-  border: 2px solid #007ACC;
-  border-radius: 20px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-  overflow: hidden;
-  padding: 0;
-  gap: 0;
-  height: 36px; 
-  align-items: center; 
+
 `;
   
 notificationButton.onmouseover = () => {
