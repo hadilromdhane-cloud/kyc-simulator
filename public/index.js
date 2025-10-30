@@ -1224,54 +1224,21 @@ function handleRealWebhookEvent(webhookData) {
 }
 
 function createNotificationElements() {
-  if (document.getElementById('notificationContainer') && 
-      document.getElementById('notificationHistoryBtn')) {
+  const container = document.getElementById('notificationContainer');
+  const button = document.getElementById('notificationHistoryBtn');
+  
+  if (container && button && button.innerHTML) {
     console.log('✅ Notification elements already exist, skipping creation');
     updateNotificationBadge();
     updateTokenStatusDisplay();
     return;
   }
 
-  const notificationContainer = document.createElement('div');
-  notificationContainer.id = 'notificationContainer';
-  notificationContainer.style.cssText = `
-  position: fixed;
-  top: 15px;
-  right: 150px;
-  z-index: 1000;
-  display: flex;
-  background: #f0f8ff;
-  border: 2px solid #007ACC;
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-  padding: 0;
-  gap: 0;
-  height: 36px; /* ✅ ADDED: Fixed height */
-  align-items: center; /* ✅ ADDED: Center content */
-  `;
-  document.body.appendChild(notificationContainer);
-
-  const notificationButton = document.createElement('button');
-  notificationButton.id = 'notificationHistoryBtn';
-  notificationButton.innerHTML = t('buttons.notifications');
-  notificationButton.style.cssText = `
-
-`;
-  
-notificationButton.onmouseover = () => {
-    notificationButton.style.backgroundColor = '#004080';
-  };
-  notificationButton.onmouseout = () => {
-    const unfinishedCount = notificationsHistory.filter(n => 
-      n.source === 'Reis_KYC' && !n.isSanctioned && !n.onboardingCompleted
-    ).length;
-    // Keep blue, only show red badge in text
-    notificationButton.style.backgroundColor = '#007ACC';
-  };
-  
-  notificationButton.onclick = showNotificationHistory;
-  document.body.appendChild(notificationButton);
+  // Set button text
+  if (button) {
+    button.innerHTML = t('buttons.notifications');
+    button.onclick = showNotificationHistory;
+  }
 
   updateNotificationBadge();
   updateTokenStatusDisplay();

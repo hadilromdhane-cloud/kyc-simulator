@@ -45,11 +45,10 @@ body {
   align-items: center; /* ✅ ADDED: Center text */
 }
 
-
-.notification_button{
+.notification-selector {
   position: fixed;
   top: 15px;
-  right: 150px;
+  right: 170px;
   z-index: 1000;
   display: flex;
   background: #f0f8ff;
@@ -59,10 +58,38 @@ body {
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
   padding: 0;
   gap: 0;
-  height: 36px; /* ✅ ADDED: Fixed height */
-  align-items: center; /* ✅ ADDED: Center content */
+  height: 36px;
+  align-items: center;
 }
 
+.notification-toggle-btn {
+  padding: 0 20px;
+  border: none;
+  background: transparent;
+  color: #007ACC;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  letter-spacing: 0.5px;
+  margin: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.notification-toggle-btn:hover {
+  background: rgba(0, 122, 204, 0.1);
+}
+
+#notificationContainer {
+  position: fixed;
+  top: 130px;
+  right: 20px;
+  z-index: 10000;
+  max-width: 350px;
+}
 
 
 
