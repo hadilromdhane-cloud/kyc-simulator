@@ -684,7 +684,7 @@ fetchRiskLevel: async function(riskCalculationId) {
             }
         },
 
-        prePopulateForm: function() {
+    prePopulateForm: function() {
     console.log('prePopulateForm called with customerData:', customerData); 
     console.log('customerData.isScreeningDataLocked:', customerData?.isScreeningDataLocked); 
     
