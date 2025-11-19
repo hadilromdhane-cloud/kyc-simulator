@@ -1,6 +1,6 @@
-
 const SUPABASE_URL = 'https://nkfduoyzmmjolxtaansw.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5rZmR1b3l6bW1qb2x4dGFhbnN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM1MjI4NDAsImV4cCI6MjA3OTA5ODg0MH0.k2RoRjHGxHOd-tJwuam9OL1KwzLiCiZuwGmjZ_ia0kU'
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5rZmR1b3l6bW1qb2x4dGFhbnN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM1MjI4NDAsImV4cCI6MjA3OTA5ODg0MH0.k2RoRjHGxHOd-tJwuam9OL1KwzLiCiZuwGmjZ_ia0kU';
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -16,12 +16,14 @@ export default {
       return new Response(null, { headers: corsHeaders });
     }
 
-    // Webhook endpoint
+    // --------------------------
+    // POST /api/webhook/searchWebhook
+    // --------------------------
     if (path === '/api/webhook/searchWebhook' && request.method === 'POST') {
       try {
         const body = await request.json();
         console.log('Webhook received:', JSON.stringify(body));
-        
+
         const eventData = {
           customer_id: body.customerId,
           search_query_id: body.searchQueryId,
@@ -31,10 +33,9 @@ export default {
           is_adverse_media: body.isAdverseMedia || false,
           pep_decision: body.pepDecision || (body.isPEP ? 'HIT' : 'NO_HIT'),
           sanction_decision: body.sanctionDecision || (body.isSanctioned ? 'HIT' : 'NO_HIT'),
-          message: `Screening completed for customer ${body.customerId}`,
-          original_data: body
+          message: `Screening completed for customer ${body.customerId}`
         };
-        
+
         const response = await fetch(`${SUPABASE_URL}/rest/v1/webhook_events`, {
           method: 'POST',
           headers: {
@@ -44,14 +45,14 @@ export default {
           },
           body: JSON.stringify(eventData)
         });
-        
+
         if (!response.ok) {
           throw new Error(`Database insert failed: ${response.status}`);
         }
-        
+
         const result = await response.json();
         console.log('Event stored in database');
-        
+
         return new Response(JSON.stringify({
           status: 'ok',
           message: 'Webhook received and stored',
@@ -59,12 +60,12 @@ export default {
         }), {
           headers: { 'Content-Type': 'application/json', ...corsHeaders }
         });
-        
+
       } catch (error) {
         console.error('Webhook error:', error);
-        return new Response(JSON.stringify({ 
-          error: 'Processing error', 
-          details: error.message 
+        return new Response(JSON.stringify({
+          error: 'Processing error',
+          details: error.message
         }), {
           status: 500,
           headers: { 'Content-Type': 'application/json', ...corsHeaders }
@@ -72,11 +73,13 @@ export default {
       }
     }
 
-    // Events endpoint
+    // --------------------------
+    // GET /api/events
+    // --------------------------
     if (path === '/api/events' && request.method === 'GET') {
       try {
         const lastId = parseInt(url.searchParams.get('since')) || 0;
-        
+
         const response = await fetch(
           `${SUPABASE_URL}/rest/v1/webhook_events?id=gt.${lastId}&order=id.asc`,
           {
@@ -86,13 +89,13 @@ export default {
             }
           }
         );
-        
+
         if (!response.ok) {
           throw new Error(`Database query failed: ${response.status}`);
         }
-        
+
         const events = await response.json();
-        
+
         const transformedEvents = events.map(event => ({
           id: event.id,
           timestamp: event.created_at,
@@ -104,23 +107,25 @@ export default {
           isAdverseMedia: event.is_adverse_media,
           pepDecision: event.pep_decision,
           sanctionDecision: event.sanction_decision,
-          message: event.message,
-          originalData: event.original_data || {}
+          message: event.message
         }));
-        
+
         return new Response(JSON.stringify({
           events: transformedEvents,
           totalFound: transformedEvents.length,
-          lastEventId: transformedEvents.length > 0 ? Math.max(...transformedEvents.map(e => e.id)) : lastId
+          lastEventId:
+            transformedEvents.length > 0
+              ? Math.max(...transformedEvents.map(e => e.id))
+              : lastId
         }), {
           headers: { 'Content-Type': 'application/json', ...corsHeaders }
         });
-        
+
       } catch (error) {
         console.error('Events API error:', error);
-        return new Response(JSON.stringify({ 
-          error: 'Processing error', 
-          details: error.message 
+        return new Response(JSON.stringify({
+          error: 'Processing error',
+          details: error.message
         }), {
           status: 500,
           headers: { 'Content-Type': 'application/json', ...corsHeaders }
@@ -128,7 +133,9 @@ export default {
       }
     }
 
-    // Health check
+    // --------------------------
+    // GET /api/health
+    // --------------------------
     if (path === '/api/health' && request.method === 'GET') {
       return new Response(JSON.stringify({
         status: 'ok',
@@ -139,9 +146,12 @@ export default {
       });
     }
 
-    return new Response(JSON.stringify({ error: 'Not found' }), { 
-      status: 404, 
-      headers: { 'Content-Type': 'application/json', ...corsHeaders } 
+    // --------------------------
+    // 404 fallback
+    // --------------------------
+    return new Response(JSON.stringify({ error: 'Not found' }), {
+      status: 404,
+      headers: { 'Content-Type': 'application/json', ...corsHeaders }
     });
   }
 };
