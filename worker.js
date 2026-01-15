@@ -1,5 +1,5 @@
-const SUPABASE_URL = 'https://nkfduoyzmmjolxtaansw.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5rZmR1b3l6bW1qb2x4dGFhbnN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM1MjI4NDAsImV4cCI6MjA3OTA5ODg0MH0.k2RoRjHGxHOd-tJwuam9OL1KwzLiCiZuwGmjZ_ia0kU';
+const SUPABASE_URL = 'https://uhwgcxxhormhvamolpvc.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVod2djeHhob3JtaHZhbW9scHZjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc2MDMyNTQsImV4cCI6MjA3MzE3OTI1NH0.gYNfKc9OUv9ZHuWj7l166M1I6s80HZkYCF3td6H4-AQ';
 
 export default {
   async fetch(request, env, ctx) {
