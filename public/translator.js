@@ -26,8 +26,8 @@ const Translator = (function() {
             },
             "onboarding": {
                 "title": "Core System Onboarding UI",
-                "decentralized": "Decentralized Process",
-                "centralized": "Centralized Process",
+                "decentralized": "Decentralized Process (via link)",
+                "centralized": "Centralized Process (via queue)",
                 "decentralizedTitle": "Decentralized Onboarding",
                 "centralizedTitle": "Centralized Onboarding",
                 "synchronous": "Synchronous",
@@ -157,8 +157,8 @@ const Translator = (function() {
             },
             "onboarding": {
                 "title": "Interface d'Onboarding du Système Central",
-                "decentralized": "Processus Décentralisé",
-                "centralized": "Processus Centralisé",
+                "decentralized": "Processus Décentralisé (via link)",
+                "centralized": "Processus Centralisé (via queue)",
                 "decentralizedTitle": "Onboarding Décentralisé",
                 "centralizedTitle": "Onboarding Centralisé",
                 "synchronous": "Synchrone",
