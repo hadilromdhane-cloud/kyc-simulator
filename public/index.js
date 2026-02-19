@@ -1288,7 +1288,7 @@ async function callReonboarding(existingClientId) {
         source_of_funds: formData.source_of_funds ? [formData.source_of_funds] : [],
         product: formData.product ? [formData.product] : []
       },
-      formId: "35"
+        formId: entityType === 'PM' ? "2" : "1"  // PP=1, PM=2
     };
 
     const res = await fetch('https://greataml.com/kyc-web-restful/onboarding/onboard', {
