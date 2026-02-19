@@ -2193,7 +2193,6 @@ function debugDecentralizedData() {
       lastName: data.lastName
     });
   });
-  
   const mappings = JSON.parse(localStorage.getItem('customerDataMappings') || '{}');
   console.log('Customer mappings:', mappings);
   
