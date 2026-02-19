@@ -428,7 +428,13 @@ function getVisibleTemplates() {
                 { label: t('fields.OrigineDesFonds'), key: 'OrigineDesFonds', type: 'fundsOriginPP', required: true }
             ] ,
             reonboarding: [
-                 { label: t('fields.existingClientId'), key: 'existingClientId' } ]
+                { label: t('fields.nationality'), key: 'nationality', type: 'country' },
+                { label: t('fields.citizenship'), key: 'Country_of_residence', type: 'country' },
+                { label: t('fields.distributionChannel'), key: 'onboarding_channel', type: 'channel' },
+                { label: t('fields.profession'), key: 'profession', type: 'profession' },
+                { label: t('fields.OrigineDesFonds'), key: 'source_of_funds', type: 'fundsOriginPP' },
+                { label: t('fields.targetProducts'), key: 'product', type: 'products' }
+            ]
         },
         PM: {
             decentralized: [{ label: t('fields.businessName'), key: 'businessName' }],
@@ -1262,6 +1268,12 @@ async function callReonboarding(existingClientId) {
     return;
   }
 
+  // Collect form fields from reonboardingFields
+  let formData = {};
+  document.querySelectorAll('#reonboardingFields input, #reonboardingFields select').forEach(input => {
+    formData[input.id.replace('reonboardingFields_', '')] = input.value;
+  });
+
   logMessage(`Starting re-onboarding for client ${existingClientId}...`, 'info');
 
   try {
@@ -1269,12 +1281,12 @@ async function callReonboarding(existingClientId) {
       customerId: parseInt(existingClientId),
       id: parseInt(existingClientId),
       items: {
-        nationality: "",
-        Country_of_residence: "",
-        onboarding_channel: "inagency",
-        profession: "",
-        source_of_funds: [],
-        product: []
+        nationality: formData.nationality || "",
+        Country_of_residence: formData.Country_of_residence || "",
+        onboarding_channel: formData.onboarding_channel || "inagency",
+        profession: formData.profession || "",
+        source_of_funds: formData.source_of_funds ? [formData.source_of_funds] : [],
+        product: formData.product ? [formData.product] : []
       },
       formId: "35"
     };
@@ -1316,6 +1328,8 @@ async function callReonboarding(existingClientId) {
     showNotification('Re-onboarding failed: ' + err.message, 'error');
   }
 }
+
+
 function updateTokenStatusDisplay() {
   const statusIndicator = document.getElementById('tokenStatusIndicator');
   const statusText = document.getElementById('tokenStatusText');
@@ -2512,17 +2526,38 @@ function initializeEventListeners() {
     });
   }
 
-  const submitReonboarding = document.getElementById('submitReonboarding');
-  if (submitReonboarding) {
-    submitReonboarding.addEventListener('click', () => {
-      const clientId = document.getElementById('existingClientId').value;
-      if (!clientId) {
-        showNotification('Please enter an existing Client ID.', 'warning');
-        return;
-      }
-      callReonboarding(clientId);
-    });
-  }
+    // Entity type change → show fields
+const entityTypeReonboarding = document.getElementById('entityTypeReonboarding');
+if (entityTypeReonboarding) {
+  entityTypeReonboarding.addEventListener('change', () => {
+    const entityType = entityTypeReonboarding.value;
+    const reonboardingFields = document.getElementById('reonboardingFields');
+    if (entityType) {
+      renderFields('reonboardingFields', entityType, 'reonboarding');
+    } else {
+      reonboardingFields.innerHTML = '';
+    }
+  });
+}
+
+    // Submit
+    const submitReonboarding = document.getElementById('submitReonboarding');
+    if (submitReonboarding) {
+      submitReonboarding.addEventListener('click', () => {
+        const entityType = document.getElementById('entityTypeReonboarding').value;
+        const clientId = document.getElementById('existingClientId').value;
+        if (!entityType) {
+          showNotification(t('notifications.selectEntityType'), 'warning');
+          return;
+        }
+        if (!clientId) {
+          showNotification('Please enter an existing Client ID.', 'warning');
+          return;
+        }
+        callReonboarding(clientId);
+      });
+    }
+
 
   // Entity type selectors
   const entityTypeDecentralized = document.getElementById('entityTypeDecentralized');

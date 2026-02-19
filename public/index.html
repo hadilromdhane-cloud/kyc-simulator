@@ -160,18 +160,23 @@
             </div>
           </div>
 
-          <!-- ========== RE-ONBOARDING TAB ========== -->
-            <div class="tabContent" id="reonboarding">
-              <h3 data-i18n="onboarding.reonboardingTitle">Re-onboarding</h3>
+          <div class="tabContent" id="reonboarding">
+                <h3 data-i18n="onboarding.reonboardingTitle">Re-onboarding</h3>
 
+                <label for="entityTypeReonboarding"><b data-i18n="onboarding.entityType">Entity Type:</b></label>
+                <select id="entityTypeReonboarding">
+                  <option value="" data-i18n="onboarding.selectEntityType">Select Entity Type</option>
+                  <option value="PP" data-i18n="onboarding.physicalPerson">Physical Person (PP)</option>
+                  <option value="PM" data-i18n="onboarding.legalPerson">Legal Person (PM)</option>
+                </select>
 
+                <label for="existingClientId"><b data-i18n="fields.existingClientId">Existing Client ID:</b></label>
+                <input type="text" id="existingClientId" data-i18n-placeholder="fields.existingClientIdPlaceholder" placeholder="Enter existing client ID" />
 
-              <label for="existingClientId"><b data-i18n="onboarding.existingClientId">Existing Client ID:</b></label>
-              <input type="text" id="existingClientId" data-i18n-placeholder="onboarding.existingClientIdPlaceholder" placeholder="Enter existing client ID" />
+                <div id="reonboardingFields"></div>
 
-              <div id="reonboardingFields"></div>
-              <button id="submitReonboarding" data-i18n="onboarding.simulate">Simulate</button>
-            </div>
+                <button id="submitReonboarding" data-i18n="onboarding.simulate">Simulate</button>
+              </div>
           
         </div> <!-- Close content wrapper -->
       </section>
