@@ -1247,7 +1247,75 @@ function createNotificationElements() {
   updateNotificationBadge();
   updateTokenStatusDisplay();
 }
+async function callReonboarding(existingClientId) {
+  if (!tenantName) {
+    showNotification(t('notifications.authenticate'), 'warning');
+    return;
+  }
 
+  let currentAuthToken;
+  try {
+    currentAuthToken = await tokenManager.getValidToken();
+    if (!currentAuthToken) throw new Error('No valid token available');
+  } catch (tokenError) {
+    showNotification('Authentication expired. Please login again.', 'error');
+    return;
+  }
+
+  logMessage(`Starting re-onboarding for client ${existingClientId}...`, 'info');
+
+  try {
+    const payload = {
+      customerId: parseInt(existingClientId),
+      id: parseInt(existingClientId),
+      items: {
+        nationality: "",
+        Country_of_residence: "",
+        onboarding_channel: "inagency",
+        profession: "",
+        source_of_funds: [],
+        product: []
+      },
+      formId: "35"
+    };
+
+    const res = await fetch('https://greataml.com/kyc-web-restful/onboarding/onboard', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-auth-tenant': tenantName,
+        'x-auth-token': currentAuthToken
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+
+    localStorage.setItem(`processType_${existingClientId}`, 'reonboarding');
+
+    logMessage(`Re-onboarding completed for client ${existingClientId}`, 'success');
+    showNotification(`Re-onboarding initiated for client ${existingClientId}`, 'success');
+
+    const reisId = data.reisId || data.id || existingClientId;
+    const customerCardUrl = `https://greataml.com/profiles/customer-card/${reisId}`;
+
+    showScreeningResponsePopup(
+      `<div style="padding: 15px; background: #f0f8ff; border-radius: 6px;">
+        <strong style="color: #007ACC;">♻️ Re-onboarding Initiated</strong>
+        <p>Client <strong>${existingClientId}</strong> has been submitted for re-onboarding.</p>
+        <p>The compliance team will review the updated data.</p>
+      </div>`,
+      customerCardUrl,
+      false,
+      {},
+      data
+    );
+
+  } catch (err) {
+    logMessage(`Re-onboarding error: ${err.message}`, 'error');
+    showNotification('Re-onboarding failed: ' + err.message, 'error');
+  }
+}
 function updateTokenStatusDisplay() {
   const statusIndicator = document.getElementById('tokenStatusIndicator');
   const statusText = document.getElementById('tokenStatusText');
@@ -2441,6 +2509,18 @@ function initializeEventListeners() {
         return;
       }
       callSearchAsync(entityType, 'asyncFields');
+    });
+  }
+
+  const submitReonboarding = document.getElementById('submitReonboarding');
+  if (submitReonboarding) {
+    submitReonboarding.addEventListener('click', () => {
+      const clientId = document.getElementById('existingClientId').value;
+      if (!clientId) {
+        showNotification('Please enter an existing Client ID.', 'warning');
+        return;
+      }
+      callReonboarding(clientId);
     });
   }
 
