@@ -36,7 +36,9 @@ const Translator = (function() {
                 "selectEntityType": "Select Entity Type",
                 "physicalPerson": "Physical Person (PP)",
                 "legalPerson": "Legal Person (PM)",
-                "simulate": "Simulate"
+                "simulate": "Simulate",
+                "reonboarding": "Re-onboarding",
+                "reonboardingTitle": "Re-onboarding"
             },
             "popup": {
                 "close": "Close"
@@ -102,7 +104,10 @@ const Translator = (function() {
                 "selectLegalForm": "Select Legal Form",
                 "selectActivitySector": "Select Activity Sector",
                 "selectFundsOrigin": "Select Funds Origin",
-                "selectSourceOfFunds": "Select Source of Funds"
+                "selectSourceOfFunds": "Select Source of Funds",
+                "existingClientId": "Existing Client ID",
+                "existingClientIdPlaceholder": "Enter existing client ID"
+
 
                 
             },
@@ -167,7 +172,11 @@ const Translator = (function() {
                 "selectEntityType": "Sélectionner un Type d'Entité",
                 "physicalPerson": "Personne Physique (PP)",
                 "legalPerson": "Personne Morale (PM)",
-                "simulate": "Simuler"
+                "simulate": "Simuler", 
+                "reonboarding": "Ré-onboarding",
+                "reonboardingTitle": "Ré-onboarding"
+       
+                
             },
             "popup": {
                 "close": "Fermer"
@@ -234,8 +243,9 @@ const Translator = (function() {
                 "selectLegalForm": "Sélectionner la forme juridique",
                 "selectActivitySector": "Sélectionner le secteur d'activité",
                 "selectFundsOrigin": "Sélectionner l'origine des fonds",
-                "selectSourceOfFunds": "Sélectionner l'origine des fonds"
-
+                "selectSourceOfFunds": "Sélectionner l'origine des fonds",
+                "existingClientId": "ID Client Existant",
+                "existingClientIdPlaceholder": "Entrez l'ID du client existant"
 
             },
             "messages": {
@@ -359,7 +369,13 @@ const Translator = (function() {
                 if (entityType && typeof window.renderFields === 'function') {
                     window.renderFields('asyncFields', entityType, 'async');
                 }
+            } else if (tabType === 'reonboarding') {
+                const entityType = document.getElementById('entityTypeReonboarding').value;
+                if (entityType && typeof window.renderFields === 'function') {
+                    window.renderFields('reonboardingFields', entityType, 'reonboarding');
+                }
             }
+
         }
     }
 
