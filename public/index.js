@@ -426,7 +426,9 @@ function getVisibleTemplates() {
                 { label: t('fields.distributionChannel'), key: 'canal', type: 'channel', required: true },
                 { label: t('fields.annualIncome'), key: 'revenu', type: 'number', placeholder: t('fields.numericOnly'), required: true },
                 { label: t('fields.OrigineDesFonds'), key: 'OrigineDesFonds', type: 'fundsOriginPP', required: true }
-            ]
+            ] ,
+            reonboarding: [
+                 { label: t('fields.existingClientId'), key: 'existingClientId' } ]
         },
         PM: {
             decentralized: [{ label: t('fields.businessName'), key: 'businessName' }],
@@ -445,7 +447,9 @@ function getVisibleTemplates() {
                 { label: t('fields.distributionChannel'), key: 'canal', type: 'channel', required: true },
                 { label: t('fields.targetProducts'), key: 'produits', type: 'products', required: true },
                 { label: t('fields.fundsOrigin'), key: 'fundsOrigin', type: 'fundsOrigin', required: true }
-            ]
+            ],
+            reonboarding: [
+                 { label: t('fields.existingClientId'), key: 'existingClientId' } ]            
         }
     };
 }
