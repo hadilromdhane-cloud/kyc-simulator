@@ -1253,7 +1253,7 @@ function createNotificationElements() {
   updateNotificationBadge();
   updateTokenStatusDisplay();
 }
-async function callReonboarding(existingClientId) {
+async function callReonboarding(existingClientId, entityType) {  // ✅ receive entityType
   if (!tenantName) {
     showNotification(t('notifications.authenticate'), 'warning');
     return;
@@ -1268,7 +1268,6 @@ async function callReonboarding(existingClientId) {
     return;
   }
 
-  // Collect form fields from reonboardingFields
   let formData = {};
   document.querySelectorAll('#reonboardingFields input, #reonboardingFields select').forEach(input => {
     formData[input.id.replace('reonboardingFields_', '')] = input.value;
@@ -1288,7 +1287,7 @@ async function callReonboarding(existingClientId) {
         source_of_funds: formData.source_of_funds ? [formData.source_of_funds] : [],
         product: formData.product ? [formData.product] : []
       },
-        formId: entityType === 'PM' ? "2" : "1"  // PP=1, PM=2
+      formId: entityType === 'PM' ? "2" : "1"  // ✅ use passed entityType
     };
 
     const res = await fetch('https://greataml.com/kyc-web-restful/onboarding/onboard', {
@@ -1328,6 +1327,7 @@ async function callReonboarding(existingClientId) {
     showNotification('Re-onboarding failed: ' + err.message, 'error');
   }
 }
+
 
 
 function updateTokenStatusDisplay() {
@@ -2541,22 +2541,23 @@ if (entityTypeReonboarding) {
 }
 
     // Submit
-    const submitReonboarding = document.getElementById('submitReonboarding');
-    if (submitReonboarding) {
-      submitReonboarding.addEventListener('click', () => {
-        const entityType = document.getElementById('entityTypeReonboarding').value;
-        const clientId = document.getElementById('existingClientId').value;
-        if (!entityType) {
-          showNotification(t('notifications.selectEntityType'), 'warning');
-          return;
-        }
-        if (!clientId) {
-          showNotification('Please enter an existing Client ID.', 'warning');
-          return;
-        }
-        callReonboarding(clientId);
-      });
+   const submitReonboarding = document.getElementById('submitReonboarding');
+if (submitReonboarding) {
+  submitReonboarding.addEventListener('click', () => {
+    const entityType = document.getElementById('entityTypeReonboarding').value;
+    const clientId = document.getElementById('existingClientId').value.trim();
+    
+    if (!entityType) {
+      showNotification(t('notifications.selectEntityType'), 'warning');
+      return;
     }
+    if (!clientId) {
+      showNotification('Please enter an existing Client ID.', 'warning');
+      return;
+    }
+    callReonboarding(clientId, entityType);  // ✅ pass entityType explicitly
+  });
+}
 
 
   // Entity type selectors
