@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:api.anthropic.com)",
+      "Bash(curl -s \"https://api.anthropic.com/v1/design/h/x3VT2hzOvsST5UEnP66fPA\" -o /tmp/design.json -w \"%{http_code} %{size_download}\\\\n\")",
+      "Bash(mkdir -p .claude/tmp)",
+      "Bash(curl -s \"https://api.anthropic.com/v1/design/h/x3VT2hzOvsST5UEnP66fPA\" -o .claude/tmp/design.json -w \"%{http_code} %{size_download}\\\\n\")",
+      "Bash(xxd)",
+      "Bash(mkdir -p .claude/tmp/design)",
+      "Bash(tar -xzf .claude/tmp/design.json -C .claude/tmp/design)",
+      "Bash(python -c ' *)",
+      "Bash(rm -rf ../.claude/tmp)",
+      "Bash(rm -rf .claude/tmp)",
+      "Bash(mkdir -p clean)",
+      "Bash(python)"
+    ]
+  }
+}
