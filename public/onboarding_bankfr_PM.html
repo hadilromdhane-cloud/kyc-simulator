@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Onboarding PM - BankFR</title>
+    <link rel="stylesheet" href="vneuron/tokens.css">
+    <link rel="stylesheet" href="vneuron/onboarding-luxe.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="icon" type="image/png" href="vneuron/assets/logo-spark.png">
     <style>
         * {
             margin: 0;
@@ -12,7 +18,7 @@
         }
 
         body {
-            font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: var(--font-sans);
             background: white;
             min-height: 100vh;
             padding: 20px;
@@ -128,7 +134,7 @@
         }
 
         .required {
-            color: #dc3545;
+            color: var(--vn-danger);
         }
 
         input[type="text"],
@@ -292,7 +298,7 @@
         }
 
         .add-btn {
-            background: #28a745;
+            background: var(--vn-success);
             color: white;
             border: none;
             padding: 10px 20px;
@@ -303,7 +309,7 @@
         }
 
         .remove-btn {
-            background: #dc3545;
+            background: var(--vn-danger);
             color: white;
             border: none;
             padding: 5px 10px;
@@ -706,7 +712,7 @@
                 
                 requiredFields.forEach(field => {
                     if (!field.value.trim()) {
-                        field.style.borderColor = '#dc3545';
+                        field.style.borderColor = 'var(--vn-danger)';
                         isValid = false;
                     } else {
                         field.style.borderColor = '#e9ecef';
@@ -859,7 +865,7 @@
             inputs.forEach(input => {
                 input.addEventListener('blur', function() {
                     if (this.hasAttribute('required') && !this.value.trim()) {
-                        this.style.borderColor = '#dc3545';
+                        this.style.borderColor = 'var(--vn-danger)';
                     } else {
                         this.style.borderColor = '#e9ecef';
                     }
@@ -884,7 +890,7 @@
             emailInputs.forEach(input => {
                 input.addEventListener('blur', function() {
                     if (this.value && !validateEmail(this.value)) {
-                        this.style.borderColor = '#dc3545';
+                        this.style.borderColor = 'var(--vn-danger)';
                     }
                 });
             });
@@ -893,7 +899,7 @@
             phoneInputs.forEach(input => {
                 input.addEventListener('blur', function() {
                     if (this.value && !validatePhone(this.value)) {
-                        this.style.borderColor = '#dc3545';
+                        this.style.borderColor = 'var(--vn-danger)';
                     }
                 });
             });
@@ -907,5 +913,8 @@
         PMOnboardingHandler.init('pmOnboardingForm', 'bankfr');
     });
 </script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => { try { window.lucide && lucide.createIcons(); } catch(_){} });
+    </script>
 </body>
 </html>

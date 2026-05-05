@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Onboarding Client - BankFR</title>
+    <link rel="stylesheet" href="vneuron/tokens.css">
+    <link rel="stylesheet" href="vneuron/onboarding-luxe.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="icon" type="image/png" href="vneuron/assets/logo-spark.png">
     <style>
         * {
             margin: 0;
@@ -12,7 +18,7 @@
         }
 
         body {
-            font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: var(--font-sans);
             background: white;
             min-height: 100vh;
             padding: 20px;
@@ -124,7 +130,7 @@
         }
 
         .required {
-            color: #dc3545;
+            color: var(--vn-danger);
         }
 
         input[type="text"],
@@ -283,7 +289,8 @@
             <div id="identification" class="tab-content active">
                 <div class="form-section">
                     <h2 class="section-title">
-                        👤 Identification du Client
+                        <i data-lucide="user-round" class="lx-icon"></i>
+                        <span>Identification du Client</span>
                     </h2>
                     
                     <div class="form-row">
@@ -342,7 +349,8 @@
 
                 <div class="form-section">
                     <h2 class="section-title">
-                        🏠 Adresse de Résidence
+                        <i data-lucide="home" class="lx-icon"></i>
+                        <span>Adresse de Résidence</span>
                     </h2>
                     
                     <div class="form-row full-width">
@@ -374,7 +382,8 @@
 
                 <div class="form-section">
                     <h2 class="section-title">
-                        📄 Pièce d'identité
+                        <i data-lucide="file-text" class="lx-icon"></i>
+                        <span>Pièce d'identité</span>
                     </h2>
                     
                     <div class="form-row">
@@ -411,7 +420,8 @@
             <div id="financial" class="tab-content">
                 <div class="form-section">
                     <h2 class="section-title">
-                        💰 Informations Financières
+                        <i data-lucide="banknote" class="lx-icon"></i>
+                        <span>Informations Financières</span>
                     </h2>
                     
                     <div class="form-row">
@@ -614,6 +624,9 @@
         }
 
 
+    </script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => { try { window.lucide && lucide.createIcons(); } catch(_){} });
     </script>
 </body>
 </html>
