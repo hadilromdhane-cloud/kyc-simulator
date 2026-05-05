@@ -508,40 +508,41 @@
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="canalDistribution">Canal de distribution <span class="required">*</span></label>
+                            <label for="canalDistribution">Distribution Channel <span class="required">*</span></label>
                             <select id="canalDistribution" name="canal_de_distribution" required>
-                                <option value="">-- Sélectionner --</option>
-                                <option value="online">En ligne</option>
-                                <option value="inagency">En personne (vente directe)</option>
+                                <option value="">-- Select --</option>
+                                <option value="In person / Physical meeting">In person / Physical meeting</option>
+                                <option value="Online / Virtual meeting">Online / Virtual meeting</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="produitsCibles">Produits/Services cibles <span class="required">*</span></label>
+                            <label for="produitsCibles">Target Products/Services <span class="required">*</span></label>
                             <select id="produitsCibles" name="produit" required>
-                                <option value="">-- Sélectionner --</option>
-                                <option value="currentAccount">Compte Courant Professionnel</option>
-                                <option value="businessLoan">Crédit Professionnel</option>
-                                <option value="cashManagement">Gestion de Trésorerie</option>
-                                <option value="tradeFinance">Financement du Commerce</option>
-                                <option value="corporateCard">Carte d'Entreprise</option>
-                                <option value="payroll">Services de Paie</option>
-                                <option value="internetBanking">Internet Banking Professionnel</option>
-                                <option value="remittances">Transferts Internationaux</option>
+                                <option value="">-- Select --</option>
+                                <option value="Mobile Banking">Mobile Banking</option>
+                                <option value="Saving Account">Saving Account</option>
+                                <option value="Current Account">Current Account</option>
+                                <option value="Time Deposit">Time Deposit</option>
+                                <option value="Credit Card">Credit Card</option>
+                                <option value="Debit Card">Debit Card</option>
+                                <option value="Remittances">Remittances</option>
+                                <option value="Internet Banking">Internet Banking</option>
                             </select>
                         </div>
                     </div>
 
                     <div class="form-row full-width">
                         <div class="form-group">
-                            <label for="origineFondsPM">Origine des fonds <span class="required">*</span></label>
+                            <label for="origineFondsPM">Source of Funds <span class="required">*</span></label>
                             <select id="origineFondsPM" name="origine_des_fonds" required>
-                                <option value="">-- Sélectionner --</option>
-                                <option value="businessRevenue">Revenus d'Activité</option>
-                                <option value="capitalContribution">Apport en Capital</option>
-                                <option value="businessLoan">Emprunt Commercial</option>
-                                <option value="investmentReturns">Rendements d'Investissement</option>
-                                <option value="grants">Subventions</option>
-                                <option value="other">Autres (veuillez préciser)</option>
+                                <option value="">-- Select --</option>
+                                <option value="Employment Income">Employment Income</option>
+                                <option value="Business Profits">Business Profits</option>
+                                <option value="Inheritance">Inheritance</option>
+                                <option value="Investment Returns">Investment Returns</option>
+                                <option value="Retirement Pension">Retirement Pension</option>
+                                <option value="Other">Other</option>
+                                <option value="Project manager">Project manager</option>
                             </select>
                         </div>
                     </div>
@@ -904,7 +905,7 @@
 <script>
     // Initialize the PM onboarding handler when the page loads
     document.addEventListener('DOMContentLoaded', function() {
-        PMOnboardingHandler.init('pmOnboardingForm', 'bankfr');
+        PMOnboardingHandler.init('pmOnboardingForm', 'banque_en');
     });
 </script>
 </body>
