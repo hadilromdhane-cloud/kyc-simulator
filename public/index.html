@@ -659,7 +659,7 @@
         const p = document.getElementById('password');
         if (t) t.value = 'bankfr';
         if (u) u.value = 'admin';
-        if (p) p.value = 'admin';
+        if (p) p.value = 'changeit';
         [t,u,p].forEach(el => el && el.dispatchEvent(new Event('change',{bubbles:true})));
         q.innerHTML = '<i data-lucide="check" class="w-3.5 h-3.5"></i><span>Filled — click Authenticate</span>';
         vnRenderIcons();

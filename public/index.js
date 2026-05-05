@@ -565,6 +565,89 @@ const asyncFieldOptions = {
     ]
 };
 
+// English versions of async field options (used when tenant is banque_en)
+const asyncFieldOptionsEN = {
+  idType: [
+    { value: 'cin', label: 'National identity card' },
+    { value: 'passeport', label: 'Passport' },
+    { value: 'titre_sejour', label: 'Residence permit' },
+    { value: 'permis_conduire', label: 'Driver\'s license' }
+  ],
+  profession: [
+    'NOTARY PUBLIC',
+    'UNKNOWN',
+    'AGRICULTURAL WORKERS',
+    'FARMERS',
+    'INDUSTRIAL WORKERS',
+    'CRAFTSMEN',
+    'FISHING INDUSTRY OWNERS',
+    'MAJOR CORPORATION & CEO',
+    'SMALL RETAILERS',
+    'MERCHANTS',
+    'COMM.ARTISAN',
+    'NURSING ASSISTANT',
+    'SELF-EMPLOYED PROFESSIONAL: PHYSICAL PERSON',
+    'SCIENTIFIC PROFESSIONALS',
+    'ENGINEERS & SIMILAR PROFESSIONS'
+  ],
+  products: [
+    { value: 'Mobile Banking', label: 'Mobile Banking' },
+    { value: 'Saving Account', label: 'Saving Account' },
+    { value: 'Current Account', label: 'Current Account' },
+    { value: 'Time Deposit', label: 'Time Deposit' },
+    { value: 'Credit Card', label: 'Credit Card' },
+    { value: 'Debit Card', label: 'Debit Card' },
+    { value: 'Remittances', label: 'Remittances' },
+    { value: 'Internet Banking', label: 'Internet Banking' }
+  ],
+  channel: [
+    { value: 'In person / Physical meeting', label: 'In person / Physical meeting' },
+    { value: 'Online / Virtual meeting', label: 'Online / Virtual meeting' }
+  ],
+  legalForm: [
+    'SARL',
+    'SA',
+    'SAS',
+    'EURL',
+    'SNC',
+    'Association',
+    'Other'
+  ],
+  activitySector: [
+    'Agriculture',
+    'Industries',
+    'Manufacture',
+    'Energy',
+    'Construction',
+    'Commerce',
+    'Transport',
+    'Information',
+    'Finance',
+    'Real Estate',
+    'Scientific',
+    'Services',
+    'Education',
+    'Health'
+  ],
+  fundsOriginPP: [
+    { value: 'Employment Income', label: 'Employment Income' },
+    { value: 'Business Profits', label: 'Business Profits' },
+    { value: 'Inheritance', label: 'Inheritance' },
+    { value: 'Investment Returns', label: 'Investment Returns' },
+    { value: 'Retirement Pension', label: 'Retirement Pension' },
+    { value: 'Other', label: 'Other' },
+    { value: 'Project manager', label: 'Project manager' }
+  ]
+};
+
+// Helper to pick the appropriate options object based on the authenticated tenant
+function getAsyncFieldOptions() {
+  const tenant = (typeof tokenManager !== 'undefined' && tokenManager.getTenant && tokenManager.getTenant())
+    || localStorage.getItem('tenantName')
+    || 'bankfr';
+  return tenant === 'banque_en' ? asyncFieldOptionsEN : asyncFieldOptions;
+}
+
 // FIXED renderFields function
 function renderFields(containerId, entityType, processType) {
     const container = document.getElementById(containerId);
@@ -718,7 +801,7 @@ function renderFields(containerId, entityType, processType) {
         defaultOption.textContent = t('fields.selectIdType');
         input.appendChild(defaultOption);
 
-        asyncFieldOptions.idType.forEach(type => {
+        getAsyncFieldOptions().idType.forEach(type => {
           const option = document.createElement('option');
           option.value = type.value;
           option.textContent = type.label;
@@ -735,7 +818,7 @@ function renderFields(containerId, entityType, processType) {
         defaultOption.textContent = t('fields.selectProfession');
         input.appendChild(defaultOption);
 
-        asyncFieldOptions.profession.forEach(prof => {
+        getAsyncFieldOptions().profession.forEach(prof => {
           const option = document.createElement('option');
           option.value = prof;
           option.textContent = prof;
@@ -752,7 +835,7 @@ function renderFields(containerId, entityType, processType) {
         defaultOption.textContent = t('fields.selectProduct');
         input.appendChild(defaultOption);
 
-        asyncFieldOptions.products.forEach(product => {
+        getAsyncFieldOptions().products.forEach(product => {
           const option = document.createElement('option');
           option.value = product.value;
           option.textContent = product.label;
@@ -769,7 +852,7 @@ function renderFields(containerId, entityType, processType) {
         defaultOption.textContent = t('fields.selectChannel');
         input.appendChild(defaultOption);
 
-        asyncFieldOptions.channel.forEach(channel => {
+        getAsyncFieldOptions().channel.forEach(channel => {
           const option = document.createElement('option');
           option.value = channel.value;
           option.textContent = channel.label;
@@ -786,7 +869,7 @@ function renderFields(containerId, entityType, processType) {
         defaultOption.textContent = t('fields.selectLegalForm');
         input.appendChild(defaultOption);
 
-        asyncFieldOptions.legalForm.forEach(form => {
+        getAsyncFieldOptions().legalForm.forEach(form => {
           const option = document.createElement('option');
           option.value = form;
           option.textContent = form;
@@ -803,7 +886,7 @@ function renderFields(containerId, entityType, processType) {
   defaultOption.textContent = t('fields.selectActivitySector');
   input.appendChild(defaultOption);
 
-  asyncFieldOptions.activitySector.forEach(sector => {
+  getAsyncFieldOptions().activitySector.forEach(sector => {
     const option = document.createElement('option');
     option.value = sector;
     option.textContent = sector;
@@ -820,7 +903,7 @@ else if (field.type === 'fundsOriginPP') {
   defaultOption.textContent = '-- Sélectionner --';
   input.appendChild(defaultOption);
 
-  asyncFieldOptions.fundsOriginPP.forEach(origin => {
+  getAsyncFieldOptions().fundsOriginPP.forEach(origin => {
     const option = document.createElement('option');
     option.value = origin.value;
     option.textContent = origin.label;
