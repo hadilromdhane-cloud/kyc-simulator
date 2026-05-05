@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Customer Onboarding - Banque EN</title>
+    <link rel="stylesheet" href="vneuron/tokens.css">
+    <link rel="stylesheet" href="vneuron/onboarding-luxe.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="icon" type="image/png" href="vneuron/assets/logo-spark.png">
     <style>
         * {
             margin: 0;
@@ -12,8 +18,8 @@
         }
 
         body {
-            font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: var(--font-sans);
+            background: var(--vn-gradient-brand);
             min-height: 100vh;
             padding: 20px;
         }
@@ -124,7 +130,7 @@
         }
 
         .required {
-            color: #dc3545;
+            color: var(--vn-danger);
         }
 
         input[type="text"],
@@ -264,7 +270,8 @@
             <div id="personal" class="tab-content active">
                 <div class="form-section">
                     <h2 class="section-title">
-                        👤 General Information
+                        <i data-lucide="user-round" class="lx-icon"></i>
+                        <span>General Information</span>
                     </h2>
                     
                     <div class="form-row">
@@ -335,7 +342,8 @@
 
                 <div class="form-section">
                     <h2 class="section-title">
-                        🏠 Residential Address
+                        <i data-lucide="home" class="lx-icon"></i>
+                        <span>Residential Address</span>
                     </h2>
                     
                     <div class="form-row full-width">
@@ -380,7 +388,8 @@
 
                 <div class="form-section">
                     <h2 class="section-title">
-                        📄 Identity Document
+                        <i data-lucide="file-text" class="lx-icon"></i>
+                        <span>Identity Document</span>
                     </h2>
                     
                     <div class="form-row">
@@ -417,7 +426,8 @@
             <div id="professional" class="tab-content">
                 <div class="form-section">
                     <h2 class="section-title">
-                        💼 Professional & Financial Information
+                        <i data-lucide="briefcase" class="lx-icon"></i>
+                        <span>Professional & Financial Information</span>
                     </h2>
                     
                     <div class="form-row">
@@ -533,6 +543,9 @@
         document.addEventListener('DOMContentLoaded', function() {
             OnboardingHandler.init('onboardingForm', 'banque_en');
         });
+    </script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => { try { window.lucide && lucide.createIcons(); } catch(_){} });
     </script>
 </body>
 </html>

@@ -3,43 +3,408 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title data-i18n="header.title">Web Service Simulator</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+  <title data-i18n="header.title">Reis™ RCS · Onboarding Simulator</title>
+  <link rel="icon" type="image/png" href="vneuron/assets/logo-spark.png" />
+
+  <!-- Vneuron design tokens (fonts + brand variables) -->
+  <link rel="stylesheet" href="vneuron/tokens.css" />
+  <!-- Visibility/animation logic for tabs, popup, notifications -->
   <link rel="stylesheet" href="styles.css" />
+
+  <!-- Tailwind via Play CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Inter for ultra-modern UI feel; pairs with Raleway for display -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy:   { 50:'#EEF0FB',100:'#D6DAF3',200:'#AAB2E4',300:'#7680CE',400:'#4E59B4',500:'#343B95',600:'#2A3078',700:'#21265C',800:'#181C44',900:'#11132D' },
+            teal:   { 50:'#E6F8F7',100:'#BEEDEC',500:'#0EB1AF',600:'#0B908E',700:'#086F6D' },
+            purple: { 50:'#F4EFF8',500:'#7E58A1',600:'#684684' },
+            ink:    { 0:'#FFFFFF', 25:'#FBFBFD', 50:'#F5F6FA',100:'#EDEFF4',200:'#DEE1EB',300:'#C5C9D8',400:'#9AA0B4',500:'#6E7590',600:'#4E556F',700:'#363C52',800:'#23273A',900:'#141725' }
+          },
+          fontFamily: {
+            sans: ['Inter','Raleway','Helvetica Neue','Arial','sans-serif'],
+            display: ['Raleway','Inter','sans-serif'],
+            mono: ['JetBrains Mono','ui-monospace','Menlo','monospace']
+          },
+          boxShadow: {
+            'glow':   '0 0 0 3px rgba(52,59,149,0.25)',
+            'card':   '0 1px 2px rgba(20,23,37,0.05), 0 8px 24px rgba(20,23,37,0.06)',
+            'lift':   '0 4px 8px rgba(20,23,37,0.06), 0 24px 48px rgba(20,23,37,0.10)',
+            'luxury': '0 20px 60px -10px rgba(52,59,149,0.35), 0 0 0 1px rgba(255,255,255,0.05) inset'
+          },
+          backgroundImage: {
+            'brand-grad': 'linear-gradient(135deg, #2A3078 0%, #7E58A1 55%, #0EB1AF 100%)',
+            'brand-dark': 'linear-gradient(135deg, #12143A 0%, #2A1B4A 50%, #0D3A48 100%)',
+            'mesh':       'radial-gradient(at 0% 0%, rgba(126,88,161,0.25) 0px, transparent 50%), radial-gradient(at 100% 0%, rgba(14,177,175,0.20) 0px, transparent 50%), radial-gradient(at 100% 100%, rgba(52,59,149,0.30) 0px, transparent 50%), radial-gradient(at 0% 100%, rgba(126,88,161,0.20) 0px, transparent 50%)'
+          },
+          keyframes: {
+            float:   { '0%,100%':{transform:'translateY(0)'},'50%':{transform:'translateY(-6px)'} },
+            shimmer: { '0%':{backgroundPosition:'-200% 0'},'100%':{backgroundPosition:'200% 0'} },
+            glow:    { '0%,100%':{opacity:'0.85'},'50%':{opacity:'1'} }
+          },
+          animation: {
+            float:   'float 6s ease-in-out infinite',
+            shimmer: 'shimmer 8s linear infinite',
+            glow:    'glow 3s ease-in-out infinite'
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    body { font-family: 'Inter','Raleway',sans-serif; background:#F5F6FA; }
+
+    /* Ambient mesh + circuit imagery */
+    .ambient-bg::before {
+      content:''; position:fixed; inset:0; z-index:-2;
+      background:
+        radial-gradient(at 8% 4%, rgba(126,88,161,0.18), transparent 45%),
+        radial-gradient(at 96% 8%, rgba(14,177,175,0.14), transparent 45%),
+        radial-gradient(at 50% 100%, rgba(52,59,149,0.10), transparent 60%);
+    }
+    .ambient-bg::after {
+      content:''; position:fixed; inset:0; z-index:-1; opacity:.06; pointer-events:none;
+      background:url('vneuron/assets/background-circuit.png') center/cover no-repeat;
+      mix-blend-mode:luminosity;
+    }
+
+    /* Glass card */
+    .glass {
+      background:rgba(255,255,255,0.72);
+      backdrop-filter:blur(18px) saturate(140%);
+      -webkit-backdrop-filter:blur(18px) saturate(140%);
+      border:1px solid rgba(255,255,255,0.6);
+    }
+
+    /* Gradient text */
+    .grad-text {
+      background:linear-gradient(120deg,#2A3078 0%, #7E58A1 50%, #0EB1AF 100%);
+      -webkit-background-clip:text; background-clip:text; color:transparent;
+    }
+
+    /* Animated gradient border */
+    .grad-border { position:relative; }
+    .grad-border::before {
+      content:''; position:absolute; inset:0; border-radius:inherit; padding:1.5px;
+      background:linear-gradient(120deg,#343B95,#7E58A1,#0EB1AF,#343B95);
+      background-size:300% 300%;
+      -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+              mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+      -webkit-mask-composite:xor; mask-composite:exclude;
+      animation:shimmer 8s linear infinite;
+      pointer-events:none;
+    }
+
+    /* Eyebrow label */
+    .eyebrow { font-size:11px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:#343B95; }
+
+    /* Inputs / selects — luxe variant */
+    .auth-sidebar input,
+    .auth-sidebar select,
+    .main-content input,
+    .main-content select {
+      width:100%; padding:11px 14px; margin-top:6px;
+      background:#fff; color:#141725;
+      border:1px solid #DEE1EB; border-radius:10px;
+      font-size:14px; font-family:inherit;
+      transition:border-color .2s, box-shadow .2s, transform .15s;
+      box-sizing:border-box;
+    }
+    .auth-sidebar input:hover,
+    .auth-sidebar select:hover,
+    .main-content input:hover,
+    .main-content select:hover { border-color:#AAB2E4; }
+    .auth-sidebar input:focus,
+    .auth-sidebar select:focus,
+    .main-content input:focus,
+    .main-content select:focus {
+      outline:none; border-color:#343B95;
+      box-shadow:0 0 0 3px rgba(52,59,149,0.18);
+    }
+
+    /* Labels */
+    .auth-sidebar label,
+    .main-content label {
+      display:block; margin-top:14px; font-size:12px; font-weight:600;
+      color:#363C52; letter-spacing:.02em;
+    }
+
+    /* Primary buttons (preserve IDs/classes used by JS) */
+    .auth-sidebar button#authBtn,
+    button#submitDecentralized, button#submitSync, button#submitAsync, button#submitReonboarding {
+      margin-top:22px; width:100%;
+      padding:13px 18px; border:none; cursor:pointer;
+      font-size:14px; font-weight:600; letter-spacing:.02em;
+      color:#fff; border-radius:12px;
+      background:linear-gradient(135deg,#343B95 0%, #2A3078 60%, #21265C 100%);
+      box-shadow:0 8px 20px -8px rgba(52,59,149,0.6), inset 0 1px 0 rgba(255,255,255,0.18);
+      transition:transform .15s, box-shadow .2s, filter .2s;
+      display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    }
+    .auth-sidebar button#authBtn:hover,
+    button#submitDecentralized:hover, button#submitSync:hover, button#submitAsync:hover, button#submitReonboarding:hover {
+      transform:translateY(-1px); filter:brightness(1.05);
+      box-shadow:0 14px 30px -10px rgba(52,59,149,0.7), inset 0 1px 0 rgba(255,255,255,0.22);
+    }
+    .auth-sidebar button#authBtn:active,
+    button#submitDecentralized:active, button#submitSync:active, button#submitAsync:active, button#submitReonboarding:active {
+      transform:translateY(0) scale(.98);
+    }
+
+    /* Tabs — pill row */
+    .tabs, .subTabs { display:flex; gap:6px; margin-top:18px; padding:6px; flex-wrap:wrap;
+      background:#EDEFF4; border-radius:14px; border:1px solid #DEE1EB; }
+    .tabBtn, .subTabBtn {
+      flex:1 1 auto; min-width:140px; padding:10px 14px;
+      border:none; cursor:pointer; background:transparent;
+      color:#4E556F; font-weight:600; font-size:13px;
+      border-radius:10px; transition:all .2s var(--ease-standard, ease);
+      display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    }
+    .tabBtn:hover, .subTabBtn:hover { color:#21265C; background:rgba(255,255,255,0.6); }
+    .tabBtn.active, .subTabBtn.active {
+      background:#fff; color:#21265C;
+      box-shadow:0 2px 6px rgba(20,23,37,0.08), 0 0 0 1px rgba(52,59,149,0.15);
+    }
+    .subTabs { background:#F5F6FA; border-color:#EDEFF4; margin-top:14px; }
+
+    /* Headings */
+    .auth-sidebar h2 { color:#21265C; font-family:Raleway,Inter,sans-serif; font-weight:700; letter-spacing:-.01em; font-size:18px; margin:0 0 4px; text-align:left; }
+    .main-content h2, .main-content h3 { color:#11132D; font-family:Raleway,Inter,sans-serif; }
+    .main-content h2 { font-weight:800; letter-spacing:-.02em; }
+    .main-content h3 { font-weight:700; letter-spacing:-.01em; margin-top:20px; }
+
+    /* Token status pill — preserve IDs */
+    .token-status-container { margin-top:18px; padding:12px 14px;
+      background:linear-gradient(135deg,#F5F6FA 0%, #EDEFF4 100%);
+      border:1px solid #DEE1EB; border-radius:12px; }
+    .token-status-label { font-size:10px; font-weight:700; color:#6E7590;
+      text-transform:uppercase; letter-spacing:.14em; margin-bottom:6px; display:block; }
+    .token-status-badge { display:flex; align-items:center; gap:10px; }
+    .token-status-indicator { width:9px; height:9px; border-radius:999px; background:#9AA0B4;
+      flex-shrink:0; box-shadow:0 0 0 3px rgba(154,160,180,0.18); animation:pulse-dot 2s ease-in-out infinite; }
+    .token-status-indicator.valid   { background:#10A66F; box-shadow:0 0 0 3px rgba(16,166,111,0.25); }
+    .token-status-indicator.refresh { background:#E0A43B; box-shadow:0 0 0 3px rgba(224,164,59,0.25); }
+    .token-status-indicator.expired { background:#D8434E; box-shadow:0 0 0 3px rgba(216,67,78,0.25); }
+    .token-status-indicator.none    { background:#9AA0B4; }
+    .token-status-text { font-size:13px; color:#141725; font-weight:600; }
+    @keyframes pulse-dot { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.25);opacity:.75} }
+
+    /* Language toggle — top-right glass pill */
+    .language-selector {
+      position:fixed; top:16px; right:20px; z-index:1000;
+      display:inline-flex; align-items:center; gap:0; height:38px; padding:3px;
+      background:rgba(255,255,255,0.7); backdrop-filter:blur(14px);
+      border:1px solid rgba(52,59,149,0.18); border-radius:999px;
+      box-shadow:0 8px 24px -10px rgba(52,59,149,0.35);
+    }
+    .lang-toggle-btn {
+      height:32px; padding:0 16px; border-radius:999px; border:0; cursor:pointer;
+      background:transparent; color:#21265C; font-weight:600; font-size:12px; letter-spacing:.06em;
+      transition:all .2s ease;
+    }
+    .lang-toggle-btn:hover:not(.active) { background:rgba(52,59,149,0.08); }
+    .lang-toggle-btn.active {
+      background:linear-gradient(135deg,#343B95 0%,#2A3078 100%); color:#fff;
+      box-shadow:0 4px 12px -4px rgba(52,59,149,0.5);
+    }
+
+    /* Notification toggle */
+    .notification-selector {
+      position:fixed; top:16px; right:170px; z-index:1000;
+      display:inline-flex; align-items:center; height:38px; padding:3px;
+      background:rgba(255,255,255,0.7); backdrop-filter:blur(14px);
+      border:1px solid rgba(52,59,149,0.18); border-radius:999px;
+      box-shadow:0 8px 24px -10px rgba(52,59,149,0.35);
+    }
+    .notification-toggle-btn {
+      height:32px; padding:0 14px; border:0; border-radius:999px;
+      background:transparent; cursor:pointer;
+      color:#21265C; font-weight:600; font-size:12px;
+      display:inline-flex; align-items:center; gap:6px; white-space:nowrap;
+    }
+    .notification-toggle-btn:hover { background:rgba(52,59,149,0.08); }
+
+    /* Popup */
+    #popup {
+      display:none; position:fixed; inset:50% auto auto 50%;
+      transform:translate(-50%,-50%); z-index:1000;
+      background:rgba(255,255,255,0.95); backdrop-filter:blur(20px);
+      border:1px solid rgba(52,59,149,0.15); border-radius:18px;
+      padding:28px 30px; min-width:min(440px,92vw); max-width:min(620px,95vw);
+      box-shadow:0 30px 80px -20px rgba(20,23,37,0.45);
+    }
+
+    /* Tab content visibility (preserves index.js logic) */
+    .tabContent, .subTabContent { display:none; margin-top:18px; }
+    .tabContent.active, .subTabContent.active { display:block; animation:fadeUp .3s ease; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+
+    /* Sidebar collapse logic */
+    .auth-sidebar.collapsed .sidebar-content { opacity:0; visibility:hidden; pointer-events:none; }
+
+    /* Float effect on the spark mark */
+    .spark-mark { animation:float 6s ease-in-out infinite; }
+
+    /* ============== VERTICAL SIDE RIBBONS ============== */
+    .side-ribbon {
+      position: fixed;
+      top: 0; bottom: 0;
+      width: 120px;
+      z-index: 1;
+      overflow: hidden;
+      pointer-events: none;
+      /* Light-gray glassmorphism */
+      background: linear-gradient(180deg, rgba(245,246,250,0.72) 0%, rgba(237,239,244,0.78) 100%);
+      backdrop-filter: blur(18px) saturate(135%);
+      -webkit-backdrop-filter: blur(18px) saturate(135%);
+    }
+    .side-ribbon.left {
+      left: 0;
+      border-right: 1px solid rgba(255,255,255,0.65);
+      box-shadow:
+        1px 0 0 rgba(52,59,149,0.06),
+        12px 0 32px -16px rgba(20,23,37,0.18);
+    }
+    .side-ribbon.right { right: 0; }
+
+    .side-track {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 64px;
+      padding: 40px 0;
+      will-change: transform;
+    }
+    .side-track.up   { animation: side-up   45s linear infinite; }
+    .side-track.down { animation: side-down 45s linear infinite; }
+    .side-ribbon:hover .side-track { animation-play-state: paused; }
+
+    .side-track img {
+      height: 50px;
+      width: auto;
+      max-width: 90px;
+      object-fit: contain;
+      pointer-events: auto;
+      filter: contrast(1.04) saturate(1.10)
+              drop-shadow(0 6px 14px rgba(20,23,37,0.14));
+      transition: transform .35s cubic-bezier(.2,0,0,1), filter .35s ease;
+    }
+    .side-track img:hover {
+      transform: scale(1.12);
+      filter: contrast(1.08) saturate(1.20)
+              drop-shadow(0 14px 26px rgba(52,59,149,0.30));
+    }
+
+    @keyframes side-up   { from { transform: translateY(0); }   to { transform: translateY(-50%); } }
+    @keyframes side-down { from { transform: translateY(-50%); } to { transform: translateY(0); } }
+
+    /* Hide on narrower screens where ribbons would crowd the main content */
+    @media (max-width: 1500px) { .side-ribbon { display: none; } }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .main-layout-grid { grid-template-columns: 1fr !important; }
+      .auth-sidebar { position:relative !important; top:auto !important; }
+    }
+  </style>
 </head>
-<body>
-  <!-- Language Selector -->
+<body class="ambient-bg text-ink-900 antialiased min-h-screen">
+
+  <!-- Top-right glass controls -->
   <div class="language-selector">
     <button class="lang-toggle-btn" data-lang="en">EN</button>
     <button class="lang-toggle-btn active" data-lang="fr">FR</button>
   </div>
-<div class="notification-selector">
-  <button id="notificationHistoryBtn" class="notification-toggle-btn"></button>
-</div>
+  <div class="notification-selector">
+    <button id="notificationHistoryBtn" class="notification-toggle-btn">
+      <i data-lucide="bell" class="w-4 h-4"></i>
+      <span>Notifications</span>
+    </button>
+  </div>
 
-  
+  <!-- ======= HERO HEADER ======= -->
+  <header class="relative overflow-hidden">
+    <div class="absolute inset-0 bg-brand-grad opacity-95"></div>
+    <div class="absolute inset-0 bg-mesh"></div>
+    <div class="absolute inset-0 opacity-15" style="background:url('vneuron/assets/background-streams.png') center/cover; mix-blend-mode:screen;"></div>
+    <div class="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-b from-transparent to-ink-50"></div>
 
-  <!-- Header -->
-  <header>
+    <div class="relative max-w-7xl mx-auto px-6 lg:px-10 pt-12 pb-24">
+      <div class="flex items-center gap-3 mb-6">
+        <img src="vneuron/assets/logo-spark-white.png" alt="" class="h-9 w-9 spark-mark drop-shadow-lg" />
+        <div class="flex items-center gap-2 text-white/80 text-xs tracking-[.18em] uppercase font-semibold">
+          <span>Vneuron</span><span class="opacity-50">·</span>
+          <span>Reis™ Risk &amp; Compliance Suite</span>
+        </div>
+      </div>
+      <h1 class="font-display font-extrabold text-white text-4xl md:text-5xl leading-[1.05] tracking-tight max-w-3xl">
+        Onboarding <span class="text-teal-100">Simulator</span>
+      </h1>
+      <p class="mt-4 max-w-2xl text-white/80 text-base md:text-lg font-medium">
+        Pre-sales control panel — configure a tenant, pick a flow, hand the link to the analyst.
+      </p>
+    </div>
   </header>
 
-  <!-- Main Layout -->
-  <div class="main-layout">
-    
-    <!-- ========== AUTHENTICATION SIDEBAR ========== -->
-    <aside id="authSidebar" class="auth-sidebar">
-      <!-- Full-width responsive logo banner -->
-      <div style="margin: -20px -20px 20px -20px; padding: clamp(12px, 3vw, 20px); background: linear-gradient(135deg, #f0f8ff 0%, #e3f2fd 100%); display: flex; align-items: center; justify-content: center; gap: clamp(10px, 2vw, 20px); border-bottom: 3px solid #007ACC; flex-wrap: wrap;">
-        <img src="logos/logo_vneuron.png" alt="Vneuron Logo" style="height: clamp(35px, 5vw, 50px); max-width: 45%; object-fit: contain;">
-        <div style="width: 2px; height: clamp(30px, 4vw, 40px); background: #007ACC; opacity: 0.3;"></div>
-        <img src="logos/logo_reis.png" alt="Reis Logo" style="height: clamp(35px, 5vw, 50px); max-width: 45%; object-fit: contain;">
+  <!-- ======= CORE BANKING PARTNERS — VERTICAL SIDE RIBBONS ======= -->
+  <aside class="side-ribbon left" aria-label="Core-banking platforms (left ribbon)">
+    <div class="side-track up">
+      <img src="logos/clean/Temenos-T24.png"          alt="Temenos T24" />
+      <img src="logos/clean/Oracle Flexcube.png"      alt="Oracle FlexCube" />
+      <img src="logos/clean/Orass suite.PNG"          alt="Orass Suite" />
+      <img src="logos/clean/dynamics.png"             alt="Microsoft Dynamics 365" />
+      <img src="logos/clean/Ethix.png"                alt="Ethix Financial Solutions" />
+      <img src="logos/clean/Orien Capital marker.png" alt="Orion Capital Markets" />
+      <img src="logos/clean/Sopra Amplitude.png"      alt="Sopra Amplitude" />
+      <img src="logos/clean/Cathago BFI.png"          alt="Cathago BFI" />
+      <img src="logos/clean/gimpay.png"               alt="Gimpay" />
+      <!-- duplicate for seamless loop -->
+      <img src="logos/clean/Temenos-T24.png"          alt="" aria-hidden="true" />
+      <img src="logos/clean/Oracle Flexcube.png"      alt="" aria-hidden="true" />
+      <img src="logos/clean/Orass suite.PNG"          alt="" aria-hidden="true" />
+      <img src="logos/clean/dynamics.png"             alt="" aria-hidden="true" />
+      <img src="logos/clean/Ethix.png"                alt="" aria-hidden="true" />
+      <img src="logos/clean/Orien Capital marker.png" alt="" aria-hidden="true" />
+      <img src="logos/clean/Sopra Amplitude.png"      alt="" aria-hidden="true" />
+      <img src="logos/clean/Cathago BFI.png"          alt="" aria-hidden="true" />
+      <img src="logos/clean/gimpay.png"               alt="" aria-hidden="true" />
+    </div>
+  </aside>
+
+
+  <!-- ======= MAIN GRID ======= -->
+  <div class="main-layout main-layout-grid relative -mt-16 max-w-7xl mx-auto px-6 lg:px-10 pb-16"
+       style="display:grid; grid-template-columns:340px 1fr; gap:24px;">
+
+    <!-- ========== AUTH SIDEBAR ========== -->
+    <aside id="authSidebar" class="auth-sidebar glass rounded-2xl shadow-luxury overflow-hidden self-start sticky top-6">
+      <!-- Sidebar header -->
+      <div class="relative px-5 pt-5 pb-4 bg-gradient-to-br from-navy-50 to-white border-b border-ink-100">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="relative">
+            <div class="w-10 h-10 rounded-xl bg-brand-grad flex items-center justify-center shadow-luxury">
+              <img src="vneuron/assets/logo-spark-white.png" alt="" class="w-5 h-5" />
+            </div>
+            <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-teal-500 border-2 border-white rounded-full animate-glow"></span>
+          </div>
+          <div>
+            <div class="eyebrow">Tenant Session</div>
+            <h2 data-i18n="authentication.title" class="font-display !text-base !font-bold !mt-0.5">Authenticate</h2>
+          </div>
+        </div>
       </div>
 
-      <!-- Sidebar Content -->
-      <div class="sidebar-content" style="padding: 0 5px;">
-        <h2 data-i18n="authentication.title">Authentication on the simulation tenant</h2>
-
-        <label for="tenantName" data-i18n="authentication.tenantName">Tenant Name:</label>
+      <div class="sidebar-content px-5 py-5">
+        <label for="tenantName" data-i18n="authentication.tenantName">Tenant</label>
         <select id="tenantName">
           <option value="" data-i18n="authentication.selectTenant">Select Tenant</option>
           <option value="banque_en">banque_en</option>
@@ -53,15 +418,24 @@
           <option value="pssandbox">pssandbox</option>
         </select>
 
-        <label for="username" data-i18n="authentication.username">Username:</label>
+        <label for="username" data-i18n="authentication.username">Username</label>
         <input type="text" id="username" data-i18n-placeholder="authentication.usernamePlaceholder" placeholder="Enter username" />
 
-        <label for="password" data-i18n="authentication.password">Password:</label>
-        <input type="password" id="password" data-i18n-placeholder="authentication.passwordPlaceholder" placeholder="Enter password" />
+        <label for="password" data-i18n="authentication.password">Password</label>
+        <input type="password" id="password" data-i18n-placeholder="authentication.passwordPlaceholder" placeholder="••••••••" />
 
-        <button id="authBtn" data-i18n="authentication.authButton">Authenticate</button>
+        <button id="authBtn" data-i18n="authentication.authButton">
+          <i data-lucide="key-round" class="w-4 h-4"></i>
+          <span>Authenticate</span>
+        </button>
 
-        <!-- Token Status -->
+        <!-- Quick-demo prefill: one click for live presentations -->
+        <button type="button" id="vnQuickDemo"
+                class="mt-2 w-full inline-flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border border-dashed border-navy-300 bg-navy-50/60 hover:bg-navy-50 text-navy-700 text-xs font-bold tracking-wide transition">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+          <span>Quick demo prefill</span>
+        </button>
+
         <div class="token-status-container" id="tokenStatusDisplay">
           <span class="token-status-label" data-i18n="authentication.tokenStatus">Token Status</span>
           <div class="token-status-badge">
@@ -69,50 +443,87 @@
             <span class="token-status-text" id="tokenStatusText" data-i18n="authentication.noToken">No Token</span>
           </div>
         </div>
+
+        <!-- Trust footer -->
+        <div class="mt-6 pt-5 border-t border-ink-100 flex items-center gap-2 text-[11px] text-ink-500">
+          <i data-lucide="lock" class="w-3.5 h-3.5"></i>
+          <span>Secured by Reis™ AML platform</span>
+        </div>
       </div>
     </aside>
 
-    <!-- ========== MAIN CONTENT AREA ========== -->
-    <main class="main-content">
-      <section id="onboardingSimulator" style="padding: 0; overflow: hidden;">
-        
-        <!-- Full-width responsive logo banner -->
-     <div style="
-  padding: clamp(10px, 2vw, 20px) 30px;
-  background: linear-gradient(135deg, #fff8f0 0%, #ffe6cc 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 20px;
-  border-bottom: 3px solid #FF9800;
-  margin-bottom: 30px;
-  box-sizing: border-box;
-  flex-wrap: wrap;
-">
-  <img 
-    src="logos/partners_02.png" 
-    alt="Partner 1" 
-    style="max-width: 100%; height: auto; object-fit: contain;"
-  >
-</div>
+    <!-- ========== MAIN CONTENT ========== -->
+    <main class="main-content min-w-0">
+      <section id="onboardingSimulator" class="glass rounded-2xl shadow-luxury overflow-hidden">
 
-        
-        <!-- Content wrapper with responsive padding -->
-        <div style="padding: 0 clamp(15px, 3vw, 30px) clamp(20px, 3vw, 30px) clamp(15px, 3vw, 30px);">
-          <h2 data-i18n="onboarding.title" style="margin: 0 0 20px 0; font-size: clamp(1.2rem, 3vw, 1.6rem); text-align: center;">Core System Onboarding UI</h2>
-          
+        <!-- Section header -->
+        <div class="relative px-7 py-6 border-b border-ink-100 bg-gradient-to-br from-white to-ink-50">
+          <div class="flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+              <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-navy-500 to-purple-500 flex items-center justify-center shadow-luxury">
+                <i data-lucide="user-round-search" class="w-5 h-5 text-white"></i>
+              </div>
+              <div>
+                <div class="eyebrow">Customer Due Diligence</div>
+                <h2 data-i18n="onboarding.title" class="!m-0 text-xl font-extrabold tracking-tight">
+                  <span class="grad-text">Core System Onboarding UI</span>
+                </h2>
+              </div>
+            </div>
+            <div class="hidden md:flex items-center gap-3 px-3 py-2 rounded-xl bg-white border border-ink-100 shadow-sm">
+              <span class="w-2 h-2 rounded-full bg-teal-500 animate-glow"></span>
+              <span class="text-xs font-semibold text-ink-700">Sandbox connected</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Body -->
+        <div class="px-7 py-6">
+
+          <!-- Demo step indicator -->
+          <ol class="grid grid-cols-3 gap-3 mb-6">
+            <li class="rounded-xl border border-ink-100 bg-white/80 px-4 py-3 flex items-center gap-3">
+              <span class="w-8 h-8 rounded-full bg-gradient-to-br from-navy-500 to-purple-500 text-white font-bold flex items-center justify-center text-sm">1</span>
+              <div>
+                <div class="eyebrow !text-[9px]">Step 1</div>
+                <div class="text-sm font-bold text-ink-900 leading-tight">Authenticate</div>
+              </div>
+            </li>
+            <li class="rounded-xl border border-ink-100 bg-white/80 px-4 py-3 flex items-center gap-3">
+              <span class="w-8 h-8 rounded-full bg-gradient-to-br from-navy-500 to-purple-500 text-white font-bold flex items-center justify-center text-sm">2</span>
+              <div>
+                <div class="eyebrow !text-[9px]">Step 2</div>
+                <div class="text-sm font-bold text-ink-900 leading-tight">Choose flow</div>
+              </div>
+            </li>
+            <li class="rounded-xl border border-ink-100 bg-white/80 px-4 py-3 flex items-center gap-3">
+              <span class="w-8 h-8 rounded-full bg-gradient-to-br from-navy-500 to-purple-500 text-white font-bold flex items-center justify-center text-sm">3</span>
+              <div>
+                <div class="eyebrow !text-[9px]">Step 3</div>
+                <div class="text-sm font-bold text-ink-900 leading-tight">Simulate</div>
+              </div>
+            </li>
+          </ol>
+
           <!-- Main Tabs -->
-          <div class="tabs">
-            <button class="tabBtn active" data-tab="decentralized" data-i18n="onboarding.decentralized">Decentralized Process (via link)</button>
-            <button class="tabBtn" data-tab="centralized" data-i18n="onboarding.centralized">Centralized Process (via queue)</button>
-            <button class="tabBtn" data-tab="reonboarding" data-i18n="onboarding.reonboarding">Re-onboarding</button>
+          <div class="tabs" role="tablist">
+            <button class="tabBtn active" data-tab="decentralized" data-i18n="onboarding.decentralized">
+              <i data-lucide="link-2" class="w-4 h-4"></i><span>Decentralized (link)</span>
+            </button>
+            <button class="tabBtn" data-tab="centralized" data-i18n="onboarding.centralized">
+              <i data-lucide="layers" class="w-4 h-4"></i><span>Centralized (queue)</span>
+            </button>
+            <button class="tabBtn" data-tab="reonboarding" data-i18n="onboarding.reonboarding">
+              <i data-lucide="refresh-cw" class="w-4 h-4"></i><span>Re-onboarding</span>
+            </button>
           </div>
 
-          <!-- ========== DECENTRALIZED TAB ========== -->
+          <!-- ===== DECENTRALIZED ===== -->
           <div class="tabContent active" id="decentralized">
             <h3 data-i18n="onboarding.decentralizedTitle">Decentralized Onboarding</h3>
+            <p class="text-sm text-ink-500 mt-1 mb-2">Generate a secure link for the customer to complete KYC asynchronously.</p>
 
-            <label for="entityTypeDecentralized"><b data-i18n="onboarding.entityType">Entity Type:</b></label>
+            <label for="entityTypeDecentralized" data-i18n="onboarding.entityType">Entity Type</label>
             <select id="entityTypeDecentralized">
               <option value="" data-i18n="onboarding.selectEntityType">Select Entity Type</option>
               <option value="PP" data-i18n="onboarding.physicalPerson">Physical Person (PP)</option>
@@ -120,82 +531,184 @@
             </select>
 
             <div id="decentralizedFields"></div>
-            <button id="submitDecentralized" data-i18n="onboarding.simulate">Simulate</button>
+            <button id="submitDecentralized" data-i18n="onboarding.simulate">
+              <i data-lucide="send" class="w-4 h-4"></i><span>Simulate</span>
+            </button>
           </div>
 
-          <!-- ========== CENTRALIZED TAB ========== -->
+          <!-- ===== CENTRALIZED ===== -->
           <div class="tabContent" id="centralized">
             <h3 data-i18n="onboarding.centralizedTitle">Centralized Onboarding</h3>
-            
-            <!-- SubTabs -->
+            <p class="text-sm text-ink-500 mt-1 mb-2">Push the case directly to your compliance queue.</p>
+
             <div class="subTabs">
-              <button class="subTabBtn active" data-subtab="sync" data-i18n="onboarding.synchronous">Synchronous</button>
-              <button class="subTabBtn" data-subtab="async" data-i18n="onboarding.asynchronous">Asynchronous (SearchOnboard)</button>
+              <button class="subTabBtn active" data-subtab="sync" data-i18n="onboarding.synchronous">
+                <i data-lucide="zap" class="w-4 h-4"></i><span>Synchronous</span>
+              </button>
+              <button class="subTabBtn" data-subtab="async" data-i18n="onboarding.asynchronous">
+                <i data-lucide="search" class="w-4 h-4"></i><span>Asynchronous (SearchOnboard)</span>
+              </button>
             </div>
 
-            <!-- SYNCHRONOUS SubTab -->
             <div class="subTabContent active" id="sync">
-              <label for="entityTypeSync"><b data-i18n="onboarding.entityType">Entity Type:</b></label>
+              <label for="entityTypeSync" data-i18n="onboarding.entityType">Entity Type</label>
               <select id="entityTypeSync">
                 <option value="" data-i18n="onboarding.selectEntityType">Select Entity Type</option>
                 <option value="PP" data-i18n="onboarding.physicalPerson">Physical Person (PP)</option>
                 <option value="PM" data-i18n="onboarding.legalPerson">Legal Person (PM)</option>
               </select>
-
               <div id="syncFields"></div>
-              <button id="submitSync" data-i18n="onboarding.simulate">Simulate</button>
+              <button id="submitSync" data-i18n="onboarding.simulate">
+                <i data-lucide="send" class="w-4 h-4"></i><span>Simulate</span>
+              </button>
             </div>
 
-            <!-- ASYNCHRONOUS SubTab -->
             <div class="subTabContent" id="async">
-              <label for="entityTypeAsync"><b data-i18n="onboarding.entityType">Entity Type:</b></label>
+              <label for="entityTypeAsync" data-i18n="onboarding.entityType">Entity Type</label>
               <select id="entityTypeAsync">
                 <option value="" data-i18n="onboarding.selectEntityType">Select Entity Type</option>
                 <option value="PP" data-i18n="onboarding.physicalPerson">Physical Person (PP)</option>
                 <option value="PM" data-i18n="onboarding.legalPerson">Legal Person (PM)</option>
               </select>
-
               <div id="asyncFields"></div>
-              <button id="submitAsync" data-i18n="onboarding.simulate">Simulate</button>
+              <button id="submitAsync" data-i18n="onboarding.simulate">
+                <i data-lucide="send" class="w-4 h-4"></i><span>Simulate</span>
+              </button>
             </div>
           </div>
 
+          <!-- ===== RE-ONBOARDING ===== -->
           <div class="tabContent" id="reonboarding">
-                <h3 data-i18n="onboarding.reonboardingTitle">Re-onboarding</h3>
+            <h3 data-i18n="onboarding.reonboardingTitle">Re-onboarding</h3>
+            <p class="text-sm text-ink-500 mt-1 mb-2">Refresh KYC for an existing client record.</p>
 
-                <label for="entityTypeReonboarding"><b data-i18n="onboarding.entityType">Entity Type:</b></label>
-                <select id="entityTypeReonboarding">
-                  <option value="" data-i18n="onboarding.selectEntityType">Select Entity Type</option>
-                  <option value="PP" data-i18n="onboarding.physicalPerson">Physical Person (PP)</option>
-                  <option value="PM" data-i18n="onboarding.legalPerson">Legal Person (PM)</option>
-                </select>
+            <label for="entityTypeReonboarding" data-i18n="onboarding.entityType">Entity Type</label>
+            <select id="entityTypeReonboarding">
+              <option value="" data-i18n="onboarding.selectEntityType">Select Entity Type</option>
+              <option value="PP" data-i18n="onboarding.physicalPerson">Physical Person (PP)</option>
+              <option value="PM" data-i18n="onboarding.legalPerson">Legal Person (PM)</option>
+            </select>
 
-                <label for="existingClientId"><b data-i18n="fields.existingClientId">Existing Client ID:</b></label>
-                <input type="text" id="existingClientId" data-i18n-placeholder="fields.existingClientIdPlaceholder" placeholder="Enter existing client ID" />
+            <label for="existingClientId" data-i18n="fields.existingClientId">Existing Client ID</label>
+            <input type="text" id="existingClientId" data-i18n-placeholder="fields.existingClientIdPlaceholder" placeholder="Enter existing client ID" />
 
-                <div id="reonboardingFields"></div>
+            <div id="reonboardingFields"></div>
 
-                <button id="submitReonboarding" data-i18n="onboarding.simulate">Simulate</button>
-              </div>
-          
-        </div> <!-- Close content wrapper -->
+            <button id="submitReonboarding" data-i18n="onboarding.simulate">
+              <i data-lucide="refresh-cw" class="w-4 h-4"></i><span>Simulate</span>
+            </button>
+          </div>
+
+        </div>
       </section>
+
+      <!-- Footer copyright -->
+      <div class="mt-6 flex flex-wrap items-center gap-2 px-2 text-[11px] text-ink-500 tracking-[.14em] uppercase font-semibold">
+        <span>© Vneuron Risk &amp; Compliance</span>
+        <span class="opacity-50">·</span>
+        <span>Reis™ RCS Simulator</span>
+      </div>
     </main>
-    
-  </div> <!-- Close main-layout -->
 
-
-
-
-
-  <!-- ========== POPUP ========== -->
-  <div id="popup">
-    <p id="popupText"></p>
-    <input type="text" id="popupLink" readonly />
-    <button id="closePopup" data-i18n="popup.close">Close</button>
   </div>
 
-  <!-- Scripts -->
+  <!-- Popup — luxury result modal -->
+  <div id="popup">
+    <div class="flex items-start gap-4 mb-5">
+      <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-teal-500 to-navy-500 flex items-center justify-center shadow-luxury flex-shrink-0">
+        <i data-lucide="check" class="w-6 h-6 text-white"></i>
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="eyebrow">Simulation result</div>
+        <p id="popupText" class="text-xl font-bold text-ink-900 mt-1 leading-snug"></p>
+      </div>
+    </div>
+    <div class="relative">
+      <input type="text" id="popupLink" readonly class="!pr-28 !bg-ink-50 !font-mono !text-xs" />
+      <button id="vnCopyLink" type="button"
+              class="absolute right-1.5 top-1/2 -translate-y-1/2 px-3 py-1.5 rounded-lg bg-navy-500 hover:bg-navy-600 text-white text-xs font-bold inline-flex items-center gap-1.5 transition">
+        <i data-lucide="copy" class="w-3.5 h-3.5"></i><span>Copy</span>
+      </button>
+    </div>
+    <div class="mt-5 flex items-center justify-end gap-2">
+      <button id="closePopup" data-i18n="popup.close"
+              class="px-5 py-2.5 rounded-xl bg-ink-100 hover:bg-ink-200 text-ink-700 font-semibold text-sm transition">
+        Close
+      </button>
+    </div>
+  </div>
+
+  <!-- Init Lucide icons once on load. (No MutationObserver — that infinite-loops
+       because Lucide replaces <i> with <svg>, which itself is a mutation.) -->
+  <script>
+    function vnRenderIcons(){ try { window.lucide && lucide.createIcons(); } catch(_){} }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', vnRenderIcons);
+    } else {
+      vnRenderIcons();
+    }
+    // Expose for index.js to call after dynamic field renders
+    window.vnRenderIcons = vnRenderIcons;
+
+    // Quick-demo prefill (one click for live presentations)
+    document.addEventListener('DOMContentLoaded', () => {
+      const q = document.getElementById('vnQuickDemo');
+      if (q) q.addEventListener('click', () => {
+        const t = document.getElementById('tenantName');
+        const u = document.getElementById('username');
+        const p = document.getElementById('password');
+        if (t) t.value = 'bankfr';
+        if (u) u.value = 'admin';
+        if (p) p.value = 'admin';
+        [t,u,p].forEach(el => el && el.dispatchEvent(new Event('change',{bubbles:true})));
+        q.innerHTML = '<i data-lucide="check" class="w-3.5 h-3.5"></i><span>Filled — click Authenticate</span>';
+        vnRenderIcons();
+      });
+
+      // Copy-link button on result popup
+      const c = document.getElementById('vnCopyLink');
+      const link = document.getElementById('popupLink');
+      if (c && link) c.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(link.value || '');
+          c.innerHTML = '<i data-lucide="check" class="w-3.5 h-3.5"></i><span>Copied</span>';
+          c.classList.add('!bg-teal-500');
+          vnRenderIcons();
+          setTimeout(() => {
+            c.innerHTML = '<i data-lucide="copy" class="w-3.5 h-3.5"></i><span>Copy</span>';
+            c.classList.remove('!bg-teal-500');
+            vnRenderIcons();
+          }, 1800);
+        } catch(_) {
+          link.select(); document.execCommand('copy');
+        }
+      });
+    });
+  </script>
+
+  <!-- Demo-grade toast styling (overrides ad-hoc inline styles in index.js) -->
+  <style>
+    #notificationContainer > div {
+      background: rgba(255,255,255,0.96) !important;
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(52,59,149,0.15) !important;
+      border-left: 4px solid #343B95 !important;
+      border-radius: 14px !important;
+      box-shadow: 0 18px 40px -12px rgba(20,23,37,0.30) !important;
+      padding: 14px 18px !important;
+      font-family: Inter, Raleway, sans-serif !important;
+      font-size: 14px !important;
+      color: #141725 !important;
+      animation: toastIn .35s cubic-bezier(.2,0,0,1);
+    }
+    #notificationContainer > div[class*="success"], #notificationContainer > div.success { border-left-color:#10A66F !important; }
+    #notificationContainer > div[class*="warning"], #notificationContainer > div.warning { border-left-color:#E0A43B !important; }
+    #notificationContainer > div[class*="error"],   #notificationContainer > div.error,
+    #notificationContainer > div[class*="danger"]                                         { border-left-color:#D8434E !important; }
+    @keyframes toastIn { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
+  </style>
+
+  <!-- App scripts -->
   <script src="translator.js"></script>
   <script src="index.js"></script>
 </body>
