@@ -1,5 +1,5 @@
-const SUPABASE_URL = 'https://uhwgcxxhormhvamolpvc.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVod2djeHhob3JtaHZhbW9scHZjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc2MDMyNTQsImV4cCI6MjA3MzE3OTI1NH0.gYNfKc9OUv9ZHuWj7l166M1I6s80HZkYCF3td6H4-AQ';
+const SUPABASE_URL = 'https://wwxblgplhleoknvjqlrn.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_JqAqQB8ZY7Sb2ZS0GQNDfQ_045CPRRa';
 
 export default {
   async fetch(request, env, ctx) {
@@ -41,7 +41,8 @@ export default {
           headers: {
             'Content-Type': 'application/json',
             'apikey': SUPABASE_ANON_KEY,
-            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+            'Prefer': 'return=representation'
           },
           body: JSON.stringify(eventData)
         });

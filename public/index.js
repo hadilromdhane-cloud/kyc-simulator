@@ -1532,10 +1532,10 @@ function continueOnboardingFromHistory(customerId, historyIndex) {
   notificationsHistory[historyIndex].onboardingStarted = true;
   localStorage.setItem('notificationsHistory', JSON.stringify(notificationsHistory));
   
-  const currentTenant = localStorage.getItem('tenantName') || 'bankfr';
+  const currentTenant = tokenManager.getTenant() || localStorage.getItem('tenantName') || 'bankfr';
   const tenantPageMap = {
     'bankfr': 'onboarding_bankfr_PP.html',
-    'banque_en': 'onboarding_banque_en.html',
+    'banque_en': 'onboarding_banque_en_PP.html',
   };
   
   const onboardingPage = tenantPageMap[currentTenant] || 'onboarding_bankfr_PP.html';
@@ -2137,7 +2137,7 @@ closeBtn.textContent = t('buttons.close');
 
 // ALSO UPDATE: navigateToOnboarding to better detect entity type
 function navigateToOnboarding(customerId) {
-  const currentTenant = localStorage.getItem('tenantName') || 'bankfr';
+  const currentTenant = tokenManager.getTenant() || localStorage.getItem('tenantName') || 'bankfr';
   
   let entityType = 'PP'; // Default to PP
   
@@ -2191,7 +2191,7 @@ function navigateToOnboarding(customerId) {
       'PM': 'onboarding_bankfr_PM.html'
     },
     'banque_en': {
-      'PP': 'onboarding_banque_en.html', 
+      'PP': 'onboarding_banque_en_PP.html',
       'PM': 'onboarding_banque_en_PM.html'
     }
   };
