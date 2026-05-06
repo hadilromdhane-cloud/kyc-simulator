@@ -198,12 +198,22 @@
     .token-status-text { font-size:13px; color:#141725; font-weight:600; }
     @keyframes pulse-dot { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.25);opacity:.75} }
 
-    /* ============== TOP-RIGHT GLASS CONTROLS (modernised) ============== */
+    /* ============== TOP-RIGHT GLASS CONTROLS (modernised) ==============
+       Both pills are stacked vertically (same right edge, language on top,
+       notifications underneath) and share the EXACT same width + height. */
+
+    /* Shared sizing */
+    :root {
+      --topctrl-width: 220px;
+      --topctrl-height: 42px;
+    }
 
     /* Language toggle — segmented glass pill with sliding active highlight */
     .language-selector {
       position:fixed; top:18px; right:24px; z-index:1000;
-      display:inline-flex; align-items:center; gap:2px; height:42px; padding:4px;
+      width:var(--topctrl-width); height:var(--topctrl-height);
+      display:inline-flex; align-items:center; justify-content:center;
+      gap:2px; padding:4px;
       background:linear-gradient(135deg, rgba(255,255,255,0.82) 0%, rgba(245,246,250,0.72) 100%);
       backdrop-filter:blur(20px) saturate(140%);
       -webkit-backdrop-filter:blur(20px) saturate(140%);
@@ -214,6 +224,7 @@
         0 0 0 1px rgba(52,59,149,0.08),
         0 12px 32px -12px rgba(20,23,37,0.25);
       transition:transform .25s cubic-bezier(.2,0,0,1), box-shadow .25s ease;
+      box-sizing:border-box;
     }
     .language-selector:hover {
       transform:translateY(-1px);
@@ -223,7 +234,7 @@
         0 18px 40px -14px rgba(20,23,37,0.32);
     }
     .lang-toggle-btn {
-      height:34px; padding:0 18px; border-radius:999px; border:0; cursor:pointer;
+      flex:1; height:34px; padding:0 18px; border-radius:999px; border:0; cursor:pointer;
       background:transparent; color:#363C52; font-weight:700; font-size:11px;
       letter-spacing:.12em; text-transform:uppercase;
       transition:color .2s ease, background .2s ease, transform .15s ease;
@@ -238,57 +249,66 @@
         0 6px 16px -6px rgba(52,59,149,0.55);
     }
 
-    /* Notification toggle — matching glass pill, with bell icon styling */
+    /* Notification toggle — stacked under language, same exact size,
+       brand-gradient surface (no blue/white glass) so it always reads
+       as the “primary” actionable pill. */
     .notification-selector {
-      position:fixed; top:18px; right:200px; z-index:1000;
-      display:inline-flex; align-items:center; height:42px; padding:4px;
-      background:linear-gradient(135deg, rgba(255,255,255,0.82) 0%, rgba(245,246,250,0.72) 100%);
-      backdrop-filter:blur(20px) saturate(140%);
-      -webkit-backdrop-filter:blur(20px) saturate(140%);
-      border:1px solid rgba(255,255,255,0.6);
+      position:fixed;
+      top:calc(18px + var(--topctrl-height) + 10px);
+      right:24px; z-index:1000;
+      width:var(--topctrl-width); height:var(--topctrl-height);
+      display:inline-flex; align-items:center; justify-content:center;
+      padding:0;
+      background:linear-gradient(135deg, #2A3078 0%, #7E58A1 55%, #0EB1AF 100%);
+      border:1px solid rgba(255,255,255,0.18);
       border-radius:999px;
       box-shadow:
-        0 1px 0 rgba(255,255,255,0.7) inset,
-        0 0 0 1px rgba(52,59,149,0.08),
-        0 12px 32px -12px rgba(20,23,37,0.25);
-      transition:transform .25s cubic-bezier(.2,0,0,1), box-shadow .25s ease;
+        0 1px 0 rgba(255,255,255,0.25) inset,
+        0 0 0 1px rgba(52,59,149,0.12),
+        0 12px 32px -12px rgba(52,59,149,0.45);
+      transition:transform .25s cubic-bezier(.2,0,0,1), box-shadow .25s ease, filter .25s ease;
+      box-sizing:border-box;
     }
     .notification-selector:hover {
       transform:translateY(-1px);
+      filter:brightness(1.05);
       box-shadow:
-        0 1px 0 rgba(255,255,255,0.7) inset,
-        0 0 0 1px rgba(52,59,149,0.12),
-        0 18px 40px -14px rgba(20,23,37,0.32);
+        0 1px 0 rgba(255,255,255,0.3) inset,
+        0 0 0 1px rgba(52,59,149,0.18),
+        0 18px 40px -14px rgba(52,59,149,0.55);
     }
     .notification-toggle-btn {
-      height:34px; padding:0 16px; border:0; border-radius:999px;
+      width:100%; height:100%; padding:0 16px; border:0; border-radius:999px;
       background:transparent; cursor:pointer;
-      color:#21265C; font-weight:700; font-size:11px;
-      letter-spacing:.10em; text-transform:uppercase;
-      display:inline-flex; align-items:center; gap:8px; white-space:nowrap;
-      transition:background .2s ease, color .2s ease, transform .15s ease;
+      color:#fff; font-weight:700; font-size:11px;
+      letter-spacing:.12em; text-transform:uppercase;
+      display:inline-flex; align-items:center; justify-content:center;
+      gap:8px; white-space:nowrap;
+      transition:transform .15s ease;
     }
-    .notification-toggle-btn:hover {
-      background:linear-gradient(135deg, rgba(52,59,149,0.10) 0%, rgba(126,88,161,0.10) 100%);
-      color:#11132D;
+    .notification-toggle-btn:active { transform:scale(0.97); }
+    .notification-toggle-btn i {
+      color:#fff; transition:transform .25s ease;
     }
-    .notification-toggle-btn:active { transform:scale(0.96); }
-    .notification-toggle-btn i { color:#7E58A1; transition:transform .25s ease; }
-    .notification-toggle-btn:hover i { transform:rotate(-12deg) scale(1.1); }
-    /* Red counter badge inside button — make it match brand */
+    .notification-selector:hover .notification-toggle-btn i {
+      transform:rotate(-12deg) scale(1.1);
+    }
+    /* Red counter badge inside button */
     .notification-toggle-btn span[style] {
-      background:linear-gradient(135deg, #D8434E 0%, #A12B36 100%) !important;
-      box-shadow:0 4px 10px -3px rgba(216,67,78,0.55);
+      background:linear-gradient(135deg, #FFB347 0%, #E0A43B 100%) !important;
+      color:#11132D !important;
+      box-shadow:0 4px 10px -3px rgba(0,0,0,0.35);
       letter-spacing:0 !important;
       font-weight:800 !important;
     }
 
-    /* On phones, stack the controls a bit tighter */
+    /* On phones, shrink both pills together */
     @media (max-width: 480px) {
-      .language-selector { top:12px; right:12px; height:36px; }
+      :root { --topctrl-width: 180px; --topctrl-height: 36px; }
+      .language-selector { top:12px; right:12px; }
+      .notification-selector { top:calc(12px + var(--topctrl-height) + 8px); right:12px; }
       .lang-toggle-btn { height:28px; padding:0 12px; font-size:10px; }
-      .notification-selector { top:12px; right:130px; height:36px; }
-      .notification-toggle-btn { height:28px; padding:0 12px; font-size:10px; }
+      .notification-toggle-btn { font-size:10px; padding:0 12px; }
     }
 
     /* Popup */
