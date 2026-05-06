@@ -1704,10 +1704,14 @@ function updateConnectionStatus(connected) {
 }
 
 // --- POLLING-BASED Event System ---
+// Auto-clear notification history on every app load (clean slate per session).
+// We keep lastEventId so the polling loop doesn't re-fetch old events as "new"
+// after the wipe — this gives a clean badge but avoids spurious popups.
+localStorage.removeItem('notificationsHistory');
 let lastEventId = parseInt(localStorage.getItem('lastEventId')) || 0;
 let pollingInterval = null;
 const pollingFrequency = 2000;
-let notificationsHistory = JSON.parse(localStorage.getItem('notificationsHistory')) || [];
+let notificationsHistory = [];
 let lastEventTimestamp = parseInt(localStorage.getItem('lastEventTimestamp')) || (Date.now() - 300000);
 
 function setupEventPolling() {
