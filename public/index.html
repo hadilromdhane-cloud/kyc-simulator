@@ -307,8 +307,27 @@
     @keyframes side-up   { from { transform: translateY(0); }   to { transform: translateY(-50%); } }
     @keyframes side-down { from { transform: translateY(-50%); } to { transform: translateY(0); } }
 
-    /* Hide on narrower screens where ribbons would crowd the main content */
-    @media (max-width: 1500px) { .side-ribbon { display: none; } }
+    /* Slim down the ribbons on smaller screens so they always show
+       without crowding the main content */
+    @media (max-width: 1500px) {
+      .side-ribbon { width: 90px; }
+      .side-track img { height: 40px; max-width: 70px; }
+      .side-track { gap: 48px; padding: 30px 0; }
+    }
+    @media (max-width: 1100px) {
+      .side-ribbon { width: 70px; }
+      .side-track img { height: 32px; max-width: 56px; }
+      .side-track { gap: 36px; padding: 24px 0; }
+    }
+    @media (max-width: 768px) {
+      .side-ribbon { width: 56px; }
+      .side-track img { height: 26px; max-width: 44px; }
+      .side-track { gap: 28px; padding: 18px 0; }
+    }
+    @media (max-width: 480px) {
+      /* Truly tiny phones — hide to keep the form usable */
+      .side-ribbon { display: none; }
+    }
 
     /* Responsive */
     @media (max-width: 900px) {
