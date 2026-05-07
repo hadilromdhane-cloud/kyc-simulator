@@ -117,12 +117,9 @@ const OnboardingHandler = (function() {
         },
 
         mapFormDataToPayload: function(formData) {
-            // Mirror of the bankfr payload (which works) — same field names,
-            // same field order, same types. Only difference is the CONTENT:
-            //   • tin_ uses English document-type labels (getDocumentTypeIdEN/NameEN)
-            //   • isPepWorkflow text is in English
-            //   • Plus extra English-named fields the banque_en risk matrix reads
-            //     (Country_of_residence, onboarding_channel, product, source_of_funds)
+            // EXACT clone of bankfr's payload — zero changes.
+            // Goal: confirm banque_en API accepts the same shape as bankfr.
+            // Once this works we'll layer English values back in incrementally.
             const customerId = parseInt(customerData.customerId) || Utils.generateCustomerId();
             const currentDateTime = new Date().toISOString();
             return {
@@ -191,7 +188,7 @@ const OnboardingHandler = (function() {
                         id_doc: [],
                         invokeElm: false,
                         isPEP: false,
-                        isPepWorkflow: "<li>PEP : <b> <span> No </span></b></li>",
+                        isPepWorkflow: "<li>Personne politiquement exposée : <b> <span> Non</span></b></li>",
                         isSanctioned: false,
                         isSanctionned: false,
                         is_hq_user: false,
@@ -208,11 +205,6 @@ const OnboardingHandler = (function() {
                         OrigineDesFonds: [formData.origineFonds || ""],
                         outboundSystems: null,
                         Nationalite: formData.Nationalite || "",
-                        // === banque_en specific fields (English-named for the risk matrix) ===
-                        Country_of_residence: formData.PaysDeResidence || "",
-                        onboarding_channel: formData.canal || "",
-                        product: formData.produits || "",
-                        source_of_funds: formData.origineFonds || "",
                         pep: "",
                         pliberal: "",
                         postal_code: formData.codePostal || "",
@@ -228,13 +220,13 @@ const OnboardingHandler = (function() {
                         tel2: formData.portable || "",
                         tiin_doc: [],
                         tin_: {
-                            id: this.getDocumentTypeIdEN(formData.typePiece),
-                            name: this.getDocumentTypeNameEN(formData.typePiece),
+                            id: this.getDocumentTypeId(formData.typePiece),
+                            name: this.getDocumentTypeName(formData.typePiece),
                             value: formData.typePiece || "",
-                            translate: this.getDocumentTypeNameEN(formData.typePiece),
+                            translate: this.getDocumentTypeName(formData.typePiece),
                             parentId: null,
                             parentName: null,
-                            uniqueCode: `${this.getDocumentTypeNameEN(formData.typePiece)}:${formData.typePiece}:tin`,
+                            uniqueCode: `${this.getDocumentTypeName(formData.typePiece)}:${formData.typePiece}:tin`,
                             tags: ["tin"]
                         },
                         url: "https://greataml.com/"
