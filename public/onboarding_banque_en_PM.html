@@ -344,7 +344,7 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="raisonSociale">Raison sociale <span class="required">*</span></label>
-                            <input type="text" id="raisonSociale" name="raisonSociale" required>
+                            <input type="text" id="raisonSociale" name="raisonSociale">
                         </div>
                         <div class="form-group">
                             <label for="denominationCommerciale">Dénomination commerciale</label>
@@ -355,7 +355,7 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="formeJuridique">Forme juridique <span class="required">*</span></label>
-                            <select id="formeJuridique" name="legal_form" required>
+                            <select id="formeJuridique" name="legal_form">
                                 <option value="">-- Sélectionner --</option>
                                 <option value="SARL">SARL - Société à Responsabilité Limitée</option>
                                 <option value="SA">SA - Société Anonyme</option>
@@ -378,18 +378,18 @@
                         </div>
                         <div class="form-group">
                             <label for="dateConstitution">Date de constitution <span class="required">*</span></label>
-                            <input type="date" id="dateConstitution" name="dateConstitution" required>
+                            <input type="date" id="dateConstitution" name="dateConstitution">
                         </div>
                     </div>
 
                     <div class="form-row">
                         <div class="form-group">
                             <label for="numeroRegistre">Numéro d'immatriculation <span class="required">*</span></label>
-                            <input type="text" id="numeroRegistre" name="numeroRegistre" required>
+                            <input type="text" id="numeroRegistre" name="numeroRegistre">
                         </div>
                         <div class="form-group">
                             <label for="paysImmatriculation">Pays d'immatriculation <span class="required">*</span></label>
-                            <select id="paysImmatriculation" name="country" required>
+                            <select id="paysImmatriculation" name="country">
                                 <!-- Options will be populated by JavaScript -->
                             </select>
                         </div>
@@ -405,7 +405,7 @@
                         </div>
                         <div class="form-group">
                             <label for="secteurActivite">Secteur d'activité <span class="required">*</span></label>
-                            <select id="secteurActivite" name="activity" required>
+                            <select id="secteurActivite" name="activity">
                                 <option value="">-- Sélectionner --</option>
                                 <option value="Agriculture">Agriculture, sylviculture et pêche</option>
                                 <option value="Industries">Industries extractives</option>
@@ -446,18 +446,18 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="codePostalSiege">Code postal <span class="required">*</span></label>
-                            <input type="text" id="codePostalSiege" name="codePostalSiege" required>
+                            <input type="text" id="codePostalSiege" name="codePostalSiege">
                         </div>
                         <div class="form-group">
                             <label for="villeSiege">Ville <span class="required">*</span></label>
-                            <input type="text" id="villeSiege" name="villeSiege" required>
+                            <input type="text" id="villeSiege" name="villeSiege">
                         </div>
                     </div>
 
                     <div class="form-row">
                         <div class="form-group">
                             <label for="paysSiege">Pays du siège social <span class="required">*</span></label>
-                            <select id="paysSiege" name="PaysDeResidence" required>
+                            <select id="paysSiege" name="PaysDeResidence">
                                 <!-- Options will be populated by JavaScript -->
                             </select>
                         </div>
@@ -505,7 +505,7 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="canalDistribution">Distribution Channel <span class="required">*</span></label>
-                            <select id="canalDistribution" name="canal_de_distribution" required>
+                            <select id="canalDistribution" name="canal_de_distribution">
                                 <option value="">-- Select --</option>
                                 <option value="In person / Physical meeting">In person / Physical meeting</option>
                                 <option value="Online / Virtual meeting">Online / Virtual meeting</option>
@@ -513,7 +513,7 @@
                         </div>
                         <div class="form-group">
                             <label for="produitsCibles">Target Products/Services <span class="required">*</span></label>
-                            <select id="produitsCibles" name="produit" required>
+                            <select id="produitsCibles" name="produit">
                                 <option value="">-- Select --</option>
                                 <option value="Mobile Banking">Mobile Banking</option>
                                 <option value="Saving Account">Saving Account</option>
@@ -530,7 +530,7 @@
                     <div class="form-row full-width">
                         <div class="form-group">
                             <label for="origineFondsPM">Source of Funds <span class="required">*</span></label>
-                            <select id="origineFondsPM" name="origine_des_fonds" required>
+                            <select id="origineFondsPM" name="origine_des_fonds">
                                 <option value="">-- Select --</option>
                                 <option value="Employment Income">Employment Income</option>
                                 <option value="Business Profits">Business Profits</option>
@@ -890,20 +890,4 @@
             const phoneInputs = document.querySelectorAll('input[type="tel"]');
             phoneInputs.forEach(input => {
                 input.addEventListener('blur', function() {
-                    if (this.value && !validatePhone(this.value)) {
-                        this.style.borderColor = '#dc3545';
-                    }
-                });
-            });
-        });
-    </script>
-    <!-- Include the PM JavaScript module -->
-<script src="onboarding_banque_en_PM.js"></script>
-<script>
-    // Initialize the PM onboarding handler when the page loads
-    document.addEventListener('DOMContentLoaded', function() {
-        PMOnboardingHandler.init('pmOnboardingForm', 'banque_en');
-    });
-</script>
-</body>
-</html>
+                    if (this.value && !validatePh

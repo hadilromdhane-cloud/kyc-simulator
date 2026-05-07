@@ -202,17 +202,21 @@ const OnboardingHandler = (function() {
                         OrigineDesFonds: [formData.origineFonds || ""],
                         outboundSystems: null,
                         Nationalite: formData.Nationalite || "",
-                        Country_of_residence: formData.PaysDeResidence || "",
-                        onboarding_channel: formData.canal || "",
-                        product: formData.produits || "",
-                        source_of_funds: formData.origineFonds || "",
+                        // === Extra banque_en custom fields (new names you specified) ===
+                        // If GreatAML 500s on unknown properties, set the flag below to
+                        // false to skip them and use existing schema fields only.
+                        ...(window.VN_SEND_CUSTOM_BANQUE_EN_FIELDS !== false ? {
+                            Country_of_residence: formData.PaysDeResidence || "",
+                            onboarding_channel: formData.canal || "",
+                            product: formData.produits || "",
+                            source_of_funds: formData.origineFonds || ""
+                        } : {}),
                         pep: "",
                         pliberal: "",
                         postal_code: formData.codePostal || "",
                         process_type: "",
                         Produit: [formData.produits || ""],
                         Profession: formData.profession || "",
-                        profession: formData.profession || "",
                         revenuAnnuelNet: parseInt(formData.revenu) || 0,
                         rm_fn: "System",
                         rm_ln: "User",
