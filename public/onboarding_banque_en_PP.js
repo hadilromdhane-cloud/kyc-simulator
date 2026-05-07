@@ -117,138 +117,130 @@ const OnboardingHandler = (function() {
         },
 
         mapFormDataToPayload: function(formData) {
-            // Built to match the exact payload Reis sends to GreatAML for the
-            // banque_en tenant — same field names, same types (arrays vs strings),
-            // same English labels in tin_, fatcaIdentification at root, etc.
+            // Mirror of the bankfr payload (which works) — same field names,
+            // same field order, same types. Only difference is the CONTENT:
+            //   • tin_ uses English document-type labels (getDocumentTypeIdEN/NameEN)
+            //   • isPepWorkflow text is in English
+            //   • Plus extra English-named fields the banque_en risk matrix reads
+            //     (Country_of_residence, onboarding_channel, product, source_of_funds)
             const customerId = parseInt(customerData.customerId) || Utils.generateCustomerId();
             const currentDateTime = new Date().toISOString();
-            const docTypeId   = this.getDocumentTypeIdEN(formData.typePiece);
-            const docTypeName = this.getDocumentTypeNameEN(formData.typePiece);
-
             return {
-                customerId: customerId,
-                customerRelationName: "",
-                formId: "1",
-                systemName: customerData.systemName || "T24",
-                systemId: customerData.systemId || `system_${Date.now()}_${Math.floor(Math.random()*1000)}`,
-                items: {
-                    isSanctionnedWorkflow: "No",
-                    isPepWorkflow: "<li>PEP : <b> <span> No </span></b></li>",
-                    agence: "headquarters",
-                    rm_username: "admin",
-                    rm_fn: "System",
-                    rm_ln: "User",
-                    process_type: "",
-                    createdOn: currentDateTime,
-                    dpr: "",
-                    last_update: currentDateTime,
 
-                    first_name: formData.prenom || "",
-                    last_name: formData.nom || "",
-                    birth_date: formData.dateNaissance || "",
-                    nationality: formData.Nationalite || "",
-                    marital_status: formData.etatCivil || "",
-                    tel1: formData.telephone || "",
-                    email: formData.email || "",
-                    adresseDeResidence: formData.adresse || "",
-                    postal_code: formData.codePostal || "",
-                    fiscale_ville: formData.ville || "",
-                    Country_of_residence: formData.PaysDeResidence || "",
-
-                    tin_: {
-                        id: docTypeId,
-                        name: docTypeName,
-                        value: formData.typePiece || "",
-                        translate: docTypeName,
-                        parentId: null,
-                        parentName: null,
-                        uniqueCode: `${docTypeName}:${formData.typePiece}:tin`,
-                        tags: ["tin"]
-                    },
-                    nid: formData.numeroPiece || "",
-                    delivery_date: formData.dateDelivrance || "",
-                    expiry_date: formData.dateExpiration || "",
-                    profession: formData.profession || "",
-                    product: [formData.produits || ""],
-                    onboarding_channel: formData.canal || "",
-                    source_of_funds: [formData.origineFonds || ""],
-
-                    dataGrid: [{
-                        select: "",
-                        nature: "",
-                        tx_nature: {}
-                    }],
-                    mscq: "",
-                    is_pep: "",
-                    is_am: "",
-                    is_sanctionned: "",
-                    related_parties: "",
-                    pliberal: "",
-                    id_doc: [],
-                    address_proof_type: {},
-                    address_doc: [],
-                    tiin_doc: [],
-                    dataGrid1: [{
-                        source_of_funds_doctype: {},
-                        source_of_funds_doc: []
-                    }],
-                    invokeElm: false,
-                    containerelm: {
-                        "profession-2": "",
-                        retrieved_dob: "",
-                        retrieved_last_name: "",
-                        retrieved_first_name: "",
-                        "citizenship-2": "",
-                        retrieved_address: ""
-                    },
-                    name: "",
-                    select: "",
-                    businessName: "",
-                    entityType: "PP",
-                    id: customerId,
-                    customer_type: "manual-entry",
-                    createdBy: "admin",
-                    creatorId: 1,
-                    creatorFirstName: "System",
-                    creatorLastName: "User",
-                    modificationDate: currentDateTime,
-                    extendedProperties: {},
-                    citizenship: formData.PaysDeResidence || "",
-                    listsNames: [],
-                    agencyId: 3,
-                    agencyName: "headquarters",
-                    eaiIds: {},
-                    searchId: Math.floor(Math.random() * 100000),
-                    outboundSystems: null,
-                    AddressDataGrid: [],
-                    current_date: currentDateTime,
-                    isPEP: false,
-                    isSanctionned: false,
-                    isSanctioned: false,
-                    hasRiskedCountry: false,
-                    form_entity_type: "PP",
-                    cus_birth_date: formData.dateNaissance || "",
-                    url: "https://greataml.com/",
-                    is_hq_user: false,
-                    current_user_name: "System User",
-                    current_user_id: 1,
-                    agency_location: null,
-                    distribution_channel: null,
-                    obnl_name: formData.nom || "",
-                    customerUrl: "https://greataml.com/",
-                    address: []
-                },
-                fatcaIdentification: {
-                    americanCitizen: "false",
-                    greenCard: "false",
-                    americanResident: "false",
-                    americanVisit: "false",
-                    address: null,
-                    beneficialOwners: null,
-                    hasBeneficialOwners: null
-                }
-            };
-        }
+                    customerId: customerId,
+                    customerRelationName: "",
+                    formId: "1",
+                    systemName: customerData.systemName || "",
+                    systemId: customerData.systemId || "",
+                    items: {
+                        isSanctionnedWorkflow: "Non",
+                        AddressDataGrid: [],
+                        PaysDeResidence: formData.PaysDeResidence || "",
+                        address: [],
+                        address_doc: [],
+                        address_proof_type: {},
+                        adresseDeResidence: formData.adresse || "",
+                        agence: "headquarters",
+                        agencyId: 3,
+                        agencyName: "headquarters",
+                        agency_location: null,
+                        birth_date: formData.dateNaissance || "",
+                        businessName: "",
+                        CanalDeDistribution: formData.canal || "",
+                        containerelm: {
+                            "profession-2": "",
+                            retrieved_dob: "",
+                            retrieved_last_name: "",
+                            retrieved_first_name: "",
+                            "citizenship-2": "",
+                            retrieved_address: ""
+                        },
+                        createdBy: "admin",
+                        createdOn: currentDateTime,
+                        creatorFirstName: "System",
+                        creatorId: 1,
+                        creatorLastName: "User",
+                        current_date: currentDateTime,
+                        current_user_id: 1,
+                        current_user_name: "System User",
+                        cus_birth_date: formData.dateNaissance || "",
+                        customerUrl: "https://greataml.com/",
+                        customer_type: "manual-entry",
+                        dataGrid: [{
+                            select: "",
+                            nature: "",
+                            tx_nature: {}
+                        }],
+                        dataGrid1: [{
+                            source_of_funds_doctype: {},
+                            source_of_funds_doc: []
+                        }],
+                        delivery_date: formData.dateDelivrance || "",
+                        distribution_channel: null,
+                        dpr: "",
+                        eaiIds: {},
+                        email: formData.email || "",
+                        entityType: "PP",
+                        expiry_date: formData.dateExpiration || "",
+                        extendedProperties: {},
+                        first_name: formData.prenom || "",
+                        fiscale_ville: formData.ville || "",
+                        form_entity_type: "PP",
+                        hasRiskedCountry: false,
+                        id: customerId,
+                        id_doc: [],
+                        invokeElm: false,
+                        isPEP: false,
+                        isPepWorkflow: "<li>PEP : <b> <span> No </span></b></li>",
+                        isSanctioned: false,
+                        isSanctionned: false,
+                        is_hq_user: false,
+                        last_name: formData.nom || "",
+                        last_update: currentDateTime,
+                        listsNames: [],
+                        luneDeVosRelationsPresenteTElleLunDesIndicesDamericaniteDefinisParLaLoiFatca: "",
+                        marital_status: formData.etatCivil || "",
+                        modificationDate: currentDateTime,
+                        mscq: "",
+                        nationality: formData.nationalite || "",
+                        nid: formData.numeroPiece || "",
+                        obnl_name: formData.nom || "",
+                        OrigineDesFonds: [formData.origineFonds || ""],
+                        outboundSystems: null,
+                        Nationalite: formData.Nationalite || "",
+                        // === banque_en specific fields (English-named for the risk matrix) ===
+                        Country_of_residence: formData.PaysDeResidence || "",
+                        onboarding_channel: formData.canal || "",
+                        product: formData.produits || "",
+                        source_of_funds: formData.origineFonds || "",
+                        pep: "",
+                        pliberal: "",
+                        postal_code: formData.codePostal || "",
+                        process_type: "",
+                        Produit: [formData.produits || ""],
+                        Profession: formData.profession || "",
+                        revenuAnnuelNet: parseInt(formData.revenu) || 0,
+                        rm_fn: "System",
+                        rm_ln: "User",
+                        rm_username: "admin",
+                        searchId: Math.floor(Math.random() * 100000),
+                        tel1: formData.telephone || "",
+                        tel2: formData.portable || "",
+                        tiin_doc: [],
+                        tin_: {
+                            id: this.getDocumentTypeIdEN(formData.typePiece),
+                            name: this.getDocumentTypeNameEN(formData.typePiece),
+                            value: formData.typePiece || "",
+                            translate: this.getDocumentTypeNameEN(formData.typePiece),
+                            parentId: null,
+                            parentName: null,
+                            uniqueCode: `${this.getDocumentTypeNameEN(formData.typePiece)}:${formData.typePiece}:tin`,
+                            tags: ["tin"]
+                        },
+                        url: "https://greataml.com/"
+                    }
+                };
+            }
 
     };
 

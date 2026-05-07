@@ -95,7 +95,7 @@ const PMOnboardingHandler = (function() {
             return {
                 customerId: customerId,
                 customerRelationName: formData.raisonSociale || "",
-                formId: "2", 
+                formId: "1",
                 systemName: customerData.systemName || "",
                 systemId: customerData.systemId || "",
                 items: {
