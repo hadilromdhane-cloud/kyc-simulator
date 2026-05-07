@@ -127,6 +127,10 @@ const OnboardingHandler = (function() {
 
             return {
                 customerId: customerId,
+                customerRelationName: "",
+                formId: "1",
+                systemName: customerData.systemName || "T24",
+                systemId: customerData.systemId || `system_${Date.now()}_${Math.floor(Math.random()*1000)}`,
                 items: {
                     isSanctionnedWorkflow: "No",
                     isPepWorkflow: "<li>PEP : <b> <span> No </span></b></li>",
@@ -234,8 +238,6 @@ const OnboardingHandler = (function() {
                     customerUrl: "https://greataml.com/",
                     address: []
                 },
-                formId: "1",
-                customerRelationName: "",
                 fatcaIdentification: {
                     americanCitizen: "false",
                     greenCard: "false",
