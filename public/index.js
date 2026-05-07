@@ -1454,12 +1454,14 @@ function updateNotificationBadge() {
   ).length;
 
   if (unfinishedCount > 0) {
-    button.innerHTML = `${t('buttons.notifications')} <span style="background: #dc3545; color: white; padding: 2px 8px; border-radius: 10px; margin-left: 5px; font-size: 11px;">${unfinishedCount}</span>`;
-    button.style.backgroundColor = '#007ACC'; // Keep blue
+    button.innerHTML = `<i data-lucide="bell" class="w-4 h-4"></i><span>${t('buttons.notifications')}</span> <span style="background: linear-gradient(135deg,#FFB347 0%,#E0A43B 100%); color: #7A5511; padding: 1px 7px; border-radius: 999px; margin-left: 4px; font-size: 10px; font-weight: 800; letter-spacing: 0; box-shadow: 0 0 0 2px #fff, 0 4px 10px -3px rgba(224,164,59,0.55);">${unfinishedCount}</span>`;
   } else {
-    button.innerHTML = t('buttons.notifications');
-    button.style.backgroundColor = '#007ACC'; // Keep blue
+    button.innerHTML = `<i data-lucide="bell" class="w-4 h-4"></i><span>${t('buttons.notifications')}</span>`;
   }
+  // Re-render the bell icon Lucide just replaced
+  if (window.vnRenderIcons) window.vnRenderIcons();
+  // Background is fully driven by .notification-selector / .notification-toggle-btn CSS now
+  button.style.backgroundColor = '';
 }
 
 
@@ -1467,94 +1469,180 @@ function showNotificationHistory() {
   const historyOverlay = document.createElement('div');
   historyOverlay.id = 'notificationHistoryOverlay';
   historyOverlay.style.cssText = `
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    z-index: 15000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    position: fixed; inset: 0; z-index: 15000;
+    background: radial-gradient(at 30% 20%, rgba(126,88,161,0.18), transparent 55%),
+                radial-gradient(at 80% 80%, rgba(14,177,175,0.15), transparent 55%),
+                rgba(17,19,45,0.62);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex; justify-content: center; align-items: center;
+    padding: 24px;
+    animation: vnOverlayIn .3s cubic-bezier(.2,0,0,1);
+    font-family: 'Raleway','Inter',sans-serif;
   `;
 
   const historyContent = document.createElement('div');
   historyContent.style.cssText = `
-    background: white;
-    padding: 30px;
-    border-radius: 10px;
-    max-width: 800px;
-    width: 90%;
-    max-height: 80%;
-    overflow-y: auto; 
+    position: relative;
+    background: rgba(255,255,255,0.96);
+    backdrop-filter: blur(20px) saturate(140%);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+    border: 1px solid rgba(255,255,255,0.7);
+    border-radius: 20px;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.7) inset,
+      0 30px 80px -20px rgba(20,23,37,0.55);
+    padding: 30px 32px;
+    max-width: 820px;
+    width: 100%;
+    max-height: 85vh;
+    overflow-y: auto;
+    animation: vnDialogIn .35s cubic-bezier(.2,0,0,1);
+  `;
+  historyContent.innerHTML = `
+    <div style="
+      position: absolute; left: 0; top: 0; right: 0; height: 5px;
+      background: linear-gradient(135deg,#2A3078 0%,#7E58A1 55%,#0EB1AF 100%);
+      border-radius: 20px 20px 0 0;
+    "></div>
   `;
 
   let historyHTML = `
-    <h2 style="color: #004080; margin-top: 0; text-align: center;">${t('buttons.notificationsHistory')}</h2>
-    <div style="margin-bottom: 20px;">
-      <button id="clearHistory" style="background: #dc3545; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer;">${t('buttons.clearHistory')}</button>
+    <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom: 6px; padding-top: 8px;">
+      <div style="display:flex; align-items:center; gap:14px;">
+        <div style="
+          width:44px; height:44px; border-radius:14px;
+          background:linear-gradient(135deg,#0EB1AF 0%,#7E58A1 100%);
+          display:flex; align-items:center; justify-content:center;
+          box-shadow:0 8px 18px -6px rgba(126,88,161,0.45);
+        ">
+          <i data-lucide="bell-ring" style="color:#fff; width:22px; height:22px;"></i>
+        </div>
+        <div>
+          <div style="font-size:11px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:#343B95; margin-bottom:2px;">Activity Stream</div>
+          <h2 style="margin:0; font-family:'Raleway','Inter',sans-serif; font-weight:800; font-size:22px; letter-spacing:-.01em; color:#11132D;">${t('buttons.notificationsHistory')}</h2>
+        </div>
+      </div>
+      <button id="clearHistory" style="
+        display:inline-flex; align-items:center; gap:6px;
+        background: linear-gradient(135deg, rgba(216,67,78,0.08) 0%, rgba(216,67,78,0.16) 100%);
+        color: #7F1F27; border: 1px solid rgba(216,67,78,0.25);
+        padding: 8px 14px; border-radius: 999px; cursor: pointer;
+        font-family:'Raleway','Inter',sans-serif;
+        font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+        transition: all .2s ease;
+      "
+      onmouseenter="this.style.background='linear-gradient(135deg,#D8434E 0%,#A12B36 100%)';this.style.color='#fff';this.style.borderColor='transparent';this.style.boxShadow='0 6px 16px -6px rgba(216,67,78,0.55)';"
+      onmouseleave="this.style.background='linear-gradient(135deg, rgba(216,67,78,0.08) 0%, rgba(216,67,78,0.16) 100%)';this.style.color='#7F1F27';this.style.borderColor='rgba(216,67,78,0.25)';this.style.boxShadow='none';">
+        <i data-lucide="trash-2" style="width:13px; height:13px;"></i>
+        <span>${t('buttons.clearHistory')}</span>
+      </button>
     </div>
+    <div style="height:1px; background:linear-gradient(90deg, transparent 0%, #DEE1EB 50%, transparent 100%); margin: 18px 0 22px;"></div>
   `;
 
  if (notificationsHistory.length === 0) {
-    historyHTML += `<p style="text-align: center; color: #666;">${t('notifications.noNotifications')}</p>`;
+    historyHTML += `
+      <div style="text-align:center; padding: 42px 20px;">
+        <div style="
+          width:64px; height:64px; margin: 0 auto 16px;
+          border-radius:18px;
+          background:linear-gradient(135deg, rgba(14,177,175,0.10) 0%, rgba(126,88,161,0.10) 100%);
+          border:1px solid rgba(255,255,255,0.7);
+          display:flex; align-items:center; justify-content:center;
+        ">
+          <i data-lucide="inbox" style="width:30px; height:30px; color:#7E58A1;"></i>
+        </div>
+        <p style="margin:0; color:#6E7590; font-size:14px; font-weight:500;">${t('notifications.noNotifications')}</p>
+      </div>
+    `;
 } else {
     const sortedHistory = [...notificationsHistory].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-    
+
     sortedHistory.forEach((notification, index) => {
       const isReis = notification.source === 'Reis_KYC';
       const canContinueOnboarding = isReis && !notification.isSanctioned && !notification.onboardingCompleted;
-      const statusColor = notification.isSanctioned ? '#dc3545' : '#28a745';
-      const statusText = notification.isSanctioned ? 'SANCTIONED' : 'CLEARED';
+      // Brand semantic colors
+      const statusBg     = notification.isSanctioned ? 'linear-gradient(135deg,#D8434E 0%,#A12B36 100%)' : 'linear-gradient(135deg,#10A66F 0%,#086B47 100%)';
+      const statusGlow   = notification.isSanctioned ? '0 4px 12px -3px rgba(216,67,78,0.45)' : '0 4px 12px -3px rgba(16,166,111,0.45)';
+      const statusText   = notification.isSanctioned ? 'SANCTIONED' : 'CLEARED';
+      const accentColor  = canContinueOnboarding ? '#0EB1AF' : (notification.isSanctioned ? '#D8434E' : '#7E58A1');
+      const cardBg       = canContinueOnboarding ? 'linear-gradient(135deg, rgba(14,177,175,0.04) 0%, rgba(255,255,255,1) 60%)' : '#fff';
       const notificationTenant = notification.tenant || 'Unknown';
-      
+
+      // Pill helper for PEP / Sanctions / Adverse Media flags
+      const flagPill = (label, on) => {
+        const fg = on ? (label === 'Sanctions' ? '#7F1F27' : '#7A5511') : '#086B47';
+        const bg = on ? (label === 'Sanctions' ? 'rgba(216,67,78,0.10)' : 'rgba(224,164,59,0.12)') : 'rgba(16,166,111,0.10)';
+        const dot = on ? (label === 'Sanctions' ? '#D8434E' : '#E0A43B') : '#10A66F';
+        return `
+          <span style="display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:999px; background:${bg}; color:${fg}; font-size:11px; font-weight:700; letter-spacing:.04em;">
+            <span style="width:6px; height:6px; border-radius:999px; background:${dot}; box-shadow:0 0 0 2px ${bg};"></span>
+            ${label}: ${on ? 'YES' : 'NO'}
+          </span>`;
+      };
+
       historyHTML += `
         <div style="
-          border: 1px solid #ddd;
-          border-radius: 8px;
-          padding: 15px;
-          margin-bottom: 15px;
-          background: ${canContinueOnboarding ? '#f8f9fa' : 'white'};
-          ${canContinueOnboarding ? 'border-left: 4px solid #007ACC;' : ''}
-        ">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <div>
-              <h4 style="margin: 0; color: #004080;">Customer ${notification.customerId}</h4>
-              <small style="color: #666; font-weight: normal;">🏦 Tenant: ${notificationTenant}</small>
+          position: relative;
+          background:${cardBg};
+          border: 1px solid #EDEFF4;
+          border-radius: 14px;
+          padding: 16px 18px 16px 22px;
+          margin-bottom: 12px;
+          box-shadow: 0 1px 2px rgba(20,23,37,0.04), 0 4px 12px -6px rgba(20,23,37,0.06);
+          transition: transform .2s ease, box-shadow .2s ease;
+        "
+        onmouseenter="this.style.transform='translateY(-1px)';this.style.boxShadow='0 4px 8px rgba(20,23,37,0.06), 0 16px 32px -12px rgba(20,23,37,0.12)';"
+        onmouseleave="this.style.transform='none';this.style.boxShadow='0 1px 2px rgba(20,23,37,0.04), 0 4px 12px -6px rgba(20,23,37,0.06)';">
+          <span style="position:absolute; left:0; top:14px; bottom:14px; width:3px; border-radius:999px; background:${accentColor};"></span>
+
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:16px; margin-bottom:10px;">
+            <div style="min-width:0;">
+              <div style="font-size:10px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:#6E7590; margin-bottom:3px;">Customer</div>
+              <h4 style="margin:0; font-family:'JetBrains Mono', ui-monospace, monospace; font-weight:600; font-size:15px; color:#11132D;">${notification.customerId}</h4>
+              <div style="margin-top:5px; display:inline-flex; align-items:center; gap:6px; font-size:12px; color:#4E556F;">
+                <i data-lucide="building-2" style="width:12px; height:12px; color:#7E58A1;"></i>
+                <span style="font-weight:600;">${notificationTenant}</span>
+              </div>
             </div>
             <span style="
-              background: ${statusColor};
-              color: white;
-              padding: 2px 8px;
-              border-radius: 12px;
-              font-size: 12px;
-              font-weight: bold;
+              background:${statusBg}; color:#fff;
+              padding:5px 12px; border-radius:999px;
+              font-size:10px; font-weight:800; letter-spacing:.10em; text-transform:uppercase;
+              box-shadow:${statusGlow}, 0 1px 0 rgba(255,255,255,0.20) inset;
+              white-space:nowrap;
             ">${statusText}</span>
           </div>
-          
+
           ${isReis ? `
-            <div style="font-size: 14px; margin: 5px 0;">
-              <span style="color: ${notification.isPEP ? '#ffc107' : '#28a745'};">PEP: ${notification.isPEP ? 'YES' : 'NO'}</span> | 
-              <span style="color: ${notification.isSanctioned ? '#dc3545' : '#28a745'};">Sanctions: ${notification.isSanctioned ? 'YES' : 'NO'}</span> | 
-              <span style="color: ${notification.isAdverseMedia ? '#ffc107' : '#28a745'};">Adverse Media: ${notification.isAdverseMedia ? 'YES' : 'NO'}</span>
+            <div style="display:flex; flex-wrap:wrap; gap:6px; margin: 10px 0;">
+              ${flagPill('PEP', !!notification.isPEP)}
+              ${flagPill('Sanctions', !!notification.isSanctioned)}
+              ${flagPill('Adverse Media', !!notification.isAdverseMedia)}
             </div>
           ` : ''}
-          
-          <p style="margin: 10px 0; color: #666; font-size: 14px;">${notification.message}</p>
-          <small style="color: #999;">${new Date(notification.timestamp).toLocaleString()}</small>
-          
+
+          <p style="margin:8px 0 6px; color:#363C52; font-size:13px; line-height:1.5;">${notification.message || ''}</p>
+          <small style="color:#9AA0B4; font-size:11px; font-weight:500;">${new Date(notification.timestamp).toLocaleString()}</small>
+
           ${canContinueOnboarding ? `
-            <div style="margin-top: 15px;">
+            <div style="margin-top:14px;">
               <button onclick="continueOnboardingFromHistory('${notification.customerId}', ${index})" style="
-                background: #28a745;
-                color: white;
-                border: none;
-                padding: 8px 15px;
-                border-radius: 5px;
-                cursor: pointer;
-                font-size: 14px;
-              ">Continue Onboarding</button>
+                display:inline-flex; align-items:center; gap:8px;
+                background:linear-gradient(135deg,#0EB1AF 0%,#7E58A1 100%);
+                color:#fff; border:0;
+                padding:9px 18px; border-radius:10px; cursor:pointer;
+                font-family:'Raleway','Inter',sans-serif;
+                font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+                box-shadow:0 1px 0 rgba(255,255,255,0.20) inset, 0 8px 18px -8px rgba(126,88,161,0.55);
+                transition:transform .15s ease, box-shadow .2s ease, filter .2s ease;
+              "
+              onmouseenter="this.style.transform='translateY(-1px)';this.style.filter='brightness(1.05)';this.style.boxShadow='0 1px 0 rgba(255,255,255,0.30) inset, 0 12px 24px -10px rgba(126,88,161,0.65)';"
+              onmouseleave="this.style.transform='none';this.style.filter='none';this.style.boxShadow='0 1px 0 rgba(255,255,255,0.20) inset, 0 8px 18px -8px rgba(126,88,161,0.55)';">
+                <i data-lucide="arrow-right" style="width:13px; height:13px;"></i>
+                <span>Continue Onboarding</span>
+              </button>
             </div>
           ` : ''}
         </div>
@@ -1563,22 +1651,39 @@ function showNotificationHistory() {
   }
 
   historyHTML += `
-    <div style="text-align: center; margin-top: 20px;">
+    <div style="text-align:center; margin-top:18px;">
       <button onclick="closeNotificationHistory()" style="
-        background: #6c757d;
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 14px;
-      ">Close</button>
+        background:#fff; color:#363C52;
+        border:1px solid #DEE1EB;
+        padding:10px 22px; border-radius:10px; cursor:pointer;
+        font-family:'Raleway','Inter',sans-serif;
+        font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+        transition:all .2s ease;
+      "
+      onmouseenter="this.style.background='#F5F6FA';this.style.borderColor='#AAB2E4';this.style.color='#21265C';"
+      onmouseleave="this.style.background='#fff';this.style.borderColor='#DEE1EB';this.style.color='#363C52';">
+        Close
+      </button>
     </div>
   `;
 
-  historyContent.innerHTML = historyHTML;
+  historyContent.innerHTML += historyHTML;
   historyOverlay.appendChild(historyContent);
   document.body.appendChild(historyOverlay);
+
+  // Inject keyframes once
+  if (!document.querySelector('style[data-vn-history-anim]')) {
+    const s = document.createElement('style');
+    s.setAttribute('data-vn-history-anim', 'true');
+    s.textContent = `
+      @keyframes vnOverlayIn { from { opacity: 0; } to { opacity: 1; } }
+      @keyframes vnDialogIn  { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    `;
+    document.head.appendChild(s);
+  }
+
+  // Render Lucide icons we just inserted
+  if (window.vnRenderIcons) window.vnRenderIcons();
 
   document.getElementById('clearHistory').onclick = () => {
 if (confirm(t('messages.confirmClearHistory'))) {
@@ -1633,61 +1738,110 @@ function showNotification(message, type = 'info', duration = 5000) {
   const container = document.getElementById('notificationContainer');
   if (!container) return;
 
+  // Vneuron design system semantic colors (token: --vn-success/warning/danger/info)
+  const accents = {
+    success: { bar: '#10A66F', icon: '✓', tint: 'rgba(16,166,111,0.06)' },
+    error:   { bar: '#D8434E', icon: '!', tint: 'rgba(216,67,78,0.06)' },
+    danger:  { bar: '#D8434E', icon: '!', tint: 'rgba(216,67,78,0.06)' },
+    warning: { bar: '#E0A43B', icon: '⚠', tint: 'rgba(224,164,59,0.06)' },
+    info:    { bar: '#0EB1AF', icon: 'i', tint: 'rgba(14,177,175,0.06)' }
+  };
+  const a = accents[type] || accents.info;
+
   const notification = document.createElement('div');
+  notification.className = `vn-toast vn-toast-${type}`;
   notification.style.cssText = `
-    background: ${getNotificationColor(type)};
-    color: white;
-    padding: 15px;
-    margin-bottom: 10px;
-    border-radius: 5px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-    animation: slideIn 0.3s ease-out;
-    position: relative;
-    word-wrap: break-word;
+    display:flex; align-items:flex-start; gap:12px;
+    background:linear-gradient(135deg, rgba(255,255,255,0.96) 0%, ${a.tint} 100%);
+    backdrop-filter:blur(18px) saturate(140%);
+    -webkit-backdrop-filter:blur(18px) saturate(140%);
+    color:#141725;
+    padding:14px 38px 14px 16px;
+    margin-bottom:10px;
+    border:1px solid rgba(255,255,255,0.7);
+    border-left:4px solid ${a.bar};
+    border-radius:14px;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.7) inset,
+      0 4px 12px -4px rgba(20,23,37,0.10),
+      0 16px 40px -16px rgba(20,23,37,0.30);
+    font-family:'Raleway','Inter',sans-serif;
+    font-size:13px; font-weight:500; line-height:1.45;
+    word-wrap:break-word;
+    animation:vnToastIn .35s cubic-bezier(.2,0,0,1);
+    position:relative;
   `;
 
-  const closeBtn = document.createElement('span');
+  // Status dot in front of the message
+  const dot = document.createElement('span');
+  dot.style.cssText = `
+    flex-shrink:0; width:24px; height:24px; border-radius:999px;
+    display:inline-flex; align-items:center; justify-content:center;
+    background:${a.bar}; color:#fff; font-weight:800; font-size:13px;
+    box-shadow:0 0 0 3px ${a.tint};
+    margin-top:1px;
+  `;
+  dot.textContent = a.icon;
+
+  const messageWrap = document.createElement('div');
+  messageWrap.style.cssText = 'flex:1; min-width:0; padding-top:2px;';
+  messageWrap.innerHTML = message;
+
+  const closeBtn = document.createElement('button');
+  closeBtn.type = 'button';
+  closeBtn.setAttribute('aria-label', 'Dismiss');
   closeBtn.innerHTML = '×';
   closeBtn.style.cssText = `
-    position: absolute;
-    top: 5px;
-    right: 10px;
-    cursor: pointer;
-    font-weight: bold;
-    font-size: 18px;
+    position:absolute; top:8px; right:10px;
+    width:22px; height:22px; padding:0;
+    border:0; background:transparent; cursor:pointer;
+    color:#6E7590; font-size:18px; font-weight:700; line-height:1;
+    border-radius:6px;
+    transition:background .15s ease, color .15s ease;
   `;
+  closeBtn.onmouseenter = () => { closeBtn.style.background = 'rgba(126,88,161,0.10)'; closeBtn.style.color = '#7E58A1'; };
+  closeBtn.onmouseleave = () => { closeBtn.style.background = 'transparent'; closeBtn.style.color = '#6E7590'; };
   closeBtn.onclick = () => notification.remove();
 
-  notification.innerHTML = message;
+  notification.appendChild(dot);
+  notification.appendChild(messageWrap);
   notification.appendChild(closeBtn);
   container.appendChild(notification);
 
   setTimeout(() => {
     if (notification.parentNode) {
-      notification.remove();
+      notification.style.animation = 'vnToastOut .25s cubic-bezier(.2,0,0,1) forwards';
+      setTimeout(() => notification.remove(), 260);
     }
   }, duration);
 
-  const style = document.createElement('style');
-  style.textContent = `
-    @keyframes slideIn {
-      from { transform: translateX(100%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
-    }
-  `;
   if (!document.querySelector('style[data-notifications]')) {
+    const style = document.createElement('style');
     style.setAttribute('data-notifications', 'true');
+    style.textContent = `
+      @keyframes vnToastIn {
+        from { transform: translateX(20px) scale(.96); opacity: 0; }
+        to   { transform: translateX(0) scale(1);     opacity: 1; }
+      }
+      @keyframes vnToastOut {
+        from { transform: translateX(0);     opacity: 1; }
+        to   { transform: translateX(20px);  opacity: 0; }
+      }
+    `;
     document.head.appendChild(style);
   }
 }
 
 function getNotificationColor(type) {
+  // Kept for backward compatibility with any external callers — returns
+  // the new Vneuron semantic token equivalents instead of bootstrap colors.
   switch(type) {
-    case 'success': return '#28a745';
-    case 'error': return '#dc3545';
-    case 'warning': return '#ffc107';
-    case 'info': return '#17a2b8';
-    default: return '#17a2b8';
+    case 'success': return '#10A66F';
+    case 'error':   return '#D8434E';
+    case 'danger':  return '#D8434E';
+    case 'warning': return '#E0A43B';
+    case 'info':    return '#0EB1AF';
+    default:        return '#0EB1AF';
   }
 }
 
@@ -1999,153 +2153,332 @@ subTabButtons.forEach(btn => btn.addEventListener('click', () => {
 
 function showScreeningResultsPopup(event) {
   const popup = document.getElementById('popup');
-  
+
   const popupText = document.getElementById('popupText');
   const popupLink = document.getElementById('popupLink');
   const closePopupBtn = document.getElementById('closePopup');
   if (popupText) popupText.style.display = 'none';
   if (popupLink) popupLink.style.display = 'none';
   if (closePopupBtn) closePopupBtn.style.display = 'none';
-  
+
+  // Vneuron design: glass card, brand-gradient top accent.
+  // Color the top accent by severity (sanctioned = danger, else warning).
+  const accent = event.isSanctioned ? '#D8434E' : '#E0A43B';
+  const accentDeep = event.isSanctioned ? '#7F1F27' : '#7A5511';
+
   popup.innerHTML = '';
   popup.style.cssText = `
     display: block;
-    position: fixed;
-    top: 50%;
-    left: 50%;
+    position: fixed; top: 50%; left: 50%;
     transform: translate(-50%, -50%);
-    background: white;
+    background: rgba(255,255,255,0.97);
+    backdrop-filter: blur(20px) saturate(140%);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
     padding: 0;
-    border-radius: 10px;
-    box-shadow: 0 5px 25px rgba(0,0,0,0.4);
+    border: 1px solid rgba(255,255,255,0.7);
+    border-radius: 20px;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.7) inset,
+      0 30px 80px -20px rgba(20,23,37,0.45);
     z-index: 1000;
-    min-width: 500px;
-    max-width: 600px;
-    border: 2px solid #FF9800;
-    border-left: 6px solid #FF9800;
-    animation: pulse 2s ease-in-out infinite;
+    min-width: 520px;
+    max-width: 620px;
+    width: min(620px, 92vw);
+    overflow: hidden;
+    font-family: 'Raleway','Inter',sans-serif;
+    animation: vnDialogIn .35s cubic-bezier(.2,0,0,1);
   `;
-  
-  if (!document.querySelector('style[data-pulse-animation]')) {
-    const style = document.createElement('style');
-    style.setAttribute('data-pulse-animation', 'true');
-    style.textContent = `
-      @keyframes pulse {
-        0%, 100% { box-shadow: 0 5px 25px rgba(0,0,0,0.4); }
-        50% { box-shadow: 0 5px 30px rgba(255, 152, 0, 0.6); }
-      }
-    `;
-    document.head.appendChild(style);
-  }
-  
+
+  // Top accent bar (semantic color, NOT the brand gradient — this is alert content)
+  const accentBar = document.createElement('div');
+  accentBar.style.cssText = `
+    height: 5px;
+    background: linear-gradient(90deg, ${accent} 0%, #7E58A1 50%, #0EB1AF 100%);
+  `;
+
   const currentTenant = tokenManager.getTenant() || localStorage.getItem('tenantName') || 'BANKFR';
-  
+
+  // Header with gradient icon tile + eyebrow + title
   const header = document.createElement('div');
-  header.style.cssText = 'display: flex; align-items: center; gap: 12px; padding: 20px; border-bottom: 1px solid #e0e0e0;';
-  header.innerHTML = `<span style="font-size: 2rem;">🔔</span><h3 style="color: #FF9800; font-size: 1.2rem; font-weight: 600; margin: 0;">${t('popupTitles.reisKycHits')}</h3>`;
-  
+  header.style.cssText = `
+    display: flex; align-items: center; gap: 14px;
+    padding: 24px 26px 18px;
+  `;
+  header.innerHTML = `
+    <div style="
+      width: 48px; height: 48px; border-radius: 14px;
+      background: linear-gradient(135deg, ${accent} 0%, #7E58A1 100%);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 8px 18px -6px ${accent}55, 0 1px 0 rgba(255,255,255,0.25) inset;
+    ">
+      <i data-lucide="shield-alert" style="color:#fff; width:24px; height:24px;"></i>
+    </div>
+    <div style="flex:1; min-width:0;">
+      <div style="font-size:11px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:${accentDeep}; margin-bottom:2px;">
+        Reis™ KYC Hits
+      </div>
+      <h3 style="margin:0; font-family:'Raleway','Inter',sans-serif; font-weight:800; font-size:20px; letter-spacing:-.01em; color:#11132D;">
+        ${t('popupTitles.reisKycHits')}
+      </h3>
+    </div>
+  `;
+
+  const divider = document.createElement('div');
+  divider.style.cssText = 'height:1px; background:linear-gradient(90deg,transparent,#DEE1EB,transparent); margin: 0 24px;';
+
   const content = document.createElement('div');
-  content.style.cssText = 'padding: 20px; color: #333; line-height: 1.6; font-size: 0.95rem;';
-  
-  const pepText = event.isPEP ? t('status.pepYes') : t('status.pepNo');
-  const sanctionText = event.isSanctioned ? t('status.pepYes') : t('status.pepNo');
-  const adverseMediaText = event.isAdverseMedia ? t('status.adverseMediaYes') : t('status.adverseMediaNo');
-  
-  let contentHTML = `<div style="margin-bottom: 15px;"><strong>${t('status.tenant')}</strong> ${currentTenant}</div>`;
-  contentHTML += `<div style="margin-bottom: 15px;"><strong>${t('status.customerKycId')}</strong> ${event.customerId}</div>`;
-  contentHTML += `<div style="margin-bottom: 15px;"><strong>${t('status.processingResults')}</strong></div>`;
-  contentHTML += `<div style="margin-left: 20px; margin-bottom: 10px;">`;
-  contentHTML += `• <strong>${t('status.pepStatus')}</strong> ${event.isPEP ? `<span style="color: #ffc107;">⚠️ ${pepText}</span>` : `<span style="color: #28a745;">✅ ${pepText}</span>`} (${event.pepDecision || 'N/A'})<br>`;
-  contentHTML += `• <strong>${t('status.sanctions')}</strong> ${event.isSanctioned ? `<span style="color: #dc3545;">🚨 ${sanctionText}</span>` : `<span style="color: #28a745;">✅ ${sanctionText}</span>`} (${event.sanctionDecision || 'N/A'})<br>`;
-  contentHTML += `• <strong>${t('status.adverseMedia')}</strong> ${event.isAdverseMedia ? `<span style="color: #ffc107;">⚠️ ${adverseMediaText}</span>` : `<span style="color: #28a745;">✅ ${adverseMediaText}</span>`}`;
-  contentHTML += `</div>`;
-  contentHTML += `<div style="margin-top: 15px; padding: 15px; background: ${event.isSanctioned ? '#f8d7da' : '#d4edda'}; border-radius: 5px;">`;
-  contentHTML += `<strong>${t('status.onboardingDecision')}</strong><br>`;
-  if (event.isSanctioned) {
-    contentHTML += `<span style="color: #721c24;">${t('status.cannotProceed')}</span>`;
-  } else {
-    contentHTML += `<span style="color: #155724;">${t('status.canProceed')}</span>`;
-  }
-  contentHTML += `</div>`;
-  
+  content.style.cssText = 'padding: 20px 26px 8px; color:#363C52; line-height:1.55; font-size:14px;';
+
+  // Customer/tenant info row — eyebrow labels + values
+  const metaRow = (label, value, mono = false) => `
+    <div style="margin-bottom: 12px;">
+      <div style="font-size:10px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:#6E7590; margin-bottom:3px;">${label}</div>
+      <div style="font-family:${mono ? "'JetBrains Mono',ui-monospace,monospace" : "inherit"}; font-weight:600; font-size:14px; color:#11132D;">${value}</div>
+    </div>`;
+
+  // Status row helper
+  const statusRow = (label, on, decision, severity) => {
+    // severity: 'pep' (warning), 'sanction' (danger), 'media' (warning)
+    const isClean = !on;
+    const fg   = isClean ? '#086B47' : (severity === 'sanction' ? '#7F1F27' : '#7A5511');
+    const bg   = isClean ? 'rgba(16,166,111,0.08)' : (severity === 'sanction' ? 'rgba(216,67,78,0.10)' : 'rgba(224,164,59,0.12)');
+    const dot  = isClean ? '#10A66F' : (severity === 'sanction' ? '#D8434E' : '#E0A43B');
+    const icon = isClean ? 'check' : (severity === 'sanction' ? 'shield-x' : 'alert-triangle');
+    const txt  = isClean ? (severity === 'media' ? t('status.adverseMediaNo') : t('status.pepNo')) : (severity === 'media' ? t('status.adverseMediaYes') : t('status.pepYes'));
+    return `
+      <div style="
+        display:flex; align-items:center; justify-content:space-between; gap:14px;
+        padding: 11px 14px; margin-bottom: 8px;
+        background:${bg}; border:1px solid ${bg}; border-radius: 12px;
+      ">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span style="
+            width:28px; height:28px; border-radius:999px;
+            background:${dot}; color:#fff;
+            display:inline-flex; align-items:center; justify-content:center;
+            box-shadow:0 0 0 3px ${bg};
+          ">
+            <i data-lucide="${icon}" style="width:15px; height:15px;"></i>
+          </span>
+          <span style="font-weight:700; font-size:13px; color:${fg};">${label}</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span style="font-size:12px; font-weight:700; color:${fg};">${txt}</span>
+          <span style="
+            font-size:10px; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+            color:${fg}; opacity:.75;
+            padding: 2px 8px; border-radius:999px; background:rgba(255,255,255,0.55);
+          ">${decision || 'N/A'}</span>
+        </div>
+      </div>`;
+  };
+
+  // Decision banner (semantic + brand)
+  const decisionBg   = event.isSanctioned ? 'linear-gradient(135deg, rgba(216,67,78,0.10) 0%, rgba(216,67,78,0.18) 100%)' : 'linear-gradient(135deg, rgba(16,166,111,0.10) 0%, rgba(14,177,175,0.18) 100%)';
+  const decisionFg   = event.isSanctioned ? '#7F1F27' : '#086B47';
+  const decisionIcon = event.isSanctioned ? 'octagon-x' : 'check-circle-2';
+  const decisionTxt  = event.isSanctioned ? t('status.cannotProceed') : t('status.canProceed');
+
+  let contentHTML = `
+    ${metaRow(t('status.tenant').replace(':',''), currentTenant)}
+    ${metaRow(t('status.customerKycId').replace(':',''), event.customerId, true)}
+    <div style="font-size:10px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:#6E7590; margin: 6px 0 10px;">${t('status.processingResults').replace(':','')}</div>
+    ${statusRow(t('status.pepStatus').replace(':',''),       !!event.isPEP,          event.pepDecision,      'pep')}
+    ${statusRow(t('status.sanctions').replace(':',''),       !!event.isSanctioned,   event.sanctionDecision, 'sanction')}
+    ${statusRow(t('status.adverseMedia').replace(':',''),    !!event.isAdverseMedia, null,                   'media')}
+
+    <div style="
+      display:flex; align-items:flex-start; gap:12px;
+      margin-top: 14px; padding: 14px 16px;
+      background: ${decisionBg};
+      border: 1px solid rgba(255,255,255,0.5);
+      border-radius: 14px;
+    ">
+      <span style="
+        width:32px; height:32px; flex-shrink:0; border-radius:10px;
+        background: ${event.isSanctioned ? '#D8434E' : 'linear-gradient(135deg,#10A66F 0%,#0EB1AF 100%)'};
+        color:#fff;
+        display:inline-flex; align-items:center; justify-content:center;
+        box-shadow: 0 4px 10px -3px ${event.isSanctioned ? 'rgba(216,67,78,0.45)' : 'rgba(16,166,111,0.45)'};
+      ">
+        <i data-lucide="${decisionIcon}" style="width:18px; height:18px;"></i>
+      </span>
+      <div style="flex:1; min-width:0;">
+        <div style="font-size:10px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:${decisionFg}; opacity:.8; margin-bottom:3px;">
+          ${t('status.onboardingDecision').replace(':','')}
+        </div>
+        <div style="font-weight:700; font-size:14px; color:${decisionFg}; line-height:1.4;">
+          ${decisionTxt}
+        </div>
+      </div>
+    </div>
+  `;
   content.innerHTML = contentHTML;
-  
+
+  // Footer buttons
   const buttonsContainer = document.createElement('div');
-  buttonsContainer.style.cssText = 'padding: 20px; display: flex; gap: 10px; justify-content: flex-end; border-top: 1px solid #e0e0e0;';
-  
+  buttonsContainer.style.cssText = `
+    display: flex; gap: 10px; justify-content: flex-end;
+    padding: 18px 24px 22px;
+    background: linear-gradient(180deg, transparent 0%, #FBFBFD 100%);
+    border-top: 1px solid #EDEFF4;
+  `;
+
   if (!event.isSanctioned) {
     const continueBtn = document.createElement('button');
-    continueBtn.textContent = t('buttons.continueOnboarding');
-    continueBtn.style.cssText = 'padding: 10px 20px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: 600;';
+    continueBtn.innerHTML = `<i data-lucide="arrow-right" style="width:14px; height:14px;"></i><span>${t('buttons.continueOnboarding')}</span>`;
+    continueBtn.style.cssText = `
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 10px 20px;
+      background: linear-gradient(135deg,#0EB1AF 0%,#7E58A1 100%);
+      color: #fff; border: 0; border-radius: 12px; cursor: pointer;
+      font-family:'Raleway','Inter',sans-serif;
+      font-size: 12px; font-weight: 700; letter-spacing:.06em; text-transform: uppercase;
+      box-shadow: 0 1px 0 rgba(255,255,255,0.25) inset, 0 8px 20px -8px rgba(126,88,161,0.55);
+      transition: transform .15s ease, filter .2s ease, box-shadow .2s ease;
+    `;
+    continueBtn.onmouseenter = () => { continueBtn.style.transform='translateY(-1px)'; continueBtn.style.filter='brightness(1.05)'; };
+    continueBtn.onmouseleave = () => { continueBtn.style.transform='none'; continueBtn.style.filter='none'; };
     continueBtn.onclick = () => {
       navigateToOnboarding(event.customerId);
       popup.style.display = 'none';
     };
     buttonsContainer.appendChild(continueBtn);
   }
-  
+
   const closeBtn = document.createElement('button');
-closeBtn.textContent = t('buttons.close');
-  closeBtn.style.cssText = 'padding: 10px 20px; background-color: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: 600;';
+  closeBtn.textContent = t('buttons.close');
+  closeBtn.style.cssText = `
+    padding: 10px 22px;
+    background: #fff; color: #363C52;
+    border: 1px solid #DEE1EB; border-radius: 12px; cursor: pointer;
+    font-family:'Raleway','Inter',sans-serif;
+    font-size: 12px; font-weight: 700; letter-spacing:.08em; text-transform: uppercase;
+    transition: all .2s ease;
+  `;
+  closeBtn.onmouseenter = () => { closeBtn.style.background='#F5F6FA'; closeBtn.style.borderColor='#AAB2E4'; closeBtn.style.color='#21265C'; };
+  closeBtn.onmouseleave = () => { closeBtn.style.background='#fff';   closeBtn.style.borderColor='#DEE1EB'; closeBtn.style.color='#363C52'; };
   closeBtn.onclick = () => popup.style.display = 'none';
   buttonsContainer.appendChild(closeBtn);
-  
+
+  popup.appendChild(accentBar);
   popup.appendChild(header);
+  popup.appendChild(divider);
   popup.appendChild(content);
   popup.appendChild(buttonsContainer);
+
+  // Render Lucide icons we just inserted
+  if (window.vnRenderIcons) window.vnRenderIcons();
 }
 
 function showScreeningResponsePopup(message, link = null, showContinueButton = false, customerData = null, apiResponse = null) {
   const popup = document.getElementById('popup');
-  
+
   const popupText = document.getElementById('popupText');
   const popupLink = document.getElementById('popupLink');
   const closePopupBtn = document.getElementById('closePopup');
   if (popupText) popupText.style.display = 'none';
   if (popupLink) popupLink.style.display = 'none';
   if (closePopupBtn) closePopupBtn.style.display = 'none';
-  
+
   popup.innerHTML = '';
   popup.style.cssText = `
     display: block;
-    position: fixed;
-    top: 50%;
-    left: 50%;
+    position: fixed; top: 50%; left: 50%;
     transform: translate(-50%, -50%);
-    background: white;
+    background: rgba(255,255,255,0.97);
+    backdrop-filter: blur(20px) saturate(140%);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
     padding: 0;
-    border-radius: 10px;
-    box-shadow: 0 5px 25px rgba(0,0,0,0.4);
+    border: 1px solid rgba(255,255,255,0.7);
+    border-radius: 20px;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.7) inset,
+      0 30px 80px -20px rgba(20,23,37,0.45);
     z-index: 1000;
-    min-width: 500px;
-    max-width: 600px;
-    border: 2px solid #007ACC;
-    border-left: 6px solid #007ACC;
+    min-width: 520px; max-width: 620px;
+    width: min(620px, 92vw);
+    overflow: hidden;
+    font-family: 'Raleway','Inter',sans-serif;
+    animation: vnDialogIn .35s cubic-bezier(.2,0,0,1);
   `;
-  
+
+  // Brand-gradient top accent (full triad, since this is a positive/info popup)
+  const accentBar = document.createElement('div');
+  accentBar.style.cssText = `
+    height: 5px;
+    background: linear-gradient(90deg,#2A3078 0%,#7E58A1 55%,#0EB1AF 100%);
+  `;
+
   const header = document.createElement('div');
-  header.style.cssText = 'display: flex; align-items: center; gap: 12px; padding: 20px; border-bottom: 1px solid #e0e0e0;';
-  header.innerHTML = `<span style="font-size: 2rem;">🔍</span><h3 style="color: #007ACC; font-size: 1.2rem; font-weight: 600; margin: 0;">${t('popupTitles.screeningResponse')}</h3>`;
+  header.style.cssText = 'display:flex; align-items:center; gap:14px; padding: 24px 26px 18px;';
+  header.innerHTML = `
+    <div style="
+      width:48px; height:48px; border-radius:14px;
+      background: linear-gradient(135deg,#0EB1AF 0%,#7E58A1 100%);
+      display:flex; align-items:center; justify-content:center;
+      box-shadow: 0 8px 18px -6px rgba(126,88,161,0.45), 0 1px 0 rgba(255,255,255,0.25) inset;
+    ">
+      <i data-lucide="search" style="color:#fff; width:22px; height:22px;"></i>
+    </div>
+    <div style="flex:1; min-width:0;">
+      <div style="font-size:11px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:#343B95; margin-bottom:2px;">
+        Simulation Result
+      </div>
+      <h3 style="margin:0; font-family:'Raleway','Inter',sans-serif; font-weight:800; font-size:20px; letter-spacing:-.01em; color:#11132D;">
+        ${t('popupTitles.screeningResponse')}
+      </h3>
+    </div>
+  `;
+
+  const divider = document.createElement('div');
+  divider.style.cssText = 'height:1px; background:linear-gradient(90deg,transparent,#DEE1EB,transparent); margin: 0 24px;';
+
   const content = document.createElement('div');
-  content.style.cssText = 'padding: 20px; color: #333; line-height: 1.6; font-size: 0.95rem;';
-  content.innerHTML = message; 
-  
+  content.style.cssText = 'padding: 20px 26px 8px; color:#363C52; line-height:1.55; font-size:14px;';
+  content.innerHTML = message;
+
   if (link) {
-    const linkElement = document.createElement('a');
-    linkElement.href = link;
-    linkElement.target = '_blank';
-    linkElement.textContent = link;
-    linkElement.style.cssText = 'color: #007ACC; text-decoration: underline; display: block; margin-top: 10px; word-break: break-all;';
-    content.appendChild(linkElement);
+    const linkWrap = document.createElement('div');
+    linkWrap.style.cssText = `
+      display:flex; align-items:center; gap:8px;
+      margin-top:14px; padding: 12px 14px;
+      background: linear-gradient(135deg, rgba(14,177,175,0.06) 0%, rgba(126,88,161,0.06) 100%);
+      border: 1px solid #EDEFF4; border-radius: 12px;
+    `;
+    linkWrap.innerHTML = `
+      <i data-lucide="link-2" style="width:16px; height:16px; color:#7E58A1; flex-shrink:0;"></i>
+      <a href="${link}" target="_blank"
+         style="color:#0B908E; font-family:'JetBrains Mono',ui-monospace,monospace; font-size:12px; text-decoration:none; word-break:break-all; flex:1; min-width:0;"
+         onmouseenter="this.style.color='#7E58A1';"
+         onmouseleave="this.style.color='#0B908E';">${link}</a>
+    `;
+    content.appendChild(linkWrap);
   }
-  
+
   const buttonsContainer = document.createElement('div');
-  buttonsContainer.style.cssText = 'padding: 20px; display: flex; gap: 10px; justify-content: flex-end; border-top: 1px solid #e0e0e0;';
-  
+  buttonsContainer.style.cssText = `
+    display:flex; gap:10px; justify-content:flex-end;
+    padding: 18px 24px 22px;
+    background: linear-gradient(180deg, transparent 0%, #FBFBFD 100%);
+    border-top: 1px solid #EDEFF4;
+  `;
+
   if (showContinueButton && customerData && apiResponse) {
     const continueBtn = document.createElement('button');
-continueBtn.textContent = t('buttons.continueOnboarding');
-    continueBtn.style.cssText = 'padding: 10px 20px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: 600;';
+    continueBtn.innerHTML = `<i data-lucide="arrow-right" style="width:14px; height:14px;"></i><span>${t('buttons.continueOnboarding')}</span>`;
+    continueBtn.style.cssText = `
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 10px 20px;
+      background: linear-gradient(135deg,#0EB1AF 0%,#7E58A1 100%);
+      color:#fff; border: 0; border-radius: 12px; cursor: pointer;
+      font-family:'Raleway','Inter',sans-serif;
+      font-size: 12px; font-weight: 700; letter-spacing:.06em; text-transform: uppercase;
+      box-shadow: 0 1px 0 rgba(255,255,255,0.25) inset, 0 8px 20px -8px rgba(126,88,161,0.55);
+      transition: transform .15s ease, filter .2s ease;
+    `;
+    continueBtn.onmouseenter = () => { continueBtn.style.transform='translateY(-1px)'; continueBtn.style.filter='brightness(1.05)'; };
+    continueBtn.onmouseleave = () => { continueBtn.style.transform='none'; continueBtn.style.filter='none'; };
     continueBtn.onclick = () => {
       const customerId = apiResponse.customerId || apiResponse.customer_id || apiResponse.id;
       if (!customerId) {
@@ -2209,16 +2542,29 @@ continueBtn.textContent = t('buttons.continueOnboarding');
     };
     buttonsContainer.appendChild(continueBtn);
   }
-  
+
   const closeBtn = document.createElement('button');
-closeBtn.textContent = t('buttons.close');
-  closeBtn.style.cssText = 'padding: 10px 20px; background-color: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: 600;';
+  closeBtn.textContent = t('buttons.close');
+  closeBtn.style.cssText = `
+    padding: 10px 22px;
+    background:#fff; color:#363C52;
+    border:1px solid #DEE1EB; border-radius: 12px; cursor: pointer;
+    font-family:'Raleway','Inter',sans-serif;
+    font-size: 12px; font-weight: 700; letter-spacing:.08em; text-transform: uppercase;
+    transition: all .2s ease;
+  `;
+  closeBtn.onmouseenter = () => { closeBtn.style.background='#F5F6FA'; closeBtn.style.borderColor='#AAB2E4'; closeBtn.style.color='#21265C'; };
+  closeBtn.onmouseleave = () => { closeBtn.style.background='#fff';   closeBtn.style.borderColor='#DEE1EB'; closeBtn.style.color='#363C52'; };
   closeBtn.onclick = () => popup.style.display = 'none';
   buttonsContainer.appendChild(closeBtn);
-  
+
+  popup.appendChild(accentBar);
   popup.appendChild(header);
+  popup.appendChild(divider);
   popup.appendChild(content);
   popup.appendChild(buttonsContainer);
+
+  if (window.vnRenderIcons) window.vnRenderIcons();
 }
 
 
