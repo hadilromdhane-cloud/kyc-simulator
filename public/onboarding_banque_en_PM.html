@@ -1,9 +1,15 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Onboarding PM - BankFR</title>
+    <title>Legal Entity Onboarding - Banque EN</title>
+    <link rel="stylesheet" href="vneuron/tokens.css">
+    <link rel="stylesheet" href="vneuron/onboarding-luxe.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="icon" type="image/png" href="vneuron/assets/logo-spark.png">
     <style>
         * {
             margin: 0;
@@ -27,29 +33,8 @@
             overflow: hidden;
         }
 
-        .header {
-            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
-            position: relative;
-        }
-
-        .header h1 {
-            font-size: 2.2rem;
-            margin-bottom: 10px;
-            font-weight: 300;
-        }
-
-        .customer-info {
-            background: rgba(255,255,255,0.1);
-            padding: 10px 15px;
-            border-radius: 10px;
-            font-size: 1rem;
-            position: absolute;
-            top: 20px;
-            right: 20px;
-        }
+        /* .header and .customer-info are styled by vneuron/onboarding-luxe.css
+           — keep them un-overridden here so the design-system rules win. */
 
         .tabs {
             display: flex;
@@ -352,6 +337,7 @@
             <div id="identification" class="tab-content active">
                 <div class="form-section">
                     <h2 class="section-title">
+                        <i data-lucide="building-2" class="lx-icon"></i>
                         Identification de l'Entité
                     </h2>
                     
@@ -446,6 +432,7 @@
 
                 <div class="form-section">
                     <h2 class="section-title">
+                        <i data-lucide="landmark" class="lx-icon"></i>
                         Siège Social
                     </h2>
                     
@@ -497,6 +484,7 @@
             <div id="financial" class="tab-content">
                 <div class="form-section">
                     <h2 class="section-title">
+                        <i data-lucide="banknote" class="lx-icon"></i>
                         Informations Financières
                     </h2>
                     
@@ -568,6 +556,7 @@
             <div id="relations" class="tab-content">
                 <div class="form-section">
                     <h2 class="section-title">
+                        <i data-lucide="users-round" class="lx-icon"></i>
                         Personnes Liées à l'Entité
                     </h2>
                     
