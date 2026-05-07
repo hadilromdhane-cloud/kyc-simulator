@@ -702,12 +702,16 @@ fetchRiskLevel: async function(riskCalculationId) {
         console.log('Entering security lock branch'); 
         Utils.log('Pre-populating form with locked screening data');
         
+        // banque_en: pre-fill these fields from screening data, but keep them
+        // editable (readonly: false) so the analyst can still adjust before
+        // submission. Only the strictly identity-bound fields (name, DOB)
+        // remain locked.
         const secureFieldMappings = [
         { screeningField: 'firstName', onboardingFields: ['prenom', 'firstName'], readonly: true, label: 'Prénom/First Name' },
         { screeningField: 'lastName', onboardingFields: ['nom', 'lastName'], readonly: true, label: 'Nom/Last Name' },
         { screeningField: 'birthDate', onboardingFields: ['dateNaissance', 'dateOfBirth'], readonly: true, label: 'Date de naissance/Birth Date' },
-        { screeningField: 'Nationalite', onboardingFields: ['Nationalite', 'nationality'], readonly: true, label: 'Nationalité/Nationality', fieldType: 'select' },
-        { screeningField: 'PaysDeResidence', onboardingFields: ['PaysDeResidence', 'countryOfResidence','citizenship'], readonly: true, label: 'Pays de Résidence/Country of Residence', fieldType: 'select' }
+        { screeningField: 'Nationalite', onboardingFields: ['Nationalite', 'nationality'], readonly: false, label: 'Nationalité/Nationality', fieldType: 'select' },
+        { screeningField: 'PaysDeResidence', onboardingFields: ['PaysDeResidence', 'countryOfResidence','citizenship'], readonly: false, label: 'Pays de Résidence/Country of Residence', fieldType: 'select' }
     ];
         let fieldsLocked = 0;
 
