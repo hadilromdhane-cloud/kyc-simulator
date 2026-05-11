@@ -117,122 +117,126 @@ const OnboardingHandler = (function() {
         },
 
         mapFormDataToPayload: function(formData) {
-            // EXACT clone of bankfr's payload — zero changes.
-            // Goal: confirm banque_en API accepts the same shape as bankfr.
-            // Once this works we'll layer English values back in incrementally.
+            // Mirror of the working Postman payload for banque_en.
+            // Key differences vs bankfr:
+            //   • No `customerId` / `customerRelationName` at root
+            //   • Adds `onBehalfOfUser: "admin"` at root
+            //   • Adds `fatcaIdentification` and `relations` at root
+            //   • items.process_type = "onboarding"
+            //   • English isSanctionnedWorkflow="No", English isPepWorkflow,
+            //     English tin_ (id 14)
+            //   • product/source_of_funds are arrays of CODES, onboarding_channel is a CODE
+            //   • mscq/pep/pliberal = "n"
+            //   • Removes Nationalite, Profession, Produit, OrigineDesFonds,
+            //     PaysDeResidence, CanalDeDistribution, customer_type, id,
+            //     searchId, listsNames, luneDeVos..., outboundSystems,
+            //     hasRiskedCountry, isPEP, isSanctioned, isSanctionned, eaiIds
             const customerId = parseInt(customerData.customerId) || Utils.generateCustomerId();
             const currentDateTime = new Date().toISOString();
-            return {
+            const docTypeId   = this.getDocumentTypeIdEN(formData.typePiece);
+            const docTypeName = this.getDocumentTypeNameEN(formData.typePiece);
 
-                    customerId: customerId,
-                    customerRelationName: "",
-                    formId: "1",
-                    systemName: customerData.systemName || "",
-                    systemId: customerData.systemId || "",
-                    items: {
-                        isSanctionnedWorkflow: "Non",
-                        AddressDataGrid: [],
-                        PaysDeResidence: formData.PaysDeResidence || "",
-                        address: [],
-                        address_doc: [],
-                        address_proof_type: {},
-                        adresseDeResidence: formData.adresse || "",
-                        agence: "headquarters",
-                        agencyId: 3,
-                        agencyName: "headquarters",
-                        agency_location: null,
-                        birth_date: formData.dateNaissance || "",
-                        businessName: "",
-                        CanalDeDistribution: formData.canal || "",
-                        containerelm: {
-                            "profession-2": "",
-                            retrieved_dob: "",
-                            retrieved_last_name: "",
-                            retrieved_first_name: "",
-                            "citizenship-2": "",
-                            retrieved_address: ""
-                        },
-                        createdBy: "admin",
-                        createdOn: currentDateTime,
-                        creatorFirstName: "System",
-                        creatorId: 1,
-                        creatorLastName: "User",
-                        current_date: currentDateTime,
-                        current_user_id: 1,
-                        current_user_name: "System User",
-                        cus_birth_date: formData.dateNaissance || "",
-                        customerUrl: "https://greataml.com/",
-                        customer_type: "manual-entry",
-                        dataGrid: [{
-                            select: "",
-                            nature: "",
-                            tx_nature: {}
-                        }],
-                        dataGrid1: [{
-                            source_of_funds_doctype: {},
-                            source_of_funds_doc: []
-                        }],
-                        delivery_date: formData.dateDelivrance || "",
-                        distribution_channel: null,
-                        dpr: "",
-                        eaiIds: {},
-                        email: formData.email || "",
-                        entityType: "PP",
-                        expiry_date: formData.dateExpiration || "",
-                        extendedProperties: {},
-                        first_name: formData.prenom || "",
-                        fiscale_ville: formData.ville || "",
-                        form_entity_type: "PP",
-                        hasRiskedCountry: false,
-                        id: customerId,
-                        id_doc: [],
-                        invokeElm: false,
-                        isPEP: false,
-                        isPepWorkflow: "<li>Personne politiquement exposée : <b> <span> Non</span></b></li>",
-                        isSanctioned: false,
-                        isSanctionned: false,
-                        is_hq_user: false,
-                        last_name: formData.nom || "",
-                        last_update: currentDateTime,
-                        listsNames: [],
-                        luneDeVosRelationsPresenteTElleLunDesIndicesDamericaniteDefinisParLaLoiFatca: "",
-                        marital_status: formData.etatCivil || "",
-                        modificationDate: currentDateTime,
-                        mscq: "",
-                        nationality: formData.nationalite || "",
-                        nid: formData.numeroPiece || "",
-                        obnl_name: formData.nom || "",
-                        OrigineDesFonds: [formData.origineFonds || ""],
-                        outboundSystems: null,
-                        Nationalite: formData.Nationalite || "",
-                        pep: "",
-                        pliberal: "",
-                        postal_code: formData.codePostal || "",
-                        process_type: "",
-                        Produit: [formData.produits || ""],
-                        Profession: formData.profession || "",
-                        revenuAnnuelNet: parseInt(formData.revenu) || 0,
-                        rm_fn: "System",
-                        rm_ln: "User",
-                        rm_username: "admin",
-                        searchId: Math.floor(Math.random() * 100000),
-                        tel1: formData.telephone || "",
-                        tel2: formData.portable || "",
-                        tiin_doc: [],
-                        tin_: {
-                            id: this.getDocumentTypeId(formData.typePiece),
-                            name: this.getDocumentTypeName(formData.typePiece),
-                            value: formData.typePiece || "",
-                            translate: this.getDocumentTypeName(formData.typePiece),
-                            parentId: null,
-                            parentName: null,
-                            uniqueCode: `${this.getDocumentTypeName(formData.typePiece)}:${formData.typePiece}:tin`,
-                            tags: ["tin"]
-                        },
-                        url: "https://greataml.com/"
-                    }
-                };
-            }
+            return {
+                systemName: customerData.systemName || "T24",
+                systemId: customerData.systemId || `t24-${customerId}`,
+                formId: "1",
+                onBehalfOfUser: "admin",
+                items: {
+                    isSanctionnedWorkflow: "No",
+                    isPepWorkflow: "<li>PEP : <b> <span> No</span></b></li>",
+                    agence: "headquarters",
+                    rm_username: "admin",
+                    rm_fn: "System",
+                    rm_ln: "User",
+                    process_type: "onboarding",
+                    createdOn: currentDateTime,
+                    dpr: "",
+                    last_update: currentDateTime,
+                    first_name: formData.prenom || "",
+                    last_name: formData.nom || "",
+                    birth_date: formData.dateNaissance || "",
+                    nationality: formData.Nationalite || "",
+                    marital_status: formData.etatCivil || "",
+                    tel1: formData.telephone || "",
+                    email: formData.email || "",
+                    adresseDeResidence: formData.adresse || "",
+                    postal_code: formData.codePostal || "",
+                    fiscale_ville: formData.ville || "",
+                    Country_of_residence: formData.PaysDeResidence || "",
+                    tin_: {
+                        id: docTypeId,
+                        name: docTypeName,
+                        value: formData.typePiece || "",
+                        translate: docTypeName,
+                        parentId: null,
+                        parentName: null,
+                        uniqueCode: `${docTypeName}:${formData.typePiece}:tin`,
+                        tags: ["tin"]
+                    },
+                    nid: formData.numeroPiece || "",
+                    delivery_date: formData.dateDelivrance || "",
+                    expiry_date: formData.dateExpiration || "",
+                    profession: formData.profession || "",
+                    product: formData.produits ? [formData.produits] : [],
+                    onboarding_channel: formData.canal || "",
+                    source_of_funds: formData.origineFonds ? [formData.origineFonds] : [],
+                    dataGrid: [{ select: "", nature: "", tx_nature: {} }],
+                    mscq: "n",
+                    pep: "n",
+                    pliberal: "n",
+                    id_doc: [],
+                    address_proof_type: {},
+                    address_doc: [],
+                    tiin_doc: [],
+                    dataGrid1: [{ source_of_funds_doctype: {}, source_of_funds_doc: [] }],
+                    invokeElm: false,
+                    containerelm: {
+                        "profession-2": "",
+                        retrieved_dob: "",
+                        retrieved_last_name: "",
+                        retrieved_first_name: "",
+                        "citizenship-2": "",
+                        retrieved_address: ""
+                    },
+                    businessName: "",
+                    entityType: "PP",
+                    createdBy: "admin",
+                    creatorId: 2,
+                    creatorFirstName: "Adel",
+                    creatorLastName: "Klein",
+                    modificationDate: currentDateTime,
+                    extendedProperties: {},
+                    citizenship: formData.PaysDeResidence || "",
+                    agencyId: 3,
+                    agencyName: "headquarters",
+                    AddressDataGrid: [],
+                    current_date: currentDateTime,
+                    form_entity_type: "PP",
+                    cus_birth_date: formData.dateNaissance || "",
+                    url: "https://greataml.com/",
+                    is_hq_user: false,
+                    current_user_name: "Adel Klein",
+                    current_user_id: 2,
+                    agency_location: null,
+                    distribution_channel: null,
+                    obnl_name: formData.nom || "",
+                    customerUrl: "https://greataml.com/",
+                    revenuAnnuelNet: parseInt(formData.revenu) || 0,
+                    n_relations: 0,
+                    address: []
+                },
+                fatcaIdentification: {
+                    americanCitizen: "false",
+                    greenCard: "false",
+                    americanResident: "false",
+                    americanVisit: "false",
+                    address: null,
+                    beneficialOwners: null,
+                    hasBeneficialOwners: null
+                },
+                relations: []
+            };
+        }
 
     };
 
