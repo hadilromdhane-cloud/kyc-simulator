@@ -1341,31 +1341,75 @@ function createNotificationElements() {
 // The picker shows checkboxes for every re-onboardable field. Ticking a
 // checkbox dynamically appends the corresponding input/select below; unticking
 // removes it. Only the visible fields are sent to the API on submit.
+//
+// Field names are TENANT-AWARE: bankfr uses the French-named keys
+// (Nationalite, Profession, Produit[], OrigineDesFonds[], CanalDeDistribution,
+// PaysDeResidence) that the bankfr API expects; banque_en uses the
+// English-named keys (nationality, Country_of_residence, citizenship,
+// profession, product[], onboarding_channel, source_of_funds[]) — same
+// shape sent during the regular onboarding flow on each tenant.
+// `wrapArray: true` means the value is sent as a single-item array.
 // =====================================================================
-const REONBOARD_AVAILABLE_FIELDS = {
-  PP: [
-    { key: 'nationality',          label: 'Nationality',          type: 'country' },
-    { key: 'Country_of_residence', label: 'Country of Residence', type: 'country' },
-    { key: 'citizenship',          label: 'Citizenship',          type: 'country' },
-    { key: 'profession',           label: 'Profession',           type: 'profession' },
-    { key: 'product',              label: 'Target Product',       type: 'products' },
-    { key: 'onboarding_channel',   label: 'Distribution Channel', type: 'channel' },
-    { key: 'source_of_funds',      label: 'Source of Funds',      type: 'fundsOriginPP' }
-  ],
-  PM: [
-    { key: 'businessName',         label: 'Business Name',          type: 'text' },
-    { key: 'Country_of_residence', label: 'Country of Residence',   type: 'country' },
-    { key: 'activitySector',       label: 'Activity Sector',        type: 'activitySector' },
-    { key: 'product',              label: 'Target Product',         type: 'products' },
-    { key: 'onboarding_channel',   label: 'Distribution Channel',   type: 'channel' },
-    { key: 'source_of_funds',      label: 'Source of Funds',        type: 'fundsOriginPP' }
-  ]
+const REONBOARD_FIELDS_BY_TENANT = {
+  bankfr: {
+    PP: [
+      { key: 'Nationalite',          label: 'Nationalité',           type: 'country' },
+      { key: 'PaysDeResidence',      label: 'Pays de Résidence',     type: 'country' },
+      { key: 'Profession',           label: 'Profession',            type: 'profession' },
+      { key: 'Produit',              label: 'Produits cibles',       type: 'products',     wrapArray: true },
+      { key: 'CanalDeDistribution',  label: 'Canal de Distribution', type: 'channel' },
+      { key: 'OrigineDesFonds',      label: 'Origine des Fonds',     type: 'fundsOriginPP', wrapArray: true }
+    ],
+    PM: [
+      { key: 'businessName',           label: 'Raison Sociale',          type: 'text' },
+      { key: 'PaysDeResidence',        label: 'Pays de Résidence',       type: 'country' },
+      { key: 'activity',               label: "Secteur d'activité",      type: 'activitySector' },
+      { key: 'Produit',                label: 'Produits cibles',         type: 'products',      wrapArray: true },
+      { key: 'canal_de_distribution',  label: 'Canal de Distribution',   type: 'channel' },
+      { key: 'origine_des_fonds',      label: 'Origine des Fonds',       type: 'fundsOriginPP', wrapArray: true }
+    ]
+  },
+  banque_en: {
+    PP: [
+      { key: 'nationality',          label: 'Nationality',          type: 'country' },
+      { key: 'Country_of_residence', label: 'Country of Residence', type: 'country' },
+      { key: 'citizenship',          label: 'Citizenship',          type: 'country' },
+      { key: 'profession',           label: 'Profession',           type: 'profession' },
+      { key: 'product',              label: 'Target Product',       type: 'products',     wrapArray: true },
+      { key: 'onboarding_channel',   label: 'Distribution Channel', type: 'channel' },
+      { key: 'source_of_funds',      label: 'Source of Funds',      type: 'fundsOriginPP', wrapArray: true }
+    ],
+    PM: [
+      { key: 'businessName',           label: 'Business Name',          type: 'text' },
+      { key: 'Country_of_residence',   label: 'Country of Residence',   type: 'country' },
+      { key: 'activity',               label: 'Activity Sector',        type: 'activitySector' },
+      { key: 'product',                label: 'Target Product',         type: 'products',      wrapArray: true },
+      { key: 'onboarding_channel',     label: 'Distribution Channel',   type: 'channel' },
+      { key: 'source_of_funds',        label: 'Source of Funds',        type: 'fundsOriginPP', wrapArray: true }
+    ]
+  }
 };
+
+function getCurrentReonboardTenantConfig() {
+  const tenant = (typeof tokenManager !== 'undefined' && tokenManager.getTenant && tokenManager.getTenant())
+    || localStorage.getItem('tenantName')
+    || 'bankfr';
+  // Fallback to bankfr config for any unknown tenant — its French names are
+  // the original schema and what the API has historically accepted.
+  return REONBOARD_FIELDS_BY_TENANT[tenant] || REONBOARD_FIELDS_BY_TENANT.bankfr;
+}
+
+function getReonboardFieldDef(entityType, key) {
+  const cfg = getCurrentReonboardTenantConfig();
+  const list = cfg[entityType] || [];
+  return list.find(f => f.key === key);
+}
 
 function renderReonboardPicker(entityType) {
   const fieldsContainer = document.getElementById('reonboardingFields');
   if (!fieldsContainer) return;
-  const fields = REONBOARD_AVAILABLE_FIELDS[entityType] || [];
+  const tenantCfg = getCurrentReonboardTenantConfig();
+  const fields = tenantCfg[entityType] || [];
 
   // Remove any previous picker
   const oldPicker = document.getElementById('reonboardFieldPicker');
@@ -1562,13 +1606,16 @@ async function callReonboarding(existingClientId, entityType) {  // ✅ receive 
 
   // Collect ONLY the fields the user picked (and that have a non-empty value).
   // Each input is rendered with id="reonboardingFields_<key>".
+  // Whether a field is sent as array or scalar comes from the tenant-aware
+  // field config (`wrapArray: true`) — so bankfr sends `Produit:[…]` and
+  // banque_en sends `product:[…]` automatically.
   const items = {};
   document.querySelectorAll('#reonboardingFields input, #reonboardingFields select').forEach(input => {
     const key = input.id.replace('reonboardingFields_', '');
     const value = (input.value || '').trim();
     if (!value) return;
-    // Fields that the API expects as arrays
-    if (key === 'product' || key === 'source_of_funds') {
+    const def = getReonboardFieldDef(entityType, key);
+    if (def && def.wrapArray) {
       items[key] = [value];
     } else {
       items[key] = value;
