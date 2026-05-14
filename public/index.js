@@ -1405,6 +1405,58 @@ function getReonboardFieldDef(entityType, key) {
   return list.find(f => f.key === key);
 }
 
+// In-memory cache of the customer's current items keyed by customerId.
+// Filled by fetchCustomerCurrentData(); read by both the picker (to pre-fill)
+// and the submit handler (to merge unchanged fields into the payload).
+window.vnReonboardCustomerCache = window.vnReonboardCustomerCache || {};
+
+async function fetchCustomerCurrentData(clientId) {
+  if (!clientId) return null;
+  // Return from cache if already fetched in this session
+  if (window.vnReonboardCustomerCache[clientId]) {
+    return window.vnReonboardCustomerCache[clientId];
+  }
+  try {
+    const token = await tokenManager.getValidToken();
+    if (!token) throw new Error('No valid auth token');
+    const tenant = tokenManager.getTenant() || localStorage.getItem('tenantName');
+
+    const url = `https://greataml.com/kyc-web-restful/customers/find-customer-form/${encodeURIComponent(clientId)}`;
+    Utils && Utils.log ? Utils.log('Fetching current customer data', url) : console.log('Fetching current customer data', url);
+    const res = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'x-auth-tenant': tenant,
+        'x-auth-token': token
+      }
+    });
+    if (!res.ok) {
+      console.warn(`find-customer-form returned ${res.status} for ${clientId}`);
+      return null;
+    }
+    const data = await res.json();
+    window.vnReonboardCustomerCache[clientId] = data;
+    console.log('✅ Cached current customer data for re-onboarding', clientId, data);
+    return data;
+  } catch (err) {
+    console.error('Failed to fetch current customer data:', err);
+    showNotification('Could not fetch current customer data: ' + err.message, 'warning');
+    return null;
+  }
+}
+
+// Read a single risk-entity value from the cached customer record.
+// Handles a few likely response shapes — `data.items.<key>`, `data.<key>`,
+// arrays for fields like product/source_of_funds.
+function getReonboardCachedValue(cache, key) {
+  if (!cache) return '';
+  const items = cache.items || cache;
+  let raw = items[key];
+  if (raw === undefined || raw === null) return '';
+  if (Array.isArray(raw)) raw = raw[0] || '';
+  return String(raw);
+}
+
 function renderReonboardPicker(entityType) {
   const fieldsContainer = document.getElementById('reonboardingFields');
   if (!fieldsContainer) return;
@@ -1493,6 +1545,15 @@ function toggleReonboardField(key, type, label, show) {
 
   const input = buildReonboardInput(key, type);
   input.id = `reonboardingFields_${key}`;
+
+  // Pre-fill from cache if we already fetched the customer's current data
+  const clientId = (document.getElementById('existingClientId') || {}).value || '';
+  const cache = clientId ? window.vnReonboardCustomerCache[clientId.trim()] : null;
+  if (cache) {
+    const cached = getReonboardCachedValue(cache, key);
+    if (cached) input.value = cached;
+  }
+
   wrap.appendChild(input);
 
   container.appendChild(wrap);
@@ -1604,28 +1665,46 @@ async function callReonboarding(existingClientId, entityType) {  // ✅ receive 
     return;
   }
 
-  // Collect ONLY the fields the user picked (and that have a non-empty value).
-  // Each input is rendered with id="reonboardingFields_<key>".
-  // Whether a field is sent as array or scalar comes from the tenant-aware
-  // field config (`wrapArray: true`) — so bankfr sends `Produit:[…]` and
-  // banque_en sends `product:[…]` automatically.
+  // Make sure we have the customer's CURRENT data so we can merge — otherwise
+  // the partial payload would wipe risk entities that weren't touched, causing
+  // the risk score to be recomputed against an incomplete profile.
+  // If the cache miss happens here, do a fresh fetch now.
+  let cache = window.vnReonboardCustomerCache[existingClientId];
+  if (!cache) {
+    cache = await fetchCustomerCurrentData(existingClientId);
+  }
+
+  // Build a FULL items payload tenant-aware:
+  //   for every re-onboardable field defined for the current tenant/entity,
+  //     - if the user picked + filled it → use their new value
+  //     - else → use the current cached value (so risk score sees the full profile)
+  //     - else → skip (no current value, no new value)
+  const cfg = getCurrentReonboardTenantConfig();
+  const fieldDefs = cfg[entityType] || [];
   const items = {};
+
+  // Collect any values the user entered in the form
+  const userValues = {};
   document.querySelectorAll('#reonboardingFields input, #reonboardingFields select').forEach(input => {
     const key = input.id.replace('reonboardingFields_', '');
     const value = (input.value || '').trim();
-    if (!value) return;
-    const def = getReonboardFieldDef(entityType, key);
-    if (def && def.wrapArray) {
-      items[key] = [value];
-    } else {
-      items[key] = value;
-    }
+    if (value) userValues[key] = value;
   });
 
-  if (Object.keys(items).length === 0) {
+  if (Object.keys(userValues).length === 0) {
     showNotification('Please pick and fill at least one field to update.', 'warning');
     return;
   }
+
+  fieldDefs.forEach(def => {
+    let value = userValues[def.key];
+    if (value === undefined) {
+      // fall back to cached current value so we don't drop the risk entity
+      value = getReonboardCachedValue(cache, def.key);
+    }
+    if (value === '' || value === undefined || value === null) return; // truly missing → skip
+    items[def.key] = def.wrapArray ? [String(value)] : String(value);
+  });
 
   logMessage(`Starting re-onboarding for client ${existingClientId} (${Object.keys(items).length} field(s) to update)...`, 'info');
 
@@ -3225,8 +3304,20 @@ function initializeEventListeners() {
 
     // Re-onboarding: entity type change → show the FIELD PICKER (checkboxes).
     // The user ticks the fields they want to update; only those become inputs
-    // below. Submit then sends only the picked fields.
+    // below. Submit then sends those merged with the customer's current values.
 const entityTypeReonboarding = document.getElementById('entityTypeReonboarding');
+const existingClientIdInput = document.getElementById('existingClientId');
+
+function vnEnsureReonboardData() {
+  // Fetch the customer's current data once we have both the entity type AND
+  // the existing client ID — so pre-fill is ready when the user picks chips.
+  const entityType = entityTypeReonboarding && entityTypeReonboarding.value;
+  const clientId = existingClientIdInput && existingClientIdInput.value.trim();
+  if (entityType && clientId) {
+    fetchCustomerCurrentData(clientId);
+  }
+}
+
 if (entityTypeReonboarding) {
   entityTypeReonboarding.addEventListener('change', () => {
     const entityType = entityTypeReonboarding.value;
@@ -3236,8 +3327,14 @@ if (entityTypeReonboarding) {
     reonboardingFields.innerHTML = '';
     if (entityType) {
       renderReonboardPicker(entityType);
+      vnEnsureReonboardData();
     }
   });
+}
+
+if (existingClientIdInput) {
+  existingClientIdInput.addEventListener('change', () => vnEnsureReonboardData());
+  existingClientIdInput.addEventListener('blur',   () => vnEnsureReonboardData());
 }
 
     // Submit
