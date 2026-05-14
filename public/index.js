@@ -1336,6 +1336,215 @@ function createNotificationElements() {
   updateNotificationBadge();
   updateTokenStatusDisplay();
 }
+// =====================================================================
+// RE-ONBOARDING FIELD PICKER
+// The picker shows checkboxes for every re-onboardable field. Ticking a
+// checkbox dynamically appends the corresponding input/select below; unticking
+// removes it. Only the visible fields are sent to the API on submit.
+// =====================================================================
+const REONBOARD_AVAILABLE_FIELDS = {
+  PP: [
+    { key: 'nationality',          label: 'Nationality',          type: 'country' },
+    { key: 'Country_of_residence', label: 'Country of Residence', type: 'country' },
+    { key: 'citizenship',          label: 'Citizenship',          type: 'country' },
+    { key: 'profession',           label: 'Profession',           type: 'profession' },
+    { key: 'product',              label: 'Target Product',       type: 'products' },
+    { key: 'onboarding_channel',   label: 'Distribution Channel', type: 'channel' },
+    { key: 'source_of_funds',      label: 'Source of Funds',      type: 'fundsOriginPP' }
+  ],
+  PM: [
+    { key: 'businessName',         label: 'Business Name',          type: 'text' },
+    { key: 'Country_of_residence', label: 'Country of Residence',   type: 'country' },
+    { key: 'activitySector',       label: 'Activity Sector',        type: 'activitySector' },
+    { key: 'product',              label: 'Target Product',         type: 'products' },
+    { key: 'onboarding_channel',   label: 'Distribution Channel',   type: 'channel' },
+    { key: 'source_of_funds',      label: 'Source of Funds',        type: 'fundsOriginPP' }
+  ]
+};
+
+function renderReonboardPicker(entityType) {
+  const fieldsContainer = document.getElementById('reonboardingFields');
+  if (!fieldsContainer) return;
+  const fields = REONBOARD_AVAILABLE_FIELDS[entityType] || [];
+
+  // Remove any previous picker
+  const oldPicker = document.getElementById('reonboardFieldPicker');
+  if (oldPicker) oldPicker.remove();
+
+  const picker = document.createElement('div');
+  picker.id = 'reonboardFieldPicker';
+  picker.style.cssText = `
+    margin: 14px 0 4px;
+    padding: 14px 16px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.85) 0%, rgba(245,246,250,0.7) 100%);
+    backdrop-filter: blur(14px) saturate(140%);
+    border: 1px solid #DEE1EB;
+    border-radius: 14px;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.7) inset, 0 4px 12px -6px rgba(20,23,37,0.08);
+    font-family: 'Raleway','Inter',sans-serif;
+  `;
+  picker.innerHTML = `
+    <div style="font-size:10px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:#343B95; margin-bottom:8px;">
+      Fields to update
+    </div>
+    <div style="color:#4E556F; font-size:12px; margin-bottom:10px;">
+      Pick the values you want to change. Only the selected fields will be sent.
+    </div>
+    <div id="reonboardFieldChips" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
+  `;
+  fieldsContainer.parentNode.insertBefore(picker, fieldsContainer);
+
+  const chipsBox = picker.querySelector('#reonboardFieldChips');
+  fields.forEach(f => {
+    const id = `reonboardChip_${f.key}`;
+    const chip = document.createElement('label');
+    chip.setAttribute('for', id);
+    chip.style.cssText = `
+      display:inline-flex; align-items:center; gap:6px;
+      padding: 6px 12px;
+      background: #fff; border: 1px solid #DEE1EB; border-radius: 999px;
+      font-size: 12px; font-weight: 600; color: #363C52; cursor: pointer;
+      transition: all .15s ease;
+      user-select: none;
+    `;
+    chip.innerHTML = `
+      <input type="checkbox" id="${id}" data-key="${f.key}" data-type="${f.type}" data-label="${f.label}" style="margin:0;">
+      <span>${f.label}</span>
+    `;
+    const cb = chip.querySelector('input');
+    cb.addEventListener('change', () => {
+      if (cb.checked) {
+        chip.style.background = 'linear-gradient(135deg, rgba(14,177,175,0.10) 0%, rgba(126,88,161,0.12) 100%)';
+        chip.style.borderColor = '#0EB1AF';
+        chip.style.color = '#11132D';
+      } else {
+        chip.style.background = '#fff';
+        chip.style.borderColor = '#DEE1EB';
+        chip.style.color = '#363C52';
+      }
+      toggleReonboardField(f.key, f.type, f.label, cb.checked);
+    });
+    chipsBox.appendChild(chip);
+  });
+}
+
+function toggleReonboardField(key, type, label, show) {
+  const container = document.getElementById('reonboardingFields');
+  const existing = document.getElementById(`reonboardWrap_${key}`);
+  if (!show) {
+    if (existing) existing.remove();
+    return;
+  }
+  if (existing) return; // already shown
+
+  const wrap = document.createElement('div');
+  wrap.id = `reonboardWrap_${key}`;
+  wrap.style.cssText = 'display:flex; flex-direction:column; margin-top: 12px;';
+
+  const lbl = document.createElement('label');
+  lbl.setAttribute('for', `reonboardingFields_${key}`);
+  lbl.textContent = label;
+  lbl.style.cssText = 'font-size:11px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:#343B95; margin-bottom:6px;';
+  wrap.appendChild(lbl);
+
+  const input = buildReonboardInput(key, type);
+  input.id = `reonboardingFields_${key}`;
+  wrap.appendChild(input);
+
+  container.appendChild(wrap);
+}
+
+function buildReonboardInput(key, type) {
+  const opts = (typeof getAsyncFieldOptions === 'function') ? getAsyncFieldOptions() : (typeof asyncFieldOptions !== 'undefined' ? asyncFieldOptions : {});
+  let sel;
+
+  const blank = () => {
+    const o = document.createElement('option');
+    o.value = ''; o.textContent = '-- Select --';
+    return o;
+  };
+
+  switch (type) {
+    case 'country': {
+      sel = document.createElement('select');
+      sel.appendChild(blank());
+      const list = (typeof getCurrentCountries === 'function') ? getCurrentCountries() : [];
+      list.forEach(c => {
+        const o = document.createElement('option');
+        o.value = c; o.textContent = c;
+        sel.appendChild(o);
+      });
+      return sel;
+    }
+    case 'profession': {
+      sel = document.createElement('select');
+      sel.appendChild(blank());
+      (opts.profession || []).forEach(p => {
+        const o = document.createElement('option');
+        o.value = p; o.textContent = p;
+        sel.appendChild(o);
+      });
+      return sel;
+    }
+    case 'products': {
+      sel = document.createElement('select');
+      sel.appendChild(blank());
+      (opts.products || []).forEach(p => {
+        const o = document.createElement('option');
+        o.value = p.value; o.textContent = p.label;
+        sel.appendChild(o);
+      });
+      return sel;
+    }
+    case 'channel': {
+      sel = document.createElement('select');
+      sel.appendChild(blank());
+      (opts.channel || []).forEach(c => {
+        const o = document.createElement('option');
+        o.value = c.value; o.textContent = c.label;
+        sel.appendChild(o);
+      });
+      return sel;
+    }
+    case 'fundsOriginPP': {
+      sel = document.createElement('select');
+      sel.appendChild(blank());
+      (opts.fundsOriginPP || []).forEach(f => {
+        const o = document.createElement('option');
+        o.value = f.value; o.textContent = f.label;
+        sel.appendChild(o);
+      });
+      return sel;
+    }
+    case 'activitySector': {
+      sel = document.createElement('select');
+      sel.appendChild(blank());
+      (opts.activitySector || []).forEach(a => {
+        const o = document.createElement('option');
+        o.value = a; o.textContent = a;
+        sel.appendChild(o);
+      });
+      return sel;
+    }
+    case 'number': {
+      const inp = document.createElement('input');
+      inp.type = 'number';
+      inp.min = '0';
+      return inp;
+    }
+    case 'date': {
+      const inp = document.createElement('input');
+      inp.type = 'date';
+      return inp;
+    }
+    default: {
+      const inp = document.createElement('input');
+      inp.type = 'text';
+      return inp;
+    }
+  }
+}
+
 async function callReonboarding(existingClientId, entityType) {  // ✅ receive entityType
   if (!tenantName) {
     showNotification(t('notifications.authenticate'), 'warning');
@@ -1351,25 +1560,33 @@ async function callReonboarding(existingClientId, entityType) {  // ✅ receive 
     return;
   }
 
-  let formData = {};
+  // Collect ONLY the fields the user picked (and that have a non-empty value).
+  // Each input is rendered with id="reonboardingFields_<key>".
+  const items = {};
   document.querySelectorAll('#reonboardingFields input, #reonboardingFields select').forEach(input => {
-    formData[input.id.replace('reonboardingFields_', '')] = input.value;
+    const key = input.id.replace('reonboardingFields_', '');
+    const value = (input.value || '').trim();
+    if (!value) return;
+    // Fields that the API expects as arrays
+    if (key === 'product' || key === 'source_of_funds') {
+      items[key] = [value];
+    } else {
+      items[key] = value;
+    }
   });
 
-  logMessage(`Starting re-onboarding for client ${existingClientId}...`, 'info');
+  if (Object.keys(items).length === 0) {
+    showNotification('Please pick and fill at least one field to update.', 'warning');
+    return;
+  }
+
+  logMessage(`Starting re-onboarding for client ${existingClientId} (${Object.keys(items).length} field(s) to update)...`, 'info');
 
   try {
     const payload = {
       customerId: parseInt(existingClientId),
       id: parseInt(existingClientId),
-      items: {
-        nationality: formData.nationality || "",
-        Country_of_residence: formData.Country_of_residence || "",
-        onboarding_channel: formData.onboarding_channel || "inagency",
-        profession: formData.profession || "",
-        source_of_funds: formData.source_of_funds ? [formData.source_of_funds] : [],
-        product: formData.product ? [formData.product] : []
-      },
+      items: items,
       formId: entityType === 'PM' ? "2" : "1"  // ✅ use passed entityType
     };
 
@@ -2959,16 +3176,19 @@ function initializeEventListeners() {
     });
   }
 
-    // Entity type change → show fields
+    // Re-onboarding: entity type change → show the FIELD PICKER (checkboxes).
+    // The user ticks the fields they want to update; only those become inputs
+    // below. Submit then sends only the picked fields.
 const entityTypeReonboarding = document.getElementById('entityTypeReonboarding');
 if (entityTypeReonboarding) {
   entityTypeReonboarding.addEventListener('change', () => {
     const entityType = entityTypeReonboarding.value;
     const reonboardingFields = document.getElementById('reonboardingFields');
+    const oldPicker = document.getElementById('reonboardFieldPicker');
+    if (oldPicker) oldPicker.remove();
+    reonboardingFields.innerHTML = '';
     if (entityType) {
-      renderFields('reonboardingFields', entityType, 'reonboarding');
-    } else {
-      reonboardingFields.innerHTML = '';
+      renderReonboardPicker(entityType);
     }
   });
 }
