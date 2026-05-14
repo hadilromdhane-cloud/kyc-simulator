@@ -1446,15 +1446,30 @@ async function fetchCustomerCurrentData(clientId) {
 }
 
 // Read a single risk-entity value from the cached customer record.
-// Handles a few likely response shapes — `data.items.<key>`, `data.<key>`,
-// arrays for fields like product/source_of_funds.
+// Tries multiple likely response shapes so it works regardless of which
+// path the API uses to deliver risk entities. Returns '' if nothing found.
 function getReonboardCachedValue(cache, key) {
   if (!cache) return '';
-  const items = cache.items || cache;
-  let raw = items[key];
-  if (raw === undefined || raw === null) return '';
-  if (Array.isArray(raw)) raw = raw[0] || '';
-  return String(raw);
+  // Candidate "containers" the field might live inside
+  const candidates = [
+    cache.items,
+    cache.formData && cache.formData.items,
+    cache.customerForm && cache.customerForm.items,
+    cache.form && cache.form.items,
+    cache.data && cache.data.items,
+    cache.payload && cache.payload.items,
+    cache
+  ].filter(Boolean);
+
+  for (const container of candidates) {
+    if (container && container[key] !== undefined && container[key] !== null && container[key] !== '') {
+      let raw = container[key];
+      if (Array.isArray(raw)) raw = raw[0];
+      if (raw === undefined || raw === null || raw === '') continue;
+      return String(raw);
+    }
+  }
+  return '';
 }
 
 function renderReonboardPicker(entityType) {
@@ -1696,15 +1711,23 @@ async function callReonboarding(existingClientId, entityType) {  // ✅ receive 
     return;
   }
 
+  console.group('🔁 Re-onboarding payload build');
+  console.log('User values from form:', userValues);
+  console.log('Cache for customer:', cache);
   fieldDefs.forEach(def => {
     let value = userValues[def.key];
+    let source = 'user';
     if (value === undefined) {
       // fall back to cached current value so we don't drop the risk entity
       value = getReonboardCachedValue(cache, def.key);
+      source = 'cache';
     }
+    console.log(`  [${source}] ${def.key} =`, value);
     if (value === '' || value === undefined || value === null) return; // truly missing → skip
     items[def.key] = def.wrapArray ? [String(value)] : String(value);
   });
+  console.log('Final items:', items);
+  console.groupEnd();
 
   logMessage(`Starting re-onboarding for client ${existingClientId} (${Object.keys(items).length} field(s) to update)...`, 'info');
 
