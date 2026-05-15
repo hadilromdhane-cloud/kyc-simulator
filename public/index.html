@@ -487,7 +487,10 @@
       filter: brightness(1.05);
     }
     .sidebar-toggle:active { transform: scale(0.95); }
-    .sidebar-toggle i {
+    /* Target both <i> (before Lucide swap) and <svg> (after the swap) so the
+       chevron rotation actually fires once Lucide has replaced the tag. */
+    .sidebar-toggle i,
+    .sidebar-toggle svg {
       transition: transform .35s cubic-bezier(.2,0,0,1);
       width: 16px; height: 16px;
     }
@@ -517,7 +520,8 @@
     .main-layout.sidebar-collapsed .sidebar-toggle {
       left: -16px;
     }
-    .main-layout.sidebar-collapsed .sidebar-toggle i {
+    .main-layout.sidebar-collapsed .sidebar-toggle i,
+    .main-layout.sidebar-collapsed .sidebar-toggle svg {
       transform: rotate(180deg);
     }
     /* Hide the toggle on small screens (where layout becomes single-column) */
