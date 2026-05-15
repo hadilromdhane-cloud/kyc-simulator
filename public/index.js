@@ -1422,7 +1422,8 @@ async function fetchCustomerCurrentData(clientId) {
     const tenant = tokenManager.getTenant() || localStorage.getItem('tenantName');
 
     const url = `https://greataml.com/kyc-web-restful/customers/find-customer-form/${encodeURIComponent(clientId)}`;
-    Utils && Utils.log ? Utils.log('Fetching current customer data', url) : console.log('Fetching current customer data', url);
+    console.log('🔁 [Re-onboard] Fetching current customer data', url);
+    console.log('🔁 [Re-onboard] Tenant:', tenant, '| Token first 12:', token ? token.substring(0,12) + '…' : 'MISSING');
     const res = await fetch(url, {
       method: 'GET',
       headers: {
@@ -1431,15 +1432,18 @@ async function fetchCustomerCurrentData(clientId) {
       }
     });
     if (!res.ok) {
-      console.warn(`find-customer-form returned ${res.status} for ${clientId}`);
+      console.warn(`🔁 [Re-onboard] find-customer-form returned ${res.status} for ${clientId}`);
+      const bodyText = await res.text().catch(() => '');
+      console.warn('🔁 [Re-onboard] Error body:', bodyText);
+      showNotification(`Could not fetch customer data (HTTP ${res.status})`, 'warning');
       return null;
     }
     const data = await res.json();
     window.vnReonboardCustomerCache[clientId] = data;
-    console.log('✅ Cached current customer data for re-onboarding', clientId, data);
+    console.log('🔁 [Re-onboard] ✅ Cached current customer data for', clientId, data);
     return data;
   } catch (err) {
-    console.error('Failed to fetch current customer data:', err);
+    console.error('🔁 [Re-onboard] Failed to fetch current customer data:', err);
     showNotification('Could not fetch current customer data: ' + err.message, 'warning');
     return null;
   }
@@ -1683,11 +1687,26 @@ async function callReonboarding(existingClientId, entityType) {  // ✅ receive 
   // Make sure we have the customer's CURRENT data so we can merge — otherwise
   // the partial payload would wipe risk entities that weren't touched, causing
   // the risk score to be recomputed against an incomplete profile.
-  // If the cache miss happens here, do a fresh fetch now.
+  // ALWAYS force a fresh fetch so we have up-to-date values; the cache stays
+  // local but the network call happens every submit if data wasn't pre-fetched.
+  console.log('🔁 [Re-onboard] Submit — fetching current customer data for', existingClientId);
   let cache = window.vnReonboardCustomerCache[existingClientId];
   if (!cache) {
     cache = await fetchCustomerCurrentData(existingClientId);
   }
+  if (!cache) {
+    const proceed = confirm(
+      `Could not fetch the customer's current data from the server.\n\n` +
+      `If you submit now, only the field(s) you typed will be sent — ` +
+      `the risk score will be recomputed WITHOUT the rest of the customer's profile.\n\n` +
+      `Click OK to submit anyway, or Cancel to stop and check the connection.`
+    );
+    if (!proceed) {
+      showNotification('Re-onboarding cancelled — current customer data unavailable.', 'warning');
+      return;
+    }
+  }
+  console.log('🔁 [Re-onboard] Cache state at submit:', cache);
 
   // Build a FULL items payload tenant-aware:
   //   for every re-onboardable field defined for the current tenant/entity,
