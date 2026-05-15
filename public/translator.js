@@ -6,33 +6,54 @@
 const Translator = (function() {
     'use strict';
 
-    let currentLanguage = 'en'; // Default language
+    let currentLanguage = 'fr'; // Default language (French) — switched from 'en' so the UI defaults to French on first visit.
     
     // ✅ ALL TRANSLATIONS EMBEDDED HERE
     let translations = {
         "en": {
             "header": {
-                "title": "Web Service Simulator"
+                "title": "Reis™ RCS · Onboarding Simulator",
+                "hero": "Onboarding Simulator",
+                "heroAccent": "Simulator",
+                "subtitle": "Pre-sales control panel — configure a tenant, pick a flow, hand the link to the analyst.",
+                "brandLine": "Vneuron · Reis™ Risk & Compliance Suite"
+            },
+            "steps": {
+                "step1": "Step 1",
+                "step2": "Step 2",
+                "step3": "Step 3",
+                "authenticate": "Authenticate",
+                "chooseFlow": "Choose flow",
+                "simulate": "Simulate"
             },
             "authentication": {
-                "title": "Authentication on the simulation tenant",
-                "tenantName": "Tenant Name:",
+                "title": "Authenticate",
+                "eyebrow": "Tenant Session",
+                "tenantName": "Tenant",
                 "selectTenant": "Select Tenant",
-                "username": "Username:",
+                "username": "Username",
                 "usernamePlaceholder": "Enter username",
-                "password": "Password:",
-                "passwordPlaceholder": "Enter password",
-                "authButton": "Authenticate"
+                "password": "Password",
+                "passwordPlaceholder": "••••••••",
+                "authButton": "Authenticate",
+                "quickDemo": "Quick Demo Prefill",
+                "tokenStatus": "Token Status",
+                "noToken": "No Token",
+                "sandboxConnected": "Sandbox connected"
             },
             "onboarding": {
                 "title": "Core System Onboarding UI",
-                "decentralized": "Decentralized Process (via link)",
-                "centralized": "Centralized Process (via queue)",
+                "eyebrow": "Customer Due Diligence",
+                "decentralized": "Decentralized (link)",
+                "centralized": "Centralized (queue)",
                 "decentralizedTitle": "Decentralized Onboarding",
                 "centralizedTitle": "Centralized Onboarding",
+                "decentralizedDesc": "Generate a secure link for the customer to complete KYC asynchronously.",
+                "centralizedDesc": "Push the case directly to your compliance queue.",
+                "reonboardingDesc": "Refresh KYC for an existing client record.",
                 "synchronous": "Synchronous",
-                "asynchronous": "Asynchronous (searchOnbaord)",
-                "entityType": "Entity Type:",
+                "asynchronous": "Asynchronous (SearchOnboard)",
+                "entityType": "Entity Type",
                 "selectEntityType": "Select Entity Type",
                 "physicalPerson": "Physical Person (PP)",
                 "legalPerson": "Legal Person (PM)",
@@ -148,35 +169,54 @@ const Translator = (function() {
         },
         "fr": {
             "header": {
-                "title": "Simulateur de Service Web"
+                "title": "Reis™ RCS · Simulateur d'Onboarding",
+                "hero": "Simulateur d'Onboarding",
+                "heroAccent": "d'Onboarding",
+                "subtitle": "Panneau de contrôle pré-vente — configurez un tenant, choisissez un flux, transmettez le lien à l'analyste.",
+                "brandLine": "Vneuron · Reis™ Risk & Compliance Suite"
+            },
+            "steps": {
+                "step1": "Étape 1",
+                "step2": "Étape 2",
+                "step3": "Étape 3",
+                "authenticate": "S'authentifier",
+                "chooseFlow": "Choisir un flux",
+                "simulate": "Simuler"
             },
             "authentication": {
-                "title": "Authentification sur le tenant de simulation",
-                "tenantName": "Nom du Tenant :",
+                "title": "Authentification",
+                "eyebrow": "Session Tenant",
+                "tenantName": "Tenant",
                 "selectTenant": "Sélectionner un Tenant",
-                "username": "Nom d'utilisateur :",
+                "username": "Nom d'utilisateur",
                 "usernamePlaceholder": "Entrez le nom d'utilisateur",
-                "password": "Mot de passe :",
-                "passwordPlaceholder": "Entrez le mot de passe",
-                "authButton": "S'authentifier"
+                "password": "Mot de passe",
+                "passwordPlaceholder": "••••••••",
+                "authButton": "S'authentifier",
+                "quickDemo": "Pré-remplissage Démo",
+                "tokenStatus": "État du Jeton",
+                "noToken": "Aucun Jeton",
+                "sandboxConnected": "Sandbox connecté"
             },
             "onboarding": {
                 "title": "Interface d'Onboarding du Système Central",
-                "decentralized": "Processus Décentralisé (via link)",
-                "centralized": "Processus Centralisé (via queue)",
+                "eyebrow": "Diligence Client",
+                "decentralized": "Décentralisé (lien)",
+                "centralized": "Centralisé (file)",
                 "decentralizedTitle": "Onboarding Décentralisé",
                 "centralizedTitle": "Onboarding Centralisé",
+                "decentralizedDesc": "Générer un lien sécurisé pour que le client complète le KYC de manière asynchrone.",
+                "centralizedDesc": "Envoyer le dossier directement à votre file de conformité.",
+                "reonboardingDesc": "Rafraîchir le KYC pour un dossier client existant.",
                 "synchronous": "Synchrone",
-                "asynchronous": "Asynchrone (serachOnboard)",
-                "entityType": "Type d'Entité :",
+                "asynchronous": "Asynchrone (SearchOnboard)",
+                "entityType": "Type d'Entité",
                 "selectEntityType": "Sélectionner un Type d'Entité",
                 "physicalPerson": "Personne Physique (PP)",
                 "legalPerson": "Personne Morale (PM)",
-                "simulate": "Simuler", 
+                "simulate": "Simuler",
                 "reonboarding": "Ré-onboarding",
                 "reonboardingTitle": "Ré-onboarding"
-       
-                
             },
             "popup": {
                 "close": "Fermer"
@@ -308,11 +348,19 @@ const Translator = (function() {
         document.querySelectorAll('[data-i18n]').forEach(element => {
             const key = element.getAttribute('data-i18n');
             const translation = getTranslation(key);
-            
+
             if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
                 element.value = translation;
             } else {
-                element.textContent = translation;
+                // If the element has child elements (e.g. <i data-lucide> for an icon
+                // + <span> for the label), only update the inner <span>'s text so
+                // we don't wipe out the icon when translating.
+                const innerSpan = element.querySelector(':scope > span');
+                if (innerSpan) {
+                    innerSpan.textContent = translation;
+                } else {
+                    element.textContent = translation;
+                }
             }
         });
 
@@ -397,7 +445,10 @@ const Translator = (function() {
 
     // Update active state of language buttons
     function updateLanguageButtons() {
-        document.querySelectorAll('.lang-btn').forEach(btn => {
+        // The pill uses the .lang-toggle-btn class (the .lang-btn variant
+        // doesn't exist on this page, so the active highlight was never
+        // refreshed when changing language).
+        document.querySelectorAll('.lang-toggle-btn').forEach(btn => {
             const btnLang = btn.getAttribute('data-lang');
             if (btnLang === currentLanguage) {
                 btn.classList.add('active');

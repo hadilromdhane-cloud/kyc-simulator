@@ -489,9 +489,9 @@
         </div>
       </div>
       <h1 class="font-display font-extrabold text-white text-4xl md:text-5xl leading-[1.05] tracking-tight max-w-3xl">
-        Onboarding <span class="text-teal-100">Simulator</span>
+        <span data-i18n="header.hero">Onboarding Simulator</span>
       </h1>
-      <p class="mt-4 text-white/80 text-base md:text-lg font-medium whitespace-nowrap">
+      <p data-i18n="header.subtitle" class="mt-4 text-white/80 text-base md:text-lg font-medium whitespace-nowrap">
         Pre-sales control panel — configure a tenant, pick a flow, hand the link to the analyst.
       </p>
 
@@ -500,22 +500,22 @@
         <li class="rounded-xl border border-white/15 bg-white/10 backdrop-blur px-4 py-3 flex items-center gap-3">
           <span class="w-8 h-8 rounded-full bg-white text-navy-700 font-bold flex items-center justify-center text-sm">1</span>
           <div>
-            <div class="text-[9px] font-bold uppercase tracking-widest text-white/60">Step 1</div>
-            <div class="text-sm font-bold text-white leading-tight">Authenticate</div>
+            <div data-i18n="steps.step1" class="text-[9px] font-bold uppercase tracking-widest text-white/60">Step 1</div>
+            <div data-i18n="steps.authenticate" class="text-sm font-bold text-white leading-tight">Authenticate</div>
           </div>
         </li>
         <li class="rounded-xl border border-white/15 bg-white/10 backdrop-blur px-4 py-3 flex items-center gap-3">
           <span class="w-8 h-8 rounded-full bg-white text-navy-700 font-bold flex items-center justify-center text-sm">2</span>
           <div>
-            <div class="text-[9px] font-bold uppercase tracking-widest text-white/60">Step 2</div>
-            <div class="text-sm font-bold text-white leading-tight">Choose flow</div>
+            <div data-i18n="steps.step2" class="text-[9px] font-bold uppercase tracking-widest text-white/60">Step 2</div>
+            <div data-i18n="steps.chooseFlow" class="text-sm font-bold text-white leading-tight">Choose flow</div>
           </div>
         </li>
         <li class="rounded-xl border border-white/15 bg-white/10 backdrop-blur px-4 py-3 flex items-center gap-3">
           <span class="w-8 h-8 rounded-full bg-white text-navy-700 font-bold flex items-center justify-center text-sm">3</span>
           <div>
-            <div class="text-[9px] font-bold uppercase tracking-widest text-white/60">Step 3</div>
-            <div class="text-sm font-bold text-white leading-tight">Simulate</div>
+            <div data-i18n="steps.step3" class="text-[9px] font-bold uppercase tracking-widest text-white/60">Step 3</div>
+            <div data-i18n="steps.simulate" class="text-sm font-bold text-white leading-tight">Simulate</div>
           </div>
         </li>
       </ol>
@@ -564,7 +564,7 @@
             <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-teal-500 border-2 border-white rounded-full animate-glow"></span>
           </div>
           <div>
-            <div class="eyebrow">Tenant Session</div>
+            <div data-i18n="authentication.eyebrow" class="eyebrow">Tenant Session</div>
             <h2 data-i18n="authentication.title" class="font-display !text-base !font-bold !mt-0.5">Authenticate</h2>
           </div>
         </div>
@@ -597,7 +597,7 @@
         </button>
 
         <!-- Quick-demo prefill: one click for live presentations -->
-        <button type="button" id="vnQuickDemo"
+        <button type="button" id="vnQuickDemo" data-i18n="authentication.quickDemo"
                 class="mt-2 w-full inline-flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border border-dashed border-navy-300 bg-navy-50/60 hover:bg-navy-50 text-navy-700 text-xs font-bold tracking-wide transition">
           <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
           <span>Quick demo prefill</span>
@@ -631,7 +631,7 @@
                 <i data-lucide="user-round-search" class="w-5 h-5 text-white"></i>
               </div>
               <div>
-                <div class="eyebrow">Customer Due Diligence</div>
+                <div data-i18n="onboarding.eyebrow" class="eyebrow">Customer Due Diligence</div>
                 <h2 data-i18n="onboarding.title" class="!m-0 text-xl font-extrabold tracking-tight">
                   <span class="grad-text">Core System Onboarding UI</span>
                 </h2>
@@ -639,7 +639,7 @@
             </div>
             <div class="hidden md:flex items-center gap-3 px-3 py-2 rounded-xl bg-white border border-ink-100 shadow-sm">
               <span class="w-2 h-2 rounded-full bg-teal-500 animate-glow"></span>
-              <span class="text-xs font-semibold text-ink-700">Sandbox connected</span>
+              <span data-i18n="authentication.sandboxConnected" class="text-xs font-semibold text-ink-700">Sandbox connected</span>
             </div>
           </div>
         </div>
@@ -663,7 +663,7 @@
           <!-- ===== DECENTRALIZED ===== -->
           <div class="tabContent active" id="decentralized">
             <h3 data-i18n="onboarding.decentralizedTitle">Decentralized Onboarding</h3>
-            <p class="text-sm text-ink-500 mt-1 mb-2">Generate a secure link for the customer to complete KYC asynchronously.</p>
+            <p data-i18n="onboarding.decentralizedDesc" class="text-sm text-ink-500 mt-1 mb-2">Generate a secure link for the customer to complete KYC asynchronously.</p>
 
             <label for="entityTypeDecentralized" data-i18n="onboarding.entityType">Entity Type</label>
             <select id="entityTypeDecentralized">
@@ -681,7 +681,7 @@
           <!-- ===== CENTRALIZED ===== -->
           <div class="tabContent" id="centralized">
             <h3 data-i18n="onboarding.centralizedTitle">Centralized Onboarding</h3>
-            <p class="text-sm text-ink-500 mt-1 mb-2">Push the case directly to your compliance queue.</p>
+            <p data-i18n="onboarding.centralizedDesc" class="text-sm text-ink-500 mt-1 mb-2">Push the case directly to your compliance queue.</p>
 
             <div class="subTabs">
               <button class="subTabBtn active" data-subtab="sync" data-i18n="onboarding.synchronous">
@@ -722,7 +722,7 @@
           <!-- ===== RE-ONBOARDING ===== -->
           <div class="tabContent" id="reonboarding">
             <h3 data-i18n="onboarding.reonboardingTitle">Re-onboarding</h3>
-            <p class="text-sm text-ink-500 mt-1 mb-2">Refresh KYC for an existing client record.</p>
+            <p data-i18n="onboarding.reonboardingDesc" class="text-sm text-ink-500 mt-1 mb-2">Refresh KYC for an existing client record.</p>
 
             <label for="entityTypeReonboarding" data-i18n="onboarding.entityType">Entity Type</label>
             <select id="entityTypeReonboarding">
