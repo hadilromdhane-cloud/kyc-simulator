@@ -457,6 +457,73 @@
       .main-layout-grid { grid-template-columns: 1fr !important; }
       .auth-sidebar { position:relative !important; top:auto !important; }
     }
+
+    /* ============== COLLAPSIBLE AUTH SIDEBAR ==============
+       A small floating chevron lets the analyst hide the auth panel so the
+       Core System Onboarding UI takes the full width. The button slides with
+       the sidebar. State is persisted in localStorage as 'authSidebarCollapsed'. */
+    .sidebar-toggle {
+      position: absolute;
+      top: 18px;
+      left: 324px;                     /* 340px sidebar width - 16px (overlap on edge) */
+      z-index: 30;
+      width: 32px; height: 32px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #0EB1AF 0%, #7E58A1 100%);
+      color: #fff;
+      border: 2px solid #fff;
+      cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center;
+      box-shadow:
+        0 1px 0 rgba(255,255,255,0.30) inset,
+        0 6px 16px -6px rgba(126,88,161,0.55);
+      transition:
+        left .35s cubic-bezier(.2,0,0,1),
+        transform .2s ease,
+        filter .2s ease;
+    }
+    .sidebar-toggle:hover {
+      transform: scale(1.08);
+      filter: brightness(1.05);
+    }
+    .sidebar-toggle:active { transform: scale(0.95); }
+    .sidebar-toggle i {
+      transition: transform .35s cubic-bezier(.2,0,0,1);
+      width: 16px; height: 16px;
+    }
+    /* When collapsed: the sidebar fades and shrinks to zero, the main content
+       grows to fill the row, and the toggle slides to the left edge with its
+       chevron rotated to point right (indicating "expand"). */
+    .main-layout.sidebar-collapsed {
+      grid-template-columns: 0 1fr !important;
+      gap: 0 !important;
+    }
+    .main-layout.sidebar-collapsed > .auth-sidebar {
+      opacity: 0;
+      transform: translateX(-30px) scale(.96);
+      pointer-events: none;
+      visibility: hidden;
+      max-height: 0;
+      overflow: hidden;
+      padding: 0 !important;
+      margin: 0 !important;
+      border: 0 !important;
+    }
+    .main-layout > .auth-sidebar {
+      transition:
+        opacity .25s ease,
+        transform .35s cubic-bezier(.2,0,0,1);
+    }
+    .main-layout.sidebar-collapsed .sidebar-toggle {
+      left: -16px;
+    }
+    .main-layout.sidebar-collapsed .sidebar-toggle i {
+      transform: rotate(180deg);
+    }
+    /* Hide the toggle on small screens (where layout becomes single-column) */
+    @media (max-width: 900px) {
+      .sidebar-toggle { display: none; }
+    }
   </style>
 </head>
 <body class="ambient-bg text-ink-900 antialiased min-h-screen">
@@ -551,6 +618,15 @@
   <!-- ======= MAIN GRID ======= -->
   <div class="main-layout main-layout-grid relative -mt-16 max-w-7xl mx-auto px-6 lg:px-10 pb-16"
        style="display:grid; grid-template-columns:340px 1fr; gap:24px;">
+
+    <!-- Collapse / expand the auth sidebar. Lets the analyst hide it so the
+         Core System Onboarding UI takes the full content width. -->
+    <button id="sidebarToggle" type="button" class="sidebar-toggle"
+            aria-label="Toggle authentication panel"
+            title="Hide / show authentication panel">
+      <i data-lucide="chevron-left"></i>
+    </button>
+
 
     <!-- ========== AUTH SIDEBAR ========== -->
     <aside id="authSidebar" class="auth-sidebar glass rounded-2xl shadow-luxury overflow-hidden self-start sticky top-6">
@@ -824,6 +900,32 @@
         } catch(_) {
           link.select(); document.execCommand('copy');
         }
+      });
+
+      // Collapsible auth sidebar — toggle, persist in localStorage, restore on load
+      const sbToggle = document.getElementById('sidebarToggle');
+      const sbLayout = document.querySelector('.main-layout');
+      const sbKey = 'authSidebarCollapsed';
+
+      function applySidebarState(collapsed) {
+        if (!sbLayout) return;
+        if (collapsed) {
+          sbLayout.classList.add('sidebar-collapsed');
+          if (sbToggle) sbToggle.setAttribute('aria-pressed', 'true');
+        } else {
+          sbLayout.classList.remove('sidebar-collapsed');
+          if (sbToggle) sbToggle.setAttribute('aria-pressed', 'false');
+        }
+      }
+
+      // Restore prior state
+      const initialCollapsed = localStorage.getItem(sbKey) === 'true';
+      applySidebarState(initialCollapsed);
+
+      if (sbToggle) sbToggle.addEventListener('click', () => {
+        const isCollapsed = sbLayout.classList.contains('sidebar-collapsed');
+        applySidebarState(!isCollapsed);
+        localStorage.setItem(sbKey, String(!isCollapsed));
       });
     });
   </script>
